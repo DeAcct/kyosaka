@@ -1,0 +1,17 @@
+.Fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.4rem;
+  transition-behavior: allow-discrete;
+  min-height: 100dvh;
+
+  &__Icon {
+    width: 12rem;
+    height: 12rem;
+  }
+  &__Text {
+    font-size: 1.6rem;
+  }
+}

@@ -1,0 +1,20 @@
+.ImportJSON {
+  height: 4.8rem;
+  color: var(--bg-100);
+  font-size: 1.6rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--brand-400);
+  padding: 0 2.4rem;
+
+  --button-depth: 4px 4px;
+  box-shadow: var(--button-depth) 0 var(--brand-200);
+  transition: translate 150ms ease-out, box-shadow 150ms ease-out;
+  &:active {
+    box-shadow: 0 0 0 var(--brand-200);
+    translate: var(--button-depth);
+  }
+}

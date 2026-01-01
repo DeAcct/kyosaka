@@ -1,0 +1,32 @@
+@use "base/reset";
+@use "variable/color";
+@forward "variable/radius";
+@forward "variable/mixin";
+
+#app {
+  min-height: 100dvh;
+  background-color: var(--bg-200);
+}
+
+.Header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 6rem;
+  padding: 2.4rem;
+
+  &::after {
+    content: "";
+    z-index: -1;
+    position: absolute;
+    inset: 0;
+    background-color: oklch(from var(--bg-100) l c h / 0.5);
+    -webkit-backdrop-filter: blur(1rem);
+    backdrop-filter: blur(1rem);
+    -webkit-mask-image: linear-gradient(#000, 30% transparent);
+    mask-image: linear-gradient(#000, transparent);
+  }
+}
