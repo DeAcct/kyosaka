@@ -1,6 +1,7 @@
 .schedule {
   background-color: var(--bg-200);
   border-radius: 2.4rem;
+  min-height: 0;
 
   @media screen and (min-width: 690px) {
     display: contents;
@@ -81,24 +82,26 @@
 }
 
 .fallback {
-  visibility: hidden;
   display: none;
-  opacity: 0;
-  transition: 150ms ease-out;
-  transition-behavior: allow-discrete;
-  grid-column: 2;
-  grid-row: 1 / span 10;
-  align-self: start;
-  position: sticky;
-  top: 8rem;
-  height: calc(100dvh - 10.4rem);
-  font-size: 1.6rem;
-  align-content: center;
-  text-align: center;
-  color: var(--text-500);
 }
-:global([class*="doubleCol"]):not(:has(details[open])) .fallback {
-  visibility: visible;
-  display: block;
-  opacity: 1;
+@media screen and (min-width: 690px) {
+  .fallback {
+    visibility: hidden;
+    opacity: 0;
+    transition: 150ms ease-out;
+    transition-behavior: allow-discrete;
+    grid-column: 2;
+    grid-row: 1 / span 10;
+    align-self: center;
+    position: sticky;
+    top: 8rem;
+    font-size: 1.6rem;
+    text-align: center;
+    color: var(--text-500);
+  }
+  :global([class*="doubleCol"]):not(:has(details[open])) .fallback {
+    visibility: visible;
+    display: block;
+    opacity: 1;
+  }
 }
