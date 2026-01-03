@@ -1,10 +1,11 @@
-import Fallback from "../Fallback/Fallback";
-import Schedule from "../Schedule/Schedule";
-import { create } from "../../lib/dom";
+import Fallback from "@/components/Fallback/Fallback";
+import Schedule from "@/components/Schedule/Schedule";
+import { create } from "@/lib/dom";
+import doubleCol from "./doubleCol.module.scss";
 
 export default function DoubleCol() {
   // 1. 실제 DOM에 붙을 고정적인 래퍼(Wrapper)를 만듭니다.
-  const $wrapper = create(`<main class="DoubleCol"></main>`);
+  const $wrapper = create(`<main class="${doubleCol.doubleCol}"></main>`);
   const $container = $wrapper.firstChild; // 실제 div 요소 추출
 
   // 2. 상태에 따라 내부를 다시 그리는 함수

@@ -59,7 +59,8 @@ input,
 textarea {
   background-color: transparent;
 }
-button {
+button,
+summary {
   border: none;
   border-radius: 0;
   background-color: transparent;
@@ -129,6 +130,7 @@ textarea {
 @media (hover: hover) and (pointer: fine) {
   a,
   button:not(:disabled),
+  summary,
   [role="progressbar"],
   [data-pointer="true"] {
     cursor: pointer;

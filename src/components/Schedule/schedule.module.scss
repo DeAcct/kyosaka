@@ -1,0 +1,104 @@
+.schedule {
+  background-color: var(--bg-200);
+  border-radius: 2.4rem;
+
+  @media screen and (min-width: 690px) {
+    display: contents;
+  }
+
+  .shrink {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1.6rem;
+    @media screen and (min-width: 690px) {
+      border-radius: 2.4rem;
+      background-color: var(--bg-200);
+    }
+  }
+  .icon {
+    font-size: 2.4rem;
+  }
+  .text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .name {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  .time {
+    font-size: 1.8rem;
+    color: var(--text-500);
+  }
+  .arrow {
+    width: 2.4rem;
+    height: 2.4rem;
+    margin-left: auto;
+    transition: rotate 150ms ease-out;
+    rotate: 90deg;
+    flex-shrink: 0;
+  }
+  &[open] .arrow {
+    rotate: -90deg;
+    @media screen and (min-width: 690px) {
+      rotate: unset;
+    }
+  }
+
+  &::details-content {
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+    border-top: 4px dotted transparent;
+    overflow: hidden;
+    transition: all 150ms ease-out;
+    transition-behavior: allow-discrete;
+    interpolate-size: allow-keywords;
+    @media screen and (min-width: 690px) {
+      grid-column: 2;
+      grid-row: 1 / span 10;
+      align-self: start;
+      position: sticky;
+      top: 8rem;
+      height: unset;
+      border-top: unset;
+    }
+  }
+  &[open]::details-content {
+    visibility: visible;
+    opacity: 1;
+    height: calc-size(auto, size);
+    border-top-color: var(--bg-100);
+  }
+  .content {
+    padding: 1.6rem;
+    @media screen and (min-width: 690px) {
+      padding: 0;
+    }
+  }
+}
+
+.fallback {
+  visibility: hidden;
+  display: none;
+  opacity: 0;
+  transition: 150ms ease-out;
+  transition-behavior: allow-discrete;
+  grid-column: 2;
+  grid-row: 1 / span 10;
+  align-self: start;
+  position: sticky;
+  top: 8rem;
+  height: calc(100dvh - 10.4rem);
+  font-size: 1.6rem;
+  align-content: center;
+  text-align: center;
+  color: var(--text-500);
+}
+:global([class*="doubleCol"]):not(:has(details[open])) .fallback {
+  visibility: visible;
+  display: block;
+  opacity: 1;
+}

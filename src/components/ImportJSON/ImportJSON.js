@@ -1,19 +1,21 @@
-import "./importJSON.scss";
-import { $, create } from "../../lib/dom";
-import { readJSONFile } from "../../lib/file";
+import { $, create } from "@/lib/dom";
+import { readJSONFile } from "@/lib/file";
+import style from "./importJSON.module.scss";
 
 export default function ImportJSON() {
   const template = `
     <input type="file" id="ImportJSON" hidden />
-    <button class="ImportJSON" type="button">불러오기</button>
+    <button class="${style.importJSON}" type="button" data-ref="ImportJSON">불러오기</button>
   `;
+
+  console.log(template);
 
   // 1. Range 객체를 사용하여 문자열을 Fragment로 즉시 변환 (wrap 없음)
   const $fragment = create(template);
 
   // 2. Fragment 내부에서 요소 찾아 이벤트 걸기
   const $input = $fragment.querySelector("#ImportJSON");
-  const $button = $fragment.querySelector(".ImportJSON");
+  const $button = $fragment.querySelector("[data-ref='ImportJSON']");
 
   $button.addEventListener("click", () => {
     $input.click();

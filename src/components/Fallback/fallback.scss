@@ -5,7 +5,7 @@
   justify-content: center;
   gap: 2.4rem;
   transition-behavior: allow-discrete;
-  min-height: 100dvh;
+  min-height: calc(100dvh - 8.4rem);
 
   &__Icon {
     width: 12rem;

@@ -1,0 +1,18 @@
+.doubleCol {
+  width: min(calc(100% - 4.8rem), 1080px);
+  margin: 0 auto;
+  padding: 8rem 0 2.4rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.2rem;
+  transition: 150ms ease-out;
+  @starting-style {
+    opacity: 0;
+    translate: 0 -2rem;
+  }
+  @media screen and (min-width: 690px) {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: 1.2rem 2rem;
+  }
+}

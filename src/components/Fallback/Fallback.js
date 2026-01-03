@@ -1,4 +1,4 @@
-import ImportJSON from "../ImportJSON/ImportJSON";
+import ImportJSON from "@/components/ImportJSON/ImportJSON";
 import "./fallback.scss";
 
 export default function Fallback() {

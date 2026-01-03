@@ -13,15 +13,18 @@ json 기반 여행 계획표 앱
 - [x] FileReader API를 이용한 JSON 업로드 컴포넌트 완성.
 - [x] 기본적인 JSON 데이터 구조 정의 (날짜별 일정, 가족별 서류 정보).
 
+- [x] dayselector 만들고 RENDER 이벤트 쏘기
+- [x] RENDER이벤트에 특정 데이터를 넣고 쏠 수 있도록 customevent를 보완
+
 ## 2주차: 폴드7 최적화 레이아웃 (Grid & Details)
 
 갤럭시 폴드7에 걸맞는 <strong>펼침 모드</strong>
 핵심 미션: 단일 HTML 마크업으로 접었을 때(아코디언)와 펼쳤을 때(2분할) UI 완성.
 
-- [ ] 접었을 때는 아코디언 ui
-- [ ] 펼쳤을 때는 display:contents를 통한 2분할 ui
-- [ ] 좌측에는 summary(for fold)
-- [ ] 우측에는 position:sticky를 통한 고정ui(for fold)
+- [x] 접었을 때 및 비폴더블 디바이스는 아코디언 ui
+- [x] 펼쳤을 때는 display:contents를 통한 2분할 ui
+- [x] 좌측에는 summary(for fold)
+- [x] 우측에는 position:sticky를 통한 고정ui(for fold)
 
 ## 3주차: 이미지 업로드 및 캐시저장
 
