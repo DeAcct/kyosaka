@@ -1,16 +1,59 @@
-import ImportJSON from "@/components/ImportJSON/ImportJSON";
-import "./fallback.scss";
+import { Component, define } from "@/lib/component";
+import { getFileFromPrompt, readJSONFile } from "@/lib/file";
+import { scheduleStore } from "@/store/scheduleStore";
 
-export default function Fallback() {
-  const template = `
-      <img src="./fallback.svg">
-      <p class="Fallback__Text">등록된 여행 일정이 없습니다.</p>
-  `;
+import mapping from "./fallback.module.scss";
+import raw from "./fallback.module.scss?inline";
 
-  const $root = document.createElement("div");
-  $root.innerHTML = template;
-  $root.classList.add("Fallback");
-  $root.appendChild(ImportJSON());
+import "@/components/Button/Button";
 
-  return $root;
-}
+export const Fallback = define("ky-fallback", { mapping, raw })(
+  class extends Component {
+    // setup(){
+    //   this.subscribe(travelData);
+    // }
+
+    getStyles() {
+      return {
+        mapping,
+        stylesheet,
+      };
+    }
+    template() {
+      return `
+      <div class="${this.styles.fallback}">
+        <img class="${this.styles.icon}" src="./fallback.svg" alt="파일을 등록해주세요">
+        <p class="${this.styles.text}">등록된 여행 일정이 없습니다.</p>
+        <ky-button>불러오기</ky-button>
+      </div>
+    `;
+    }
+    initEventListeners() {
+      this.addEvent("ky-click", "ky-button", this.onJSONButtonClick);
+    }
+
+    async onJSONButtonClick(e) {
+      try {
+        const file = await getFileFromPrompt({
+          types: [
+            {
+              description: "계획표 파일",
+              accept: { "application/json": [".json"] },
+            },
+          ],
+          multiple: false,
+        });
+        if (!file) return;
+
+        const tripData = await readJSONFile(file);
+        scheduleStore.commit("list", tripData);
+        // localStorage.setItem("myKyotoTrip", JSON.stringify(tripData));
+        window.dispatchEvent(new CustomEvent("RENDER"));
+      } catch (error) {
+        console.log(error);
+      } finally {
+        e.target.value = "";
+      }
+    }
+  }
+);

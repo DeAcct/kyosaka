@@ -1,7 +1,0 @@
-:root {
-  --radius-base: 0.4rem;
-
-  @for $i from 0 through 5 {
-    --radius-#{$i}: calc(var(--radius-base) * 6 - var(--radius-base) * #{$i});
-  }
-}
