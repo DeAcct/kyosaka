@@ -1,13 +1,15 @@
-import { Component, define } from "@/lib/component";
+import { Component, define } from "@/lib/dom";
 import { switcher } from "@/lib/switcher";
 import { scheduleStore } from "@/store/scheduleStore";
+import { useSwipe } from "@/hooks/touch";
 
 import mapping from "./schedule.module.scss";
 import raw from "./schedule.module.scss?inline";
 
-import "@/icons/Arrow";
-import "@/components/RouteCard/RouteCard";
-import "@/components/Description/Description";
+import { Arrow } from "@/icons/Arrow";
+import { Description } from "@/components/Description/Description";
+import { Fallback } from "@/components/Fallback/Fallback";
+import { RouteCard } from "@/components/RouteCard/RouteCard";
 
 export const Schedule = define("ky-schedule", { mapping, raw })(
   class extends Component {
@@ -22,9 +24,28 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
         .case((type) => type === "food", "🍣")
         .default(() => "❤️");
     }
+    initEventListeners(signal) {
+      useSwipe(
+        this,
+        `.${this.styles.schedule}`,
+        {
+          left: () => scheduleStore.nextDay(),
+          right: () => scheduleStore.prevDay(),
+        },
+        signal
+      );
+    }
     template() {
-      const list = scheduleStore.currentDayData;
+      const list = scheduleStore.currentDayList;
+
+      if (!list) {
+        return `<ky-fallback></ky-fallback>`;
+      }
       return `
+        <slot name="selector"></slot>
+        <div class="${this.styles.colBG}">
+          <p class="${this.styles.emptyHolder}">일정을 누르면 열립니다</p>
+        </div>
         ${list.schedule
           .map(
             (item, index) => `
@@ -32,6 +53,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
                 name="itinerary" 
                 class="${this.styles.schedule}" 
                 ${index === 0 ? "open" : ""}
+                style="--schedule-rows:${list.schedule.length + 1}"
               >
                 <summary class="${this.styles.shrink}">
                   <i class="${this.styles.icon}">${this.getIcon(item)}</i>
@@ -45,9 +67,15 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
                 </summary>
 
                 <div class="${this.styles.content}">
+                  <strong class="${this.styles.contentTitle}">
+                    ${item.name}
+                  </strong>
                   ${
                     item.route
-                      ? `<route-card from="${item.route.from}" to="${item.route.to}"></route-card>`
+                      ? `<route-card 
+                          from="${item.route.from}" 
+                          to="${item.route.to}"
+                        ></route-card>`
                       : ""
                   }
                   <ky-description data-ref="${index}"></ky-description>
@@ -56,11 +84,11 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
               `
           )
           .join("")}
-      <p class="${this.styles.fallback}">일정을 누르면 여기에 열립니다</p>
+        
     `;
     }
     afterRender() {
-      const { schedule } = scheduleStore.currentDayData;
+      const { schedule } = scheduleStore.currentDayList;
 
       // 획기적으로 줄어든 데이터 주입 코드
       schedule.forEach((item, index) => {

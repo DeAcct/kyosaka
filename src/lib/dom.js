@@ -1,4 +1,5 @@
 import resetStyle from "@/styles/base/_reset.scss?inline";
+import { updateDOM } from "./diff";
 const sharedResetSheet = new CSSStyleSheet();
 sharedResetSheet.replaceSync(resetStyle);
 
@@ -63,18 +64,14 @@ export class Component extends HTMLElement {
     if (this.initEventListeners) {
       this.initEventListeners(signal);
     }
-
-    this.afterRender();
   }
   disconnectedCallback() {
     // 3. 모든 이벤트 리스너를 한꺼번에 파기
     if (this._abortController) {
       this._abortController.abort();
-      console.log(`[Cleanup] ${this.tagName}의 모든 이벤트가 파기되었습니다.`);
     }
 
     this._unsubscribers.forEach((unsub) => unsub());
-    console.log(`[Store] ${this.tagName} 구독 해제 완료`);
   }
   /**
    * 컴포넌트에 요소가 주입되기 직전 실행될 것을 여기서 정의한다.
@@ -101,10 +98,16 @@ export class Component extends HTMLElement {
 
     const templateStr = this.template();
     if (templateStr) {
-      this.shadowRoot.innerHTML = templateStr;
+      // 2. 🔍 핵심 변경: 초기 렌더링 이후에는 updateDOM 사용
+      if (this.shadowRoot.innerHTML === "") {
+        this.shadowRoot.innerHTML = templateStr;
+      } else {
+        updateDOM(this.shadowRoot, templateStr);
+      }
     }
 
     this.setEvent();
+    this.afterRender();
   }
   /**
    * 가상돔 내부에서 요소를 찾아 반환하는 메서드

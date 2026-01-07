@@ -1,0 +1,37 @@
+.daySelector {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scrollClip {
+  overflow-x: auto;
+  width: 100%;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.scrollBody {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.2rem;
+}
+.button {
+  white-space: nowrap;
+  background-color: var(--brand-900);
+  height: 3.6rem;
+  align-content: center;
+  padding: 0 1.2rem;
+  border-radius: 0.8rem;
+  font-size: 1.6rem;
+  font-weight: 500;
+  transition: 150ms ease-out;
+  &.selected {
+    border-radius: 1.8rem;
+    background-color: var(--brand-500);
+  }
+}

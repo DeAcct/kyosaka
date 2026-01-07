@@ -7,8 +7,24 @@
   padding: 0;
   box-sizing: border-box;
 }
+// * {
+//   animation: blink 500ms ease-out;
+// }
+// @keyframes blink {
+//   from {
+//     outline: 1px solid red;
+//   }
+//   to {
+//     outline: transparent;
+//   }
+// }
+
 html {
   font-size: 0.625em;
+}
+#App {
+  min-height: 100dvh;
+  background-color: var(--bg-100);
 }
 
 body {

@@ -1,4 +1,5 @@
 import "./styles/variable/_color.scss";
+import "./styles/variable/_utils.scss";
 import "./styles/base/_reset.scss";
 import "./components/App/App";
 

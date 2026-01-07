@@ -1,11 +1,12 @@
 .description {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.6rem;
   .item {
     display: flex;
     gap: 0.4rem;
     font-size: 1.6rem;
+    line-height: 1.5;
     &::before {
       content: "-";
     }

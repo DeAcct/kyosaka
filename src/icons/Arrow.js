@@ -1,4 +1,4 @@
-import { Stateless, defineStateless } from "../lib/component";
+import { Stateless, defineStateless } from "@/lib/dom";
 
 export const Arrow = defineStateless("icon-arrow")(
   class extends Stateless {

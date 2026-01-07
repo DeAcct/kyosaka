@@ -1,7 +1,49 @@
+.daySelector {
+  width: 100%;
+  position: sticky;
+  top: var(--header-height);
+  z-index: 20;
+}
+
+.colBG {
+  display: none;
+}
+.emptyHolder {
+  display: none;
+}
+@media screen and (min-width: 690px) {
+  .colBG {
+    display: block;
+    opacity: 1;
+    position: fixed;
+    text-align: center;
+    align-content: center;
+    inset: var(--header-height) max(2.4rem, calc(50dvw - 54rem)) 2rem
+      calc(50% + 1rem);
+    border-radius: 0.8rem;
+    background-color: var(--bg-200);
+    .emptyHolder {
+      display: block;
+      font-size: 1.6rem;
+      color: var(--text-500);
+      transition: opacity 150ms ease-out, display 150ms ease-out allow-discrete;
+      transition-behavior: allow-discrete;
+      @starting-style {
+        opacity: 0;
+      }
+    }
+  }
+  :host:has(details[open]) .emptyHolder {
+    display: none;
+    opacity: 0;
+  }
+}
+
 .schedule {
-  background-color: var(--bg-200);
-  border-radius: 2.4rem;
+  position: relative;
+  border-radius: 0.8rem;
   min-height: 0;
+  background-color: var(--bg-200);
 
   @media screen and (min-width: 690px) {
     display: contents;
@@ -13,7 +55,11 @@
     gap: 0.8rem;
     padding: 1.6rem;
     @media screen and (min-width: 690px) {
-      border-radius: 2.4rem;
+      border-radius: 0.8rem;
+    }
+  }
+  &[open] .shrink {
+    @media screen and (min-width: 690px) {
       background-color: var(--bg-200);
     }
   }
@@ -59,10 +105,10 @@
     interpolate-size: allow-keywords;
     @media screen and (min-width: 690px) {
       grid-column: 2;
-      grid-row: 1 / span 10;
+      grid-row: 1 / var(--schedule-rows);
       align-self: start;
       position: sticky;
-      top: 8rem;
+      top: 6rem;
       height: unset;
       border-top: unset;
     }
@@ -79,32 +125,18 @@
     gap: 1rem;
     padding: 1.6rem;
     @media screen and (min-width: 690px) {
-      padding: 0;
+      padding: 0 1.6rem 1.6rem;
     }
   }
-}
-
-.fallback {
-  display: none;
-}
-@media screen and (min-width: 690px) {
-  .fallback {
-    visibility: hidden;
-    opacity: 0;
-    transition: 150ms ease-out;
-    transition-behavior: allow-discrete;
-    grid-column: 2;
-    grid-row: 1 / span 10;
-    align-self: center;
-    position: sticky;
-    top: 8rem;
-    font-size: 1.6rem;
-    text-align: center;
-    color: var(--text-500);
-  }
-  :global([class*="doubleCol"]):not(:has(details[open])) .fallback {
-    visibility: visible;
-    display: block;
-    opacity: 1;
+  .contentTitle {
+    display: none;
+    @media screen and (min-width: 690px) {
+      display: block;
+      font-size: 3rem;
+      text-align: center;
+      height: 20rem;
+      align-content: center;
+      line-height: 1.2;
+    }
   }
 }

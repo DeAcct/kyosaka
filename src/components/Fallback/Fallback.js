@@ -1,11 +1,11 @@
-import { Component, define } from "@/lib/component";
+import { Component, define } from "@/lib/dom";
 import { getFileFromPrompt, readJSONFile } from "@/lib/file";
 import { scheduleStore } from "@/store/scheduleStore";
 
 import mapping from "./fallback.module.scss";
 import raw from "./fallback.module.scss?inline";
 
-import "@/components/Button/Button";
+import { Button } from "@/components/Button/Button";
 
 export const Fallback = define("ky-fallback", { mapping, raw })(
   class extends Component {

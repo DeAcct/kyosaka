@@ -1,4 +1,4 @@
-import { Component, define } from "@/lib/component";
+import { Component, define } from "@/lib/dom";
 import mapping from "./button.module.scss";
 import raw from "./button.module.scss?inline";
 

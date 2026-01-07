@@ -1,4 +1,4 @@
-import { Component, define } from "@/lib/component";
+import { Component, define } from "@/lib/dom";
 
 import mapping from "./header.module.scss";
 import raw from "./header.module.scss?inline";
