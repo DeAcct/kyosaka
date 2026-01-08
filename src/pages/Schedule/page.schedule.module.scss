@@ -1,0 +1,30 @@
+.doubleCol {
+  width: min(calc(100% - 4.8rem), 1080px);
+  min-height: calc(100dvh - 10.4rem);
+  margin: 0 auto;
+  padding: var(--header-height) 0 2.4rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.4rem;
+  transition: 150ms var(--ease-in-out-back);
+  align-content: start;
+  @starting-style {
+    opacity: 0;
+    translate: 0 -2rem;
+  }
+  @media screen and (min-width: 690px) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 1.2rem 2rem;
+  }
+  .daySelector {
+    width: 100%;
+    position: sticky;
+    top: var(--header-height);
+    z-index: 20;
+    margin-bottom: 0.8rem;
+    @media screen and (min-width: 690px) {
+      margin-bottom: 0;
+    }
+  }
+}

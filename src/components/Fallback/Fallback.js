@@ -28,8 +28,10 @@ export const Fallback = define("ky-fallback", { mapping, raw })(
       </div>
     `;
     }
-    initEventListeners() {
-      this.addEvent("ky-click", "ky-button", this.onJSONButtonClick);
+    initEventListeners(signal) {
+      this.addEvent("ky-click", "ky-button", this.onJSONButtonClick, {
+        signal,
+      });
     }
 
     async onJSONButtonClick(e) {

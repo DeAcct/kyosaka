@@ -8,6 +8,7 @@
 
 .scrollClip {
   overflow-x: auto;
+  border-radius: 9999px;
   width: 100%;
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -19,19 +20,28 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 0.2rem;
+  animation: nudge 300ms alternate-reverse var(--ease-in-out-quad) 4;
+  @keyframes nudge {
+    from {
+      translate: -1rem;
+    }
+    to {
+      translate: 0;
+    }
+  }
 }
 .button {
   white-space: nowrap;
   background-color: var(--brand-900);
-  height: 3.6rem;
+  height: calc(var(--card-radius-base) * 2);
   align-content: center;
   padding: 0 1.2rem;
-  border-radius: 0.8rem;
+  border-radius: 0.4rem;
   font-size: 1.6rem;
   font-weight: 500;
-  transition: 150ms ease-out;
+  transition: 200ms var(--ease-in-out-back);
   &.selected {
-    border-radius: 1.8rem;
+    border-radius: var(--card-radius-base);
     background-color: var(--brand-500);
   }
 }

@@ -24,7 +24,7 @@ export function useSwipe(
       const { screenX: x, screenY: y } = e.changedTouches[0];
       start = { x, y };
     },
-    signal
+    { signal }
   );
 
   comp.addEvent(
@@ -40,6 +40,6 @@ export function useSwipe(
         diffX > 0 ? left?.() : right?.();
       }
     },
-    signal
+    { signal }
   );
 }

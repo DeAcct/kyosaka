@@ -24,7 +24,6 @@ class ScheduleStore extends Store {
 
     this.commit("selectedDay", nextValue);
   }
-
   nextDay(mode) {
     this.#move(1, mode);
   }
@@ -33,6 +32,6 @@ class ScheduleStore extends Store {
   }
 }
 export const scheduleStore = new ScheduleStore("scheduleStore", {
-  list: [], // 전체 일차별 데이터
-  selectedDay: 0, // 현재 활성화된 일차 (0 = 1일차)
+  list: [],
+  selectedDay: 0,
 });

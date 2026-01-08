@@ -34,9 +34,23 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
         },
         signal
       );
+
+      // this.addEvent(
+      //   "toggle",
+      //   `.${this.styles.schedule}`,
+      //   (e, target) => {
+      //     if (!e.isTrusted) return;
+      //     if (target.open) {
+      //       const index = parseInt(target.dataset.ref);
+      //       scheduleStore.setOpenedIndex(index);
+      //     }
+      //   },
+      //   { signal, capture: true }
+      // );
     }
     template() {
       const list = scheduleStore.currentDayList;
+      // const openedIndex = scheduleStore.lastOpenedIndex;
 
       if (!list) {
         return `<ky-fallback></ky-fallback>`;
@@ -52,8 +66,13 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
               <details 
                 name="itinerary" 
                 class="${this.styles.schedule}" 
+                data-ref="${index}"
+                
                 ${index === 0 ? "open" : ""}
-                style="--schedule-rows:${list.schedule.length + 1}"
+                style="--schedule-rows:${
+                  list.schedule.length + 1
+                }; --i:${index};"
+                key="${list.name}-${item.name}"
               >
                 <summary class="${this.styles.shrink}">
                   <i class="${this.styles.icon}">${this.getIcon(item)}</i>
@@ -88,10 +107,13 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
     `;
     }
     afterRender() {
-      const { schedule } = scheduleStore.currentDayList;
+      const allList = scheduleStore.currentDayList;
 
-      // 획기적으로 줄어든 데이터 주입 코드
-      schedule.forEach((item, index) => {
+      if (!allList) {
+        return;
+      }
+
+      allList.schedule.forEach((item, index) => {
         this.applyProps({
           [`ky-description[data-ref="${index}"]`]: {
             list: item.description || [],

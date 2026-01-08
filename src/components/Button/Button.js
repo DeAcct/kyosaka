@@ -13,15 +13,20 @@ export const Button = define("ky-button", { mapping, raw })(
       `;
     }
 
-    initEventListeners() {
-      this.addEvent("click", `.${this.styles.button}`, () => {
-        this.dispatchEvent(
-          new CustomEvent("ky-click", {
-            bubbles: true,
-            composed: true,
-          })
-        );
-      });
+    initEventListeners(signal) {
+      this.addEvent(
+        "click",
+        `.${this.styles.button}`,
+        () => {
+          this.dispatchEvent(
+            new CustomEvent("ky-click", {
+              bubbles: true,
+              composed: true,
+            })
+          );
+        },
+        { signal }
+      );
     }
   }
 );

@@ -130,7 +130,7 @@ export class Component extends HTMLElement {
    * 이벤트 위임을 사용하여 리렌더링과 상관없이 유지될 이벤트를 정의한다.
    * shadowRoot에 리스너를 걸어 내부 요소가 바뀌어도 이벤트를 캐치한다.
    */
-  addEvent(type, selector, callback, signal) {
+  addEvent(type, selector, callback, options) {
     this.shadowRoot.addEventListener(
       type,
       (event) => {
@@ -138,7 +138,7 @@ export class Component extends HTMLElement {
         if (!target) return;
         callback(event, target);
       },
-      { signal }
+      options
     ); // 브라우저가 자동으로 관리함
   }
   /** 이벤트 위임 리스너들을 모아두는 곳 */
@@ -211,4 +211,21 @@ export const defineStateless = (tagName) => (ComponentClass) => {
   }
 
   return ComponentClass;
+};
+
+/**
+ * @template T 반복할 아이템의 타입
+ * @param {object | Array<T>} iterable 원본의 타입, 객체나 배열 등 반복 가능할 경우
+ */
+export const kyFor = (iterable, templateFn) => {
+  if (!iterable) {
+    return "";
+  }
+
+  let _iterable = iterable;
+  if (typeof iterable === "object") {
+    _iterable = Object.entries(iterable);
+  }
+
+  return _iterable.map(templateFn).join("");
 };

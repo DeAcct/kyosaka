@@ -16,13 +16,34 @@ export const DaySelector = define("day-selector", { mapping, raw })(
       this.addEvent(
         "click",
         `.${this.styles.button}`,
-        (e) => {
-          const index = parseInt(e.target.dataset.index);
-          scheduleStore.commit("selectedDay", index);
+        (e, target) => {
+          const index = parseInt(target.dataset.ref);
+          if (!isNaN(index)) {
+            scheduleStore.commit("selectedDay", index);
+          }
         },
-        signal
+        { signal }
       );
     }
+    afterRender() {
+      this.centerActiveButton();
+    }
+    centerActiveButton() {
+      const { selectedDay } = scheduleStore.data;
+
+      const $activeBtn = this.$selector(
+        `.${this.styles.button}[data-ref="${selectedDay}"]`
+      );
+
+      if ($activeBtn) {
+        $activeBtn.scrollIntoView({
+          behavior: "smooth", // 부드럽게
+          inline: "center", // 👈 핵심: 가로 중앙 정렬
+          block: "nearest", // 세로 위치는 유지
+        });
+      }
+    }
+
     // afterRender() {
     //   const { selectedDay } = scheduleStore.data;
     //   const $buttons = this.shadowRoot.querySelectorAll(
@@ -58,9 +79,17 @@ export const DaySelector = define("day-selector", { mapping, raw })(
                 .map(
                   ({ name, day, description }, index) => `
                   <li>
-                    <button class="${this.styles.button} ${
+                    <button 
+                      class="${this.styles.button} ${
                     selectedDay === index ? this.styles.selected : ""
-                  }" data-index="${index}">${this.formatter(day)}</button>
+                  }" 
+                      data-ref="${index}"
+                    >
+                      <span>${index + 1}일차</span>
+                      <strong>
+                        ${this.formatter(day)}
+                      </strong>
+                    </button>
                   </li>
                   `
                 )

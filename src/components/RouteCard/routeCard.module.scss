@@ -2,44 +2,39 @@
   display: block;
 }
 .routeCard {
-  @media screen and (min-width: 690px) {
-    border-top: 1px solid var(--bg-100);
-    border-bottom: 1px solid var(--bg-100);
-  }
-  .card {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    margin: 0 auto;
-    &::after {
-      content: "";
-      position: absolute;
-      z-index: 2;
-      inset: 1.4rem auto 1.4rem 0;
-      width: 1.2rem;
-      background-color: var(--brand-500);
-      border-radius: 9999px;
-    }
+  border-radius: calc(var(--card-radius-base) - 1.6rem);
+  overflow: hidden;
+  display: flex;
+  gap: 0.4rem;
+  flex-direction: column;
+  position: relative;
+  margin: 0 auto;
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: 1.4rem auto 1.4rem 1.2rem;
+    width: 1.2rem;
+    background: linear-gradient(var(--brand-600), var(--brand-400));
+    border-radius: 9999px;
   }
   .point {
     display: flex;
     gap: 0.6rem;
     font-size: 1.6rem;
-    padding: 1.2rem 0;
-    margin-left: 2.4rem;
+    padding: 1.2rem 3.2rem;
     position: relative;
-    &:not(:last-child) {
-      border-bottom: 1px solid var(--bg-100);
-    }
+    background-color: var(--bg-300);
+
     &::after {
       content: "";
       position: absolute;
       z-index: 3;
-      width: 0.6rem;
-      height: 0.6rem;
+      width: 0.4rem;
+      height: 0.4rem;
       background-color: #fff;
       border-radius: 50%;
-      left: -2.1rem;
+      left: 1.6rem;
       top: 50%;
       translate: 0 -50%;
     }

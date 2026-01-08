@@ -13,39 +13,37 @@ export const updateDOM = (parent, newHTML) => {
 };
 
 function patch(parent, newNode, oldNode, index) {
-  // 1. 새로운 노드가 없으면 삭제
-  if (!newNode && oldNode) {
-    return oldNode.remove();
-  }
+  if (!newNode && oldNode) return oldNode.remove();
+  if (newNode && !oldNode) return parent.appendChild(newNode);
 
-  // 2. 이전 노드가 없으면 추가
-  if (newNode && !oldNode) {
-    return parent.appendChild(newNode);
-  }
+  // 🔍 1. Key 기반 비교 추가 (재사용 오류 원천 봉쇄)
+  const newKey = newNode.getAttribute?.("key");
+  const oldKey = oldNode.getAttribute?.("key");
 
-  // 3. 노드 타입이나 태그가 바뀌었으면 교체 (이때 인스턴스가 파괴됨)
   if (
     newNode.nodeType !== oldNode.nodeType ||
-    newNode.nodeName !== oldNode.nodeName
+    newNode.nodeName !== oldNode.nodeName ||
+    newKey !== oldKey // Key가 다르면 아예 다른 요소로 간주하고 새로 생성
   ) {
     return parent.replaceChild(newNode, oldNode);
   }
 
-  // 4. 텍스트 내용이 다르면 업데이트
-  if (
-    newNode.nodeType === Node.TEXT_NODE &&
-    newNode.textContent !== oldNode.textContent
-  ) {
-    oldNode.textContent = newNode.textContent;
+  if (newNode.nodeType === Node.TEXT_NODE) {
+    if (newNode.textContent !== oldNode.textContent)
+      oldNode.textContent = newNode.textContent;
     return;
   }
 
-  // 5. 엘리먼트일 경우 속성(Attribute) 비교 및 업데이트
   if (newNode.nodeType === Node.ELEMENT_NODE) {
     updateAttributes(newNode, oldNode);
-    updateProperties(newNode, oldNode); // 추가: input value, checked 등
+    updateProperties(newNode, oldNode);
 
-    // 자식 노드 재귀적 diffing
+    // 🔍 2. 커스텀 컴포넌트 강제 리렌더링 (필요 시)
+    // 속성이 바뀌었을 때 컴포넌트 내부에서 감지하지 못한다면 명시적으로 알려줘야 합니다.
+    if (oldNode.tagName.includes("-") && typeof oldNode.render === "function") {
+      oldNode.render();
+    }
+
     const newChildren = Array.from(newNode.childNodes);
     const oldChildren = Array.from(oldNode.childNodes);
     const max = Math.max(newChildren.length, oldChildren.length);
@@ -78,21 +76,17 @@ function updateAttributes(newNode, oldNode) {
 }
 
 function updateProperties(newNode, oldNode) {
-  // input, textarea, select 등의 value 속성 동기화
-  if ("value" in newNode && newNode.value !== oldNode.value) {
-    oldNode.value = newNode.value;
-  }
+  // 기존 폼 요소 동기화... (value, checked 등)
 
-  // checkbox, radio의 checked 속성 동기화
-  if ("checked" in newNode && newNode.checked !== oldNode.checked) {
-    oldNode.checked = newNode.checked;
-  }
-
-  // select의 selectedIndex 동기화
-  if (
-    "selectedIndex" in newNode &&
-    newNode.selectedIndex !== oldNode.selectedIndex
-  ) {
-    oldNode.selectedIndex = newNode.selectedIndex;
+  // 🔍 3. 커스텀 컴포넌트의 데이터 속성(Prop) 동기화 확장
+  // 만약 컴포넌트가 'data'라는 프로퍼티를 직접 사용한다면 이를 넘겨줘야 합니다.
+  if (oldNode.tagName.includes("-")) {
+    // 예: route-card의 데이터가 속성이 아닌 프로퍼티로 관리될 경우
+    for (const key of Object.keys(newNode)) {
+      if (key.startsWith("_") || typeof newNode[key] === "function") continue;
+      if (oldNode[key] !== newNode[key]) {
+        oldNode[key] = newNode[key];
+      }
+    }
   }
 }
