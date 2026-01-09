@@ -1,6 +1,6 @@
 export const routes = {
   "/": () => `<page-schedule></page-schedule>`,
-  "/schedule": () => `<ky-schedule></ky-schedule>`,
-  "/checklist": () => `<ky-checklist></ky-checklist>`,
-  "/gallery": () => `<ky-gallery></ky-gallery>`,
+  "/schedule": () => `<page-schedule></page-schedule>`,
+  "/checklist": () => `<page-checklist></page-checklist>`,
+  "/gallery": () => `<page-gallery></page-gallery>`,
 };

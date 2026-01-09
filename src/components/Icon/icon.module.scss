@@ -1,0 +1,20 @@
+.icon {
+  justify-content: center;
+  align-items: center;
+  width: var(--icon-width);
+  transition: opacity 300ms var(--ease-in-out-back),
+    scale 300ms var(--ease-in-out-back);
+  font-weight: inherit;
+  font-size: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  scale: 0;
+
+  &.loaded {
+    display: flex;
+    font-size: inherit;
+    opacity: 1;
+    scale: 1;
+  }
+}

@@ -30,6 +30,18 @@
     }
   }
 }
+
+.item {
+  &:first-of-type .button {
+    border-top-left-radius: var(--card-radius-base);
+    border-bottom-left-radius: var(--card-radius-base);
+  }
+  &:last-of-type .button {
+    border-top-right-radius: var(--card-radius-base);
+    border-bottom-right-radius: var(--card-radius-base);
+  }
+}
+
 .button {
   white-space: nowrap;
   background-color: var(--brand-900);

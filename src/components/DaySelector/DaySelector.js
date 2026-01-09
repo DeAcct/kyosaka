@@ -78,7 +78,7 @@ export const DaySelector = define("day-selector", { mapping, raw })(
               ${this.days
                 .map(
                   ({ name, day, description }, index) => `
-                  <li>
+                  <li class="${this.styles.item}">
                     <button 
                       class="${this.styles.button} ${
                     selectedDay === index ? this.styles.selected : ""

@@ -17,16 +17,27 @@ export class Router {
 
     // 3. 전역 클릭 이벤트 위임 (<a> 태그 가로채기)
     document.addEventListener("click", (e) => {
-      const link = e.target.closest("a[data-link]");
+      const path = e.composedPath();
+      const link = path.find(
+        (el) => el.tagName === "A" && el.hasAttribute("data-link")
+      );
+      // const link = e.target.closest("a[data-link]");
+
       if (link) {
         e.preventDefault();
-        this.navigate(link.getAttribute("href"));
+        const href = link.getAttribute("href");
+
+        // 🔍 현재 경로와 같으면 무시 (불필요한 리렌더링 방지)
+        if (window.location.pathname === href) return;
+        this.navigate(href);
       }
     });
   }
 
   navigate(path) {
     window.history.pushState({}, "", path);
+    const navEvent = new CustomEvent("locationchange", { detail: { path } });
+    window.dispatchEvent(navEvent);
     this.render();
   }
 

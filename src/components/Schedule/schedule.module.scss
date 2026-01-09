@@ -11,7 +11,7 @@
     position: fixed;
     text-align: center;
     align-content: center;
-    inset: var(--header-height) max(2.4rem, calc(50dvw - 54rem)) 2.4rem
+    inset: var(--header-height) max(2.4rem, calc(50dvw - 54rem)) 10rem
       calc(50% + 1rem);
     border-radius: 0.8rem;
     background-color: var(--bg-200);
@@ -22,6 +22,7 @@
       transition: opacity 150ms ease-out, display 150ms ease-out allow-discrete;
       transition-behavior: allow-discrete;
       @starting-style {
+        display: none;
         opacity: 0;
       }
     }

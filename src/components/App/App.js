@@ -3,11 +3,13 @@ import { Router } from "@/lib/router";
 import { routes } from "@/routes"; // 라우트 설정 파일
 
 import mapping from "./app.module.scss";
+import raw from "./app.module.scss?inline";
 
-import { Header } from "@/components/Header/Header";
 import { SchedulePage } from "@/pages/Schedule/Schedule";
+import { Header } from "@/components/Header/Header";
+import { NavigationBar } from "@/components/NavigationBar/NavigationBar";
 
-export const App = define("ky-app", { mapping })(
+export const App = define("ky-app", { mapping, raw })(
   class extends Component {
     afterRender() {
       // 🔍 1. 내부의 뷰 컨테이너를 찾습니다.
@@ -19,13 +21,9 @@ export const App = define("ky-app", { mapping })(
       return `
         <ky-header></ky-header>
 
-        <main class="${this.styles.view}" data-rotuer-view></main>
+        <main class="${this.styles.view}" data-router-view></main>
 
-        <nav class="${this.styles.bottomNav}">
-          <a href="/schedule" data-link class="${this.styles.link}">📅 일정</a>
-          <a href="/checklist" data-link class="${this.styles.link}">✅ 체크</a>
-          <a href="/gallery" data-link class="${this.styles.link}">🖼️ 갤러리</a>
-        </nav>
+        <navigation-bar class="${this.styles.navigationBar}"></navigation-bar>
       `;
     }
   }

@@ -1,7 +1,8 @@
 import resetStyle from "@/styles/base/_reset.scss?inline";
+
 import { updateDOM } from "./diff";
 const sharedResetSheet = new CSSStyleSheet();
-sharedResetSheet.replaceSync(resetStyle);
+sharedResetSheet.replace(resetStyle);
 
 export class Component extends HTMLElement {
   state = {};
@@ -183,16 +184,17 @@ export class Stateless extends HTMLElement {
 }
 
 export const define =
-  (tagName, { mapping, raw }) =>
+  (tagName, { mapping, raw } = { mapping: {}, raw: {} }) =>
   (ComponentClass) => {
     // 1. 전달받은 raw 문자열로 시트 생성 (여기서 딱 한 번만 실행됨)
     const stylesheet = new CSSStyleSheet();
+
     stylesheet.replaceSync(raw);
 
     // 2. 컴포넌트 클래스의 getStyles 메서드를 자동으로 오버라이딩
     ComponentClass.prototype.getStyles = function () {
       return {
-        mapping: mapping || {},
+        mapping,
         stylesheet: stylesheet,
       };
     };
