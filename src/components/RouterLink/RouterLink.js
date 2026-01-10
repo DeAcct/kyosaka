@@ -1,4 +1,5 @@
-import { define, Component } from "@/lib/dom";
+// import { Component, define, html } from "@/lib/v2/core";
+import { Component, define, html } from "@/lib/v2/core";
 
 export const RouterLink = define("router-link")(
   class extends Component {
@@ -16,14 +17,13 @@ export const RouterLink = define("router-link")(
         throw new Error("to가 정의되지 않았어요");
       }
       const isActive = window.location.pathname === href;
-      // 🔍 디핑 엔진이 속성 변화를 감지하여 리렌더링
       this.setAttribute("aria-selected", isActive ? "true" : "false");
     }
 
     template() {
       const to = this.getAttribute("to");
 
-      return `
+      return html`
         <a href="${to}" data-link>
           <slot></slot>
         </a>

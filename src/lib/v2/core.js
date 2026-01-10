@@ -1,0 +1,193 @@
+//lib/core.js
+
+import resetStyle from "@/styles/base/_reset.scss?inline";
+import { patch } from "./diff";
+
+const sharedResetSheet = new CSSStyleSheet();
+sharedResetSheet.replaceSync(resetStyle);
+
+/**
+ * 베이스 컴포넌트 클래스
+ */
+export class Component extends HTMLElement {
+  state = {};
+  _unsubscribers = [];
+  _abortController = null;
+  styles = {};
+  $refs = {};
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.shadowRoot.adoptedStyleSheets = [sharedResetSheet];
+  }
+
+  setState(newState) {
+    this.state = { ...this.state, ...newState };
+    this.render();
+  }
+
+  subscribe(store) {
+    const unsub = store.subscribe(() => this.render());
+    this._unsubscribers.push(unsub);
+  }
+
+  connectedCallback() {
+    this._abortController = new AbortController();
+    const { signal } = this._abortController;
+    this.setup();
+    this.setIsolatedEvent(signal);
+    this.render();
+    if (this.initEventListeners) this.initEventListeners(signal);
+  }
+
+  disconnectedCallback() {
+    if (this._abortController) this._abortController.abort();
+    this._unsubscribers.forEach((unsub) => unsub());
+  }
+
+  setup() {}
+  template() {
+    return html``;
+  }
+  getStyles() {
+    return { mapping: {}, stylesheet: null };
+  }
+
+  render() {
+    const { mapping, stylesheet } = this.getStyles();
+    this.styles = mapping;
+
+    if (stylesheet instanceof CSSStyleSheet) {
+      this.shadowRoot.adoptedStyleSheets = [sharedResetSheet, stylesheet];
+    }
+
+    const templateResult = this.template();
+    if (templateResult) {
+      this.$refs = {};
+      updateDOM(this.shadowRoot, templateResult, this);
+    }
+
+    this.setEvent();
+    this.afterRender();
+  }
+
+  $selector(query, all = false) {
+    return all
+      ? this.shadowRoot.querySelectorAll(query)
+      : this.shadowRoot.querySelector(query);
+  }
+
+  afterRender() {}
+  setEvent() {}
+  addEvent(type, selector, callback, options) {
+    this.shadowRoot.addEventListener(
+      type,
+      (event) => {
+        const target = event.target.closest(selector);
+        if (!target) return;
+        callback(event, target);
+      },
+      options
+    );
+  }
+  setIsolatedEvent() {}
+}
+
+/**
+ * 상태가 없는 단순 컴포넌트용 클래스
+ */
+export class Stateless extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+  }
+  connectedCallback() {
+    this.render();
+  }
+  render() {
+    const { mapping, stylesheet } = this.getStyles();
+    this.styles = mapping || {};
+    if (stylesheet instanceof CSSStyleSheet) {
+      this.shadowRoot.adoptedStyleSheets = [sharedResetSheet, stylesheet];
+    }
+    const result = this.template();
+    if (result) updateDOM(this.shadowRoot, result);
+  }
+  getStyles() {
+    return { mapping: {}, stylesheet: null };
+  }
+  template() {
+    return html``;
+  }
+}
+
+/** * 1. 복잡한 컴포넌트용 define (SCSS 매핑 포함)
+ */
+export const define =
+  (tagName, { mapping, raw } = { mapping: {}, raw: "" }) =>
+  (ComponentClass) => {
+    const stylesheet = new CSSStyleSheet();
+    if (raw) stylesheet.replaceSync(raw);
+
+    // 프로토타입에 스타일 주입 로직 오버라이딩
+    ComponentClass.prototype.getStyles = function () {
+      return { mapping: mapping || {}, stylesheet };
+    };
+
+    if (!customElements.get(tagName)) {
+      customElements.define(tagName, ComponentClass);
+    }
+    return ComponentClass;
+  };
+
+/**
+ * 2. 단순 컴포넌트용 define
+ */
+export const defineStateless = (tagName) => (ComponentClass) => {
+  if (!customElements.get(tagName)) {
+    customElements.define(tagName, ComponentClass);
+  }
+  return ComponentClass;
+};
+
+/**
+ * 반복 헬퍼 (배열을 반환하여 patch가 처리하게 함)
+ */
+export const kyFor = (iterable, templateFn) => {
+  if (!iterable) return [];
+  const list = Array.isArray(iterable) ? iterable : Object.entries(iterable);
+  return list.map(templateFn);
+};
+
+/**
+ * Tagged Template Literal
+ */
+export const html = (strings, ...values) => ({ strings, values });
+
+/**
+ * 렌더링 엔진
+ */
+
+export const updateDOM = (parent, templateResult, component) => {
+  if (!templateResult || !templateResult.strings) return;
+  const { strings, values } = templateResult;
+
+  // 마커 포함 골격 생성
+  const fullHTML = strings.reduce(
+    (acc, str, i) => acc + str + (i < values.length ? `__VAL_${i}__` : ""),
+    ""
+  );
+
+  const temp = document.createElement("template");
+  temp.innerHTML = fullHTML;
+
+  const newNodes = Array.from(temp.content.childNodes);
+  const oldNodes = Array.from(parent.childNodes);
+
+  // 🔍 parent 자체를 청소하지 않고 patch에게 맡김 (트랜지션 핵심)
+  const max = Math.max(newNodes.length, oldNodes.length);
+  for (let i = 0; i < max; i++) {
+    patch(parent, newNodes[i], oldNodes[i], i, values, component);
+  }
+};

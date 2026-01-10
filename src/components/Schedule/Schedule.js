@@ -1,4 +1,4 @@
-import { Component, define } from "@/lib/dom";
+import { Component, define, html } from "@/lib/v2/core";
 import { switcher } from "@/lib/switcher";
 import { scheduleStore } from "@/store/scheduleStore";
 import { useSwipe } from "@/hooks/touch";
@@ -53,73 +53,67 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
       // const openedIndex = scheduleStore.lastOpenedIndex;
 
       if (!list) {
-        return `<ky-fallback></ky-fallback>`;
+        return html`<ky-fallback></ky-fallback>`;
       }
-      return `
+      return html`
         <slot name="selector"></slot>
         <div class="${this.styles.colBG}">
           <p class="${this.styles.emptyHolder}">일정을 누르면 열립니다</p>
         </div>
-        ${list.schedule
-          .map(
-            (item, index) => `
-              <details 
-                name="itinerary" 
-                class="${this.styles.schedule}" 
-                data-ref="${index}"
-                
-                ${index === 0 ? "open" : ""}
-                style="--schedule-rows:${
-                  list.schedule.length + 1
-                }; --i:${index};"
-                key="${list.name}-${item.name}"
-              >
-                <summary class="${this.styles.shrink}">
-                  <i class="${this.styles.icon}">${this.getIcon(item)}</i>
-                  <div class="${this.styles.text}">
-                    <h2 class="${this.styles.name}">${item.name}</h2>
-                    <p class="${this.styles.time}">
+        ${list.schedule.map(
+          (item, index) => html`
+            <details
+              name="itinerary"
+              class="${this.styles.schedule}"
+              data-ref="${index}"
+              ${index === 0 ? "open" : ""}
+              style="--schedule-rows:${list.schedule.length + 1}; --i:${index};"
+              key="${list.name}-${item.name}"
+            >
+              <summary class="${this.styles.shrink}">
+                <i class="${this.styles.icon}">${this.getIcon(item)}</i>
+                <div class="${this.styles.text}">
+                  <h2 class="${this.styles.name}">${item.name}</h2>
+                  <p class="${this.styles.time}">
                     ${item.time.from} ~ ${item.time.to}
-                    </p>
-                  </div>
-                  <icon-arrow class="${this.styles.arrow}"></icon-arrow>
-                </summary>
-
-                <div class="${this.styles.content}">
-                  <strong class="${this.styles.contentTitle}">
-                    ${item.name}
-                  </strong>
-                  ${
-                    item.route
-                      ? `<route-card 
-                          from="${item.route.from}" 
-                          to="${item.route.to}"
-                        ></route-card>`
-                      : ""
-                  }
-                  <ky-description data-ref="${index}"></ky-description>
+                  </p>
                 </div>
-              </details>
-              `
-          )
-          .join("")}
-        
-    `;
-    }
-    afterRender() {
-      const allList = scheduleStore.currentDayList;
+                <icon-arrow class="${this.styles.arrow}"></icon-arrow>
+              </summary>
 
-      if (!allList) {
-        return;
-      }
-
-      allList.schedule.forEach((item, index) => {
-        this.applyProps({
-          [`ky-description[data-ref="${index}"]`]: {
-            list: item.description || [],
-          },
-        });
-      });
+              <div class="${this.styles.content}">
+                <strong class="${this.styles.contentTitle}">
+                  ${item.name}
+                </strong>
+                ${item.route
+                  ? html`<route-card
+                      :from="${item.route.from}"
+                      :to="${item.route.to}"
+                    ></route-card>`
+                  : ""}
+                <ky-description
+                  :list="${item.description || []}"
+                ></ky-description>
+              </div>
+            </details>
+          `
+        )}
+      `;
     }
+    // afterRender() {
+    //   const allList = scheduleStore.currentDayList;
+
+    //   if (!allList) {
+    //     return;
+    //   }
+
+    //   allList.schedule.forEach((item, index) => {
+    //     this.applyProps({
+    //       [`ky-description[data-ref="${index}"]`]: {
+    //         list: item.description || [],
+    //       },
+    //     });
+    //   });
+    // }
   }
 );

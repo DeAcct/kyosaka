@@ -1,4 +1,4 @@
-import { Component, define } from "@/lib/dom";
+import { Component, define, html } from "@/lib/v2/core";
 import mapping from "./button.module.scss";
 import raw from "./button.module.scss?inline";
 
@@ -6,7 +6,7 @@ import raw from "./button.module.scss?inline";
 export const Button = define("ky-button", { mapping, raw })(
   class extends Component {
     template() {
-      return `
+      return html`
         <button class="${this.styles.button}" type="button">
           <slot></slot>
         </button>

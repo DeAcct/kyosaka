@@ -1,4 +1,4 @@
-import { define, Component } from "@/lib/dom";
+import { Component, define, html } from "@/lib/v2/core";
 
 import mapping from "./icon.module.scss";
 import raw from "./icon.module.scss?inline";
@@ -17,10 +17,12 @@ export const Icon = define("ky-icon", { raw, mapping })(
     }
     template() {
       const { loaded } = this.state;
-      return `
-        <i class="material-symbols-outlined ${this.styles.icon} ${
-        loaded ? this.styles.loaded : ""
-      }">
+      return html`
+        <i
+          class="material-symbols-outlined ${this.styles.icon} ${loaded
+            ? this.styles.loaded
+            : ""}"
+        >
           <slot></slot>
         </i>
       `;

@@ -1,5 +1,5 @@
 // lib/router.js
-import { updateDOM } from "./diff";
+import { updateDOM } from "./v2/core";
 
 export class Router {
   constructor(routes, container) {
@@ -44,9 +44,6 @@ export class Router {
   render() {
     const path = window.location.pathname;
     const viewFn = this.routes[path] || this.routes["/"];
-
-    // 🔍 핵심: innerHTML 대신 updateDOM을 사용하여 디핑 적용
-    // viewFn()이 리턴하는 템플릿 문자열을 기존 컨테이너와 비교하여 패치합니다.
     updateDOM(this.container, viewFn());
   }
 }

@@ -1,4 +1,4 @@
-import { Stateless, defineStateless } from "@/lib/dom";
+import { Stateless, defineStateless } from "@/lib/v2/core";
 
 export const Calendar = defineStateless("icon-calendar")(
   class extends Stateless {

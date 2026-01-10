@@ -1,4 +1,4 @@
-import { Component, define } from "@/lib/dom";
+import { Component, define, html } from "@/lib/v2/core";
 
 import mapping from "./description.module.scss";
 import raw from "./description.module.scss?inline";
@@ -17,12 +17,11 @@ export const Description = define("ky-description", { mapping, raw })(
     }
 
     template() {
-      return `
-        <ul class="${this.styles.description}">
-          ${this.list
-            .map((desc) => `<li class="${this.styles.item}">${desc}</li>`)
-            .join("")}
-        </ul>`;
+      return html` <ul class="${this.styles.description}">
+        ${this.list.map(
+          (desc) => html`<li class="${this.styles.item}">${desc}</li>`
+        )}
+      </ul>`;
     }
   }
 );

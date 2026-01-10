@@ -12,6 +12,7 @@
     --icon-color: var(--brand-400);
     --icon-bg-color: var(--brand-800);
     --text-color: var(--brand-400);
+    --icon-scale: 1;
   }
 }
 
@@ -26,13 +27,24 @@
   font-size: 1.8rem;
   font-weight: 500;
   --icon-width: 1.8rem;
+
   padding: 0.4rem 1.2rem;
-  border-radius: 9999px;
-  background-color: var(--icon-bg-color, transparent);
   color: var(--icon-color);
+  position: relative;
+  z-index: 1;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transition: scale 150ms var(--ease-in-out-back);
+    background-color: var(--icon-bg-color, transparent);
+    border-radius: 9999px;
+    scale: var(--icon-scale, 0);
+  }
 }
 
 .text {
   font-size: 1.4rem;
   color: var(--text-color, inherit);
+  transition: color 150ms var(--ease-in-out-quad);
 }

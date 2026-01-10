@@ -1,4 +1,4 @@
-import { Component, define } from "@/lib/dom";
+import { Component, define, html } from "@/lib/v2/core";
 import { getFileFromPrompt, readJSONFile } from "@/lib/file";
 import { scheduleStore } from "@/store/scheduleStore";
 
@@ -20,13 +20,17 @@ export const Fallback = define("ky-fallback", { mapping, raw })(
       };
     }
     template() {
-      return `
-      <div class="${this.styles.fallback}">
-        <img class="${this.styles.icon}" src="./fallback.svg" alt="파일을 등록해주세요">
-        <p class="${this.styles.text}">등록된 여행 일정이 없습니다.</p>
-        <ky-button>불러오기</ky-button>
-      </div>
-    `;
+      return html`
+        <div class="${this.styles.fallback}">
+          <img
+            class="${this.styles.icon}"
+            src="./fallback.svg"
+            alt="파일을 등록해주세요"
+          />
+          <p class="${this.styles.text}">등록된 여행 일정이 없습니다.</p>
+          <ky-button>불러오기</ky-button>
+        </div>
+      `;
     }
     initEventListeners(signal) {
       this.addEvent("ky-click", "ky-button", this.onJSONButtonClick, {

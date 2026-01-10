@@ -1,4 +1,4 @@
-import { Component, define } from "@/lib/dom";
+import { Component, define, html } from "@/lib/v2/core";
 import { Router } from "@/lib/router";
 import { routes } from "@/routes"; // 라우트 설정 파일
 
@@ -18,10 +18,10 @@ export const App = define("ky-app", { mapping, raw })(
     }
 
     template() {
-      return `
+      return html`
         <ky-header></ky-header>
 
-        <main class="${this.styles.view}" data-router-view></main>
+        <main data-router-view></main>
 
         <navigation-bar class="${this.styles.navigationBar}"></navigation-bar>
       `;
