@@ -1,0 +1,20 @@
+/* src/styles/_layout.scss */
+@mixin double-col-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  transition: opacity 0.5s var(--ease-in-out-back);
+  @starting-style {
+    opacity: 0;
+  }
+
+  /* 🔍 화면 너비가 넓어질 때 (Unfolded / Tablet) */
+  @media (min-width: 690px) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+@mixin safe-area {
+  width: min(calc(100% - 4.8rem), 1080px);
+  min-height: calc(100dvh - 10.4rem);
+  padding: var(--header-height) 0 10rem;
+}

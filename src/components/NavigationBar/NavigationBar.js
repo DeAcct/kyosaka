@@ -1,4 +1,4 @@
-import { Component, define, html } from "@/lib/v2/core";
+import { Component, define, html } from "@/lib/core";
 
 import mapping from "./navigationBar.module.scss";
 import raw from "./navigationBar.module.scss?inline";

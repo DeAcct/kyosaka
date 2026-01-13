@@ -1,13 +1,24 @@
 // lib/store.js
 export default class Store {
-  constructor(key, initialData = { list: [], lastUpdated: null }) {
-    this.key = key;
+  constructor(key, initialData) {
+    // 🔍 1. 네임스페이스 추가 (다른 앱/프로젝트와의 충돌 방지)
+    this.key = `kyosaka_${key}`;
     this.subscribers = new Set();
 
-    const savedData = localStorage.getItem(key);
-    // 데이터가 없거나 형식이 깨졌을 경우 초기 데이터 사용
-    this.state = savedData ? JSON.parse(savedData) : initialData;
+    const savedData = localStorage.getItem(this.key);
 
+    try {
+      const parsedData = savedData ? JSON.parse(savedData) : null;
+
+      // 🔍 2. 핵심 수정: 초기 데이터의 구조를 유지하며 저장된 값만 병합
+      // 이렇게 하면 localStorage에 'list'만 있어도 'items'가 사라지지 않습니다.
+      this.state = parsedData ? { ...initialData, ...parsedData } : initialData;
+    } catch (e) {
+      console.error(`[Store:${key}] 데이터 파싱 에러. 초기화합니다.`, e);
+      this.state = initialData;
+    }
+
+    // 구조가 바뀌었거나 처음인 경우 즉시 저장하여 정합성 유지
     if (!savedData) this._save();
   }
 
@@ -15,13 +26,7 @@ export default class Store {
     return this.state;
   }
 
-  /**
-   * 특정 키의 데이터를 교체하는 방식 (배열 보존)
-   * @param {string} key - 저장할 위치 (예: 'list')
-   * @param {any} value - 저장할 값 (배열, 객체 등)
-   */
   commit(key, value) {
-    // 스프레드 연산자로 루트를 합치지 않고, 특정 키에 직접 할당하여 타입 보존
     this.state = {
       ...this.state,
       [key]: value,

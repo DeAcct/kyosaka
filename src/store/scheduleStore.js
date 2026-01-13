@@ -1,5 +1,4 @@
 import Store from "@/lib/store";
-import { switcher } from "@/lib/switcher";
 class ScheduleStore extends Store {
   get currentDayList() {
     const { list, selectedDay } = this.state;

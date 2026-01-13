@@ -1,4 +1,4 @@
-import { Component, define, html } from "@/lib/v2/core";
+import { Component, define, html } from "@/lib/core";
 
 import mapping from "./header.module.scss";
 import raw from "./header.module.scss?inline";

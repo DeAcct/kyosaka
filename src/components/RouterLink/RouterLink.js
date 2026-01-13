@@ -1,5 +1,5 @@
-// import { Component, define, html } from "@/lib/v2/core";
-import { Component, define, html } from "@/lib/v2/core";
+// import { Component, define, html } from "@/lib/core";
+import { Component, define, html } from "@/lib/core";
 
 export const RouterLink = define("router-link")(
   class extends Component {

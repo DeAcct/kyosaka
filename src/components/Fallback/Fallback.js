@@ -1,4 +1,4 @@
-import { Component, define, html } from "@/lib/v2/core";
+import { Component, define, html } from "@/lib/core";
 import { getFileFromPrompt, readJSONFile } from "@/lib/file";
 import { scheduleStore } from "@/store/scheduleStore";
 

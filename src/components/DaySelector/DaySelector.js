@@ -1,5 +1,5 @@
 import { scheduleStore } from "@/store/scheduleStore";
-import { Component, define, html, kyFor } from "@/lib/v2/core";
+import { Component, define, html, kyFor } from "@/lib/core";
 
 import mapping from "./daySelector.module.scss";
 import raw from "./daySelector.module.scss?inline";
@@ -52,7 +52,7 @@ export const DaySelector = define("day-selector", { mapping, raw })(
     template() {
       const { selectedDay } = scheduleStore.data;
       return html`
-        <global-event @resize="${this.centerActiveButton}"></global-event>
+        <global @resize="${this.centerActiveButton}"></global>
         <div class="${this.styles.daySelector}">
           <div class="${this.styles.scrollClip}">
             <ul class="${this.styles.scrollBody}">

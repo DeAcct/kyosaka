@@ -1,11 +1,10 @@
-import { Component, define, html } from "@/lib/v2/core";
+import { Component, define, html } from "@/lib/core";
 import { Router } from "@/lib/router";
 import { routes } from "@/routes"; // 라우트 설정 파일
 
 import mapping from "./app.module.scss";
 import raw from "./app.module.scss?inline";
 
-import { SchedulePage } from "@/pages/Schedule/Schedule";
 import { Header } from "@/components/Header/Header";
 import { NavigationBar } from "@/components/NavigationBar/NavigationBar";
 

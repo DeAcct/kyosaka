@@ -1,11 +1,8 @@
-import { Component, define, html } from "@/lib/v2/core";
+import { Component, define, html } from "@/lib/core";
 import { scheduleStore } from "@/store/scheduleStore";
 import { useSwipe } from "@/hooks/touch";
 
-import mapping from "./swipeWrap.module.scss";
-import raw from "./swipeWrap.module.scss?inline";
-
-export const SwipeWrap = define("swipe-wrap", { mapping, raw })(
+export const SwipeWrap = define("swipe-wrap")(
   class extends Component {
     setup() {
       this.subscribe(scheduleStore);
@@ -17,13 +14,13 @@ export const SwipeWrap = define("swipe-wrap", { mapping, raw })(
 
     template() {
       return html`
-        <host-event
+        <host
           @pointerdown="${this.swipe.start}"
           @pointermove="${this.swipe.move}"
           @pointerup="${this.swipe.end}"
           @pointercancel="${this.swipe.end}"
-        ></host-event>
-        <host-event></host-event>
+          style="display: contents; touch-action: pan-y; user-select: none; -webkit-user-drag: none;"
+        ></host>
         <slot></slot>
       `;
     }

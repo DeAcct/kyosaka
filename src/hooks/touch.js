@@ -1,4 +1,4 @@
-// lib/hooks.js
+//lib/hooks.js
 
 export function useSwipe(callbacks, threshold = 5) {
   let startPos = { x: 0, y: 0 };

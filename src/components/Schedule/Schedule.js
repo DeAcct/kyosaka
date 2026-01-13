@@ -1,4 +1,4 @@
-import { Component, define, html } from "@/lib/v2/core";
+import { Component, define, html } from "@/lib/core";
 import { switcher } from "@/lib/switcher";
 import { scheduleStore } from "@/store/scheduleStore";
 import { useSwipe } from "@/hooks/touch";
@@ -79,7 +79,11 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
       `;
     }
     afterRender() {
-      this.$refs.details[0].setAttribute("open", "");
+      const list = scheduleStore.currentDayList;
+      if (!list) {
+        return;
+      }
+      this.$refs.details[0]?.setAttribute("open", "");
     }
   }
 );

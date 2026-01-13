@@ -6,8 +6,7 @@
   background-color: var(--bg-300);
 }
 .link {
-  flex-grow: 1;
-  min-width: 0;
+  flex: 1 0 0;
   &[aria-selected="true"] {
     --icon-color: var(--brand-400);
     --icon-bg-color: var(--brand-800);

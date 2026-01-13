@@ -1,5 +1,5 @@
-// lib/router.js
-import { updateDOM } from "./v2/core";
+//lib/router.js
+import { updateDOM } from "./core";
 
 export class Router {
   constructor(routes, container) {

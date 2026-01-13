@@ -1,4 +1,4 @@
-import { Stateless, defineStateless } from "@/lib/v2/core";
+import { Stateless, defineStateless } from "@/lib/core";
 
 export const Selected = defineStateless("icon-selected")(
   class extends Stateless {
