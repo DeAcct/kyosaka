@@ -56,7 +56,10 @@ function resolveMarkers(node, values, component) {
 
 export function patch(parent, newNode, oldNode, index, values, component) {
   // 1. 삭제 처리
-  if (!newNode && oldNode) return oldNode.remove();
+  if (!newNode && oldNode) {
+    cleanupEventListeners(oldNode);
+    return oldNode.remove();
+  }
 
   let targetNode = oldNode;
 
@@ -66,6 +69,8 @@ export function patch(parent, newNode, oldNode, index, values, component) {
     newNode.nodeType !== oldNode.nodeType ||
     newNode.nodeName !== oldNode.nodeName
   ) {
+    if (oldNode) cleanupEventListeners(oldNode);
+
     targetNode = newNode.cloneNode(true);
     if (!oldNode) parent.appendChild(targetNode);
     else parent.replaceChild(targetNode, oldNode);
@@ -121,17 +126,77 @@ export function patch(parent, newNode, oldNode, index, values, component) {
   }
 }
 
-function updateAttrs(blueprint, target, values) {
+/**
+ * 🔍 요소 파기 시 자동 청소 설계
+ * 요소에 직접 붙은 @ 핸들러와 자식들의 핸들러를 재귀적으로 제거합니다.
+ */
+function cleanupEventListeners(node) {
+  if (!node || node.nodeType !== Node.ELEMENT_NODE) return;
+
+  // 1. 해당 요소의 핸들러 제거
+  // Object.keys로 _@ 접두사가 붙은 속성을 찾아 리스너를 해제합니다.
+  Object.keys(node).forEach((key) => {
+    if (key.startsWith("_@")) {
+      const eventName = key.replace("_@", "");
+      node.removeEventListener(eventName, node[key]);
+      delete node[key]; // 참조 삭제
+    }
+  });
+
+  // 2. 자식 요소들도 모두 뒤져서 청소 (재귀)
+  // 부모가 사라지면 자식들도 DOM에서 떨어지므로 함께 청소해야 합니다.
+  Array.from(node.childNodes).forEach(cleanupEventListeners);
+}
+
+export function updateAttrs(blueprint, target, values) {
   const attrs = Array.from(blueprint.attributes || []);
+
   attrs.forEach(({ name, value }) => {
-    if (name.startsWith(":") || name.startsWith("@")) return;
+    // 1. 특수 바인딩($ , : , @)은 건드리지 않음
+    if (name.startsWith(":") || name.startsWith("@") || name.startsWith("$"))
+      return;
+
+    // 2. 🔍 물음표(?) 접두사 처리 (불리언 속성 전용)
+    // 예: <details ?open="${index === 0}">
+    if (name.startsWith("?")) {
+      const realName = name.slice(1); // '?open' -> 'open'
+      const match = value.match(/__VAL_(\d+)__/);
+
+      if (match) {
+        // 실제 데이터(values)에서 불리언 값을 가져옴
+        const boolValue = !!values[match[1]];
+        if (boolValue) {
+          target.setAttribute(realName, ""); // open 속성 추가
+        } else {
+          target.removeAttribute(realName); // 🎯 확실히 제거해서 details를 닫음
+        }
+      }
+      // 브라우저가 생성한 가짜 속성(?open)은 DOM에서 즉시 제거
+      target.removeAttribute(name);
+      return;
+    }
+
+    // 3. 🔍 이름 자체가 마커인 경우 처리 (예: <details __VAL_2__>)
+    // `${index === 0 ? 'open' : ''}` 같은 코드를 처리합니다.
+    const nameMatch = name.match(/^__val_(\d+)__$/i);
+    if (nameMatch) {
+      const realValue = values[nameMatch[1]];
+      if (realValue && typeof realValue === "string") {
+        target.setAttribute(realValue, ""); // 'open' 주입
+      }
+      target.removeAttribute(name); // 쓰레기 마커 삭제
+      return;
+    }
+
+    // 4. 일반 속성 처리 (class, id 등)
     const finalValue = value.replace(/__VAL_(\d+)__/g, (_, i) => values[i]);
-    if (target.getAttribute(name) !== finalValue)
+    if (target.getAttribute(name) !== finalValue) {
       target.setAttribute(name, finalValue);
+    }
   });
 }
 
-function updateProps(blueprint, target, values, component) {
+export function updateProps(blueprint, target, values, component) {
   const attrs = Array.from(blueprint.attributes || []);
   attrs.forEach(({ name, value }) => {
     if (name.startsWith("$") && component) {
@@ -159,10 +224,10 @@ function updateProps(blueprint, target, values, component) {
       target.removeAttribute(name);
     } else if (name.startsWith("@")) {
       const eventName = name.slice(1);
-      if (target[`_handler_${eventName}`] !== realValue) {
-        target.removeEventListener(eventName, target[`_handler_${eventName}`]);
+      if (target[`_@${eventName}_`] !== realValue) {
+        target.removeEventListener(eventName, target[`_@${eventName}_`]);
         target.addEventListener(eventName, realValue);
-        target[`_handler_${eventName}`] = realValue;
+        target[`_@${eventName}_`] = realValue;
       }
       target.removeAttribute(name);
     }

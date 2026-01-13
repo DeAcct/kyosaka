@@ -1,7 +1,7 @@
 //lib/core.js
 
 import resetStyle from "@/styles/base/_reset.scss?inline";
-import { patch } from "./diff";
+import { patch, updateAttrs, updateProps } from "./diff";
 
 const sharedResetSheet = new CSSStyleSheet();
 sharedResetSheet.replaceSync(resetStyle);
@@ -112,7 +112,7 @@ export class Stateless extends HTMLElement {
       this.shadowRoot.adoptedStyleSheets = [sharedResetSheet, stylesheet];
     }
     const result = this.template();
-    if (result) updateDOM(this.shadowRoot, result);
+    if (result) updateDOM(this.shadowRoot, result, this);
   }
   getStyles() {
     return { mapping: {}, stylesheet: null };
@@ -168,12 +168,8 @@ export const html = (strings, ...values) => ({ strings, values });
 /**
  * 렌더링 엔진
  */
-
 export const updateDOM = (parent, templateResult, component) => {
-  if (!templateResult || !templateResult.strings) return;
   const { strings, values } = templateResult;
-
-  // 마커 포함 골격 생성
   const fullHTML = strings.reduce(
     (acc, str, i) => acc + str + (i < values.length ? `__VAL_${i}__` : ""),
     ""
@@ -182,11 +178,45 @@ export const updateDOM = (parent, templateResult, component) => {
   const temp = document.createElement("template");
   temp.innerHTML = fullHTML;
 
+  const globalEventBinderElement = temp.content.querySelector("global-event");
+  if (globalEventBinderElement) {
+    if (component._globalHandlers) {
+      component._globalHandlers.forEach(({ target, type, handler }) => {
+        target.removeEventListener(type, handler);
+      });
+    }
+    component._globalHandlers = [];
+
+    Array.from(globalEventBinderElement.attributes).forEach((attr) => {
+      if (attr.name.startsWith("@")) {
+        const eventName = attr.name.slice(1);
+        const match = attr.value.match(/__VAL_(\d+)__/);
+
+        if (match) {
+          const handler = values[match[1]].bind(component);
+          const target = window;
+
+          target.addEventListener(eventName, handler);
+          component._globalHandlers.push({ target, type: eventName, handler });
+        }
+      }
+    });
+    globalEventBinderElement.remove();
+  }
+
+  const hostEventBinderElement = temp.content.querySelector("host-event");
+  if (hostEventBinderElement) {
+    updateAttrs(hostEventBinderElement, component, values);
+    updateProps(hostEventBinderElement, component, values, component);
+    hostEventBinderElement.remove();
+  }
+
+  // 기존 텍스트 마커/앵커 처리 로직... (생략)
+
   const newNodes = Array.from(temp.content.childNodes);
   const oldNodes = Array.from(parent.childNodes);
-
-  // 🔍 parent 자체를 청소하지 않고 patch에게 맡김 (트랜지션 핵심)
   const max = Math.max(newNodes.length, oldNodes.length);
+
   for (let i = 0; i < max; i++) {
     patch(parent, newNodes[i], oldNodes[i], i, values, component);
   }

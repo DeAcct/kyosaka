@@ -52,11 +52,11 @@ export const DaySelector = define("day-selector", { mapping, raw })(
     template() {
       const { selectedDay } = scheduleStore.data;
       return html`
+        <global-event @resize="${this.centerActiveButton}"></global-event>
         <div class="${this.styles.daySelector}">
           <div class="${this.styles.scrollClip}">
             <ul class="${this.styles.scrollBody}">
-              ${kyFor(
-                this.days,
+              ${this.days.map(
                 ({ name, day, description }, index) => html`
                   <li
                     class="${this.styles.item}"
