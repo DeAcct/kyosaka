@@ -1,3 +1,5 @@
+@use "@/styles/layout/layout" as *;
+
 .colBG {
   display: none;
 }
@@ -37,26 +39,9 @@
 
 .schedule {
   position: relative;
-  border-radius: 0.8rem;
   min-height: 0;
   background-color: var(--bg-200);
-  transition: opacity 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
-    scale 150ms var(--ease-in-out-back) calc(30ms * var(--i));
-  @media screen and (max-width: 659px) {
-    @starting-style {
-      opacity: 0;
-      scale: 0.9;
-    }
-  }
-
-  &:first-of-type {
-    border-top-left-radius: var(--card-radius-base);
-    border-top-right-radius: var(--card-radius-base);
-  }
-  &:last-of-type {
-    border-bottom-left-radius: var(--card-radius-base);
-    border-bottom-right-radius: var(--card-radius-base);
-  }
+  @include round-list;
 
   @media screen and (min-width: 690px) {
     display: contents;

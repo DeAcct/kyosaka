@@ -4,7 +4,6 @@
   margin: 0 auto;
   @include safe-area;
   @include double-col-layout;
-  gap: 0.4rem;
   .daySelector {
     width: 100%;
     position: sticky;

@@ -6,6 +6,7 @@ import raw from "./page.checklist.module.scss?inline";
 
 import { DaySelector } from "@/components/DaySelector/DaySelector";
 import { Schedule } from "@/components/Schedule/Schedule";
+import { Progress } from "@/components/Progress/Progress";
 
 export const ChecklistPage = define("page-checklist", { mapping, raw })(
   class extends Component {
@@ -13,32 +14,36 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
       this.subscribe(checklistStore);
     }
 
+    get mock() {
+      return [{ done: false, text: "여권 챙기기", id: 123 }];
+    }
+
     template() {
-      // 🔍 html 태그를 사용한 선언적 템플릿
       return html`
         <div class="${this.styles.doubleCol}">
-          <section class="${this.styles.leftCol}">
+          <section class="${this.styles.stickyBoard}">
             <h2 class="${this.styles.title}">준비물 현황</h2>
-            <div class="${this.styles.progressCard}">
-              <span>전체 완료율:${checklistStore.percentage * 100}%</span>
-            </div>
+            <ky-progress
+              :percent="${checklistStore.percentage}"
+              class="${this.styles.progress}"
+              >${checklistStore.percentage}</ky-progress
+            >
           </section>
-
-          <section class="${this.styles.rightCol}">
-            <ul class="${this.styles.itemList}">
-              ${checklistStore.items.map(
-                (item) => html`
-                  <!--li
-                    key="chk-${item.id}"
-                    class="${item.done ? this.styles.done : ""}"
-                  >
-                    <ky-icon>${item.done ? "check_circle" : "circle"}</ky-icon>
-                    <span>${item.text}</span>
-                  </li-->
-                `
-              )}
-            </ul>
-          </section>
+          <ul class="${this.styles.list}">
+            ${this.mock.map(
+              (item) => html`
+                <li
+                  key="chk-${item.id}"
+                  class="${this.styles.item} ${item.done
+                    ? this.styles.done
+                    : ""}"
+                >
+                  <ky-icon>${item.done ? "check_circle" : "circle"}</ky-icon>
+                  <span>${item.text}</span>
+                </li>
+              `
+            )}
+          </ul>
         </div>
       `;
     }

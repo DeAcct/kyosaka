@@ -3,18 +3,40 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   transition: opacity 0.5s var(--ease-in-out-back);
+  gap: 0.4rem;
   @starting-style {
     opacity: 0;
   }
 
   /* 🔍 화면 너비가 넓어질 때 (Unfolded / Tablet) */
   @media (min-width: 690px) {
+    gap: 1.2rem 2rem;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 }
 
 @mixin safe-area {
   width: min(calc(100% - 4.8rem), 1080px);
-  min-height: calc(100dvh - 10.4rem);
+  min-height: 100dvh;
   padding: var(--header-height) 0 10rem;
+}
+
+@mixin round-list {
+  border-radius: 0.8rem;
+  transition: opacity 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
+    scale 150ms var(--ease-in-out-back) calc(30ms * var(--i));
+  &:first-of-type {
+    border-top-left-radius: var(--card-radius-base);
+    border-top-right-radius: var(--card-radius-base);
+  }
+  &:last-of-type {
+    border-bottom-left-radius: var(--card-radius-base);
+    border-bottom-right-radius: var(--card-radius-base);
+  }
+  @media screen and (max-width: 689px) {
+    @starting-style {
+      opacity: 0;
+      scale: 0.9;
+    }
+  }
 }
