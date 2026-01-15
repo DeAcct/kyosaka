@@ -8,12 +8,10 @@ export const Progress = define("ky-progress", { mapping, raw })(
     template() {
       return html`
         <div class="${this.styles.back}">
-          <span class="${this.styles.body}" style="width: ${this.percent};">
-          </span>
-          <span class="${this.styles.text}" style="width: ${this.percent};">
-            <slot></slot>
+          <span class="${this.styles.body}" style="--progress:${this.progress}">
           </span>
         </div>
+        <slot></slot>
       `;
     }
   }

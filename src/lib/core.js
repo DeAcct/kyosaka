@@ -16,9 +16,22 @@ export class Component extends HTMLElement {
   styles = {};
   $refs = {};
 
+  static shadowOptions = { mode: "open" };
+
+  _internals = null;
+  // 브라우저에게 이 컴포넌트가 폼과 연동될 수 있음을 알림 (기본값 false)
+  static formAssociated = false;
+
   constructor() {
     super();
-    this.attachShadow({ mode: "open" });
+    const options = this.constructor.shadowOptions || { mode: "open" };
+
+    if (!this.shadowRoot) {
+      this.attachShadow(options);
+    }
+    if (this.constructor.formAssociated) {
+      this._internals = this.attachInternals();
+    }
     this.shadowRoot.adoptedStyleSheets = [sharedResetSheet];
   }
 
@@ -92,6 +105,10 @@ export class Component extends HTMLElement {
     );
   }
   setIsolatedEvent() {}
+
+  emit(eventName, option) {
+    this.dispatchEvent(new CustomEvent(eventName, option));
+  }
 }
 
 /**

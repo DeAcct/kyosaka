@@ -1,19 +1,26 @@
-.back {
-  width: 100%;
-  height: 100%;
-  background-color: var(--progress-back);
+:host {
   position: relative;
+  overflow: hidden;
+}
+
+.back {
+  position: absolute;
+  inset: 0;
+  background-color: var(--progress-back);
   display: flex;
   justify-content: flex-start;
   align-items: center;
   font-size: inherit;
+  z-index: -1;
 }
 .body {
+  width: 100%;
   height: 100%;
+  scale: var(--progress) 1;
+  transform-origin: left;
   background-color: var(--progress-body);
-}
-.text {
-  position: absolute;
-  left: 0.8rem;
-  font-size: inherit;
+  transition: scale 300ms var(--ease-out-expo);
+  @starting-style {
+    scale: 0 1;
+  }
 }

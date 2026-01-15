@@ -1,0 +1,11 @@
+@use "@/styles/layout/layout" as *;
+
+.item {
+  font-size: 2rem;
+}
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1.6rem;
+}
