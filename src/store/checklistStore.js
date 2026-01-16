@@ -37,7 +37,7 @@ class ChecklistStore extends Store {
     if (!text.trim()) return;
 
     const newItem = {
-      id: Date.now(), // 🔍 고유 ID 생성
+      id: crypto.randomUUID(),
       text,
       checked: false,
     };
@@ -45,12 +45,23 @@ class ChecklistStore extends Store {
     const newItems = [...this.state.items, newItem];
     this.commit("items", newItems);
   }
+
+  editItem(id, text) {
+    if (!text.trim()) return;
+
+    const newItems = this.items.map((item) =>
+      item.id === id ? { ...item, text } : item
+    );
+
+    return newItems;
+  }
+
+  removeItem(id) {
+    const newItems = this.items.filter((item) => item.id !== id);
+    return newItems;
+  }
 }
 
 export const checklistStore = new ChecklistStore("checklistStore", {
-  items: [
-    { id: 1, checked: true, text: "여권 챙기기" },
-    { id: 2, checked: true, text: "세면도구" },
-    { id: 3, checked: true, text: "3일치 옷" },
-  ],
+  items: [],
 });

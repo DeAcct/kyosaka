@@ -8,7 +8,7 @@ import { DaySelector } from "@/components/DaySelector/DaySelector";
 import { Schedule } from "@/components/Schedule/Schedule";
 import { Progress } from "@/components/Progress/Progress";
 import { ChecklistItem } from "@/components/ChecklistItem/ChecklistItem";
-import { ChecklistInput } from "@/components/ChecklistInput/ChecklistInput";
+import { ChecklistControl } from "@/components/ChecklistControl/ChecklistControl";
 
 export const ChecklistPage = define("page-checklist", { mapping, raw })(
   class extends Component {
@@ -17,29 +17,36 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
     }
 
     template() {
-      const { percentage: percent, progress } = checklistStore;
+      const {
+        percentage: percent,
+        progress,
+        items,
+        allChecked,
+      } = checklistStore;
       return html`
         <div class="${this.styles.doubleCol}">
           <ky-progress
             :progress="${progress}"
             class="${this.styles.sticky}"
-            style="--list-length: ${checklistStore.items.length + 1}"
+            style="--list-length: ${items.length + 1}"
           >
-            <h2 class="${this.styles.title}">준비물 현황</h2>
-            <span class="${this.styles.progress}">
-              ${checklistStore.allChecked.length} /
-              ${checklistStore.items.length}
-            </span>
+            <span class="${this.styles.title}">체크리스트 완료 현황</span>
+            <strong class="${this.styles.progress}">
+              ${allChecked.length} / ${items.length}
+            </strong>
           </ky-progress>
+          <h2 class="${this.styles.title}">전체 체크리스트</h2>
           <ul class="${this.styles.list}">
-            ${checklistStore.items.map(
+            ${items.map(
               (item) => html`
                 <checklist-item
                   key="item-${item.id}"
                   :item="${item}"
                   @toggle="${({ detail }) => {
                     checklistStore.toggleItem(detail.id);
-                    console.log(item.checked);
+                  }}"
+                  @longpress="${() => {
+                    console.log("longpress");
                   }}"
                   class="${this.styles.item}"
                 ></checklist-item>
@@ -47,7 +54,12 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
             )}
           </ul>
         </div>
-        <checklist-input class="${this.styles.input}"></checklist-input>
+        <checklist-control
+          class="${this.styles.input}"
+          @add="${({ detail }) => {
+            checklistStore.addItem(detail.text);
+          }}"
+        ></checklist-control>
       `;
     }
   }
