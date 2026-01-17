@@ -66,8 +66,8 @@ body {
 }
 
 ::selection {
-  background-color: oklch(var(--brand-500));
-  color: oklch(var(--gray-900));
+  background-color: var(--brand-500);
+  color: var(--gray-900);
 }
 em,
 i {

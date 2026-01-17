@@ -21,21 +21,45 @@ export const ChecklistControl = define("checklist-control", { mapping, raw })(
 
     template() {
       return html`
-        <form
-          class="${this.styles.form}"
-          @submit="${(e) => {
-            this.handleSubmit(e);
-          }}"
-        >
+        <form class="${this.styles.form}">
           <input
+            name="newItem"
             type="text"
             $input
             placeholder="체크리스트 추가"
-            class="${this.styles.input}"
+            class="${this.styles.input} ${this.mode === "view"
+              ? this.styles.show
+              : ""}"
           />
-          <button type="submit" class="${this.styles.button}">
-            <ky-icon>add</ky-icon>
-          </button>
+          <div class="${this.styles.buttonWrap}">
+            <button
+              type="button"
+              class="${this.styles.button} ${this.mode === "edit"
+                ? this.styles.cancel
+                : ""}"
+              @click="${(e) => {
+                if (this.mode === "edit") {
+                  this.emit("cancel");
+                  return;
+                }
+                this.handleSubmit(e);
+              }}"
+            >
+              <ky-icon class="${this.styles.icon}">add</ky-icon>
+            </button>
+
+            ${this.mode === "edit"
+              ? html`<button
+                  type="button"
+                  class="${this.styles.button}"
+                  @click="${(e) => {
+                    this.emit("delete");
+                  }}"
+                >
+                  <ky-icon class="${this.styles.icon}">delete</ky-icon>
+                </button>`
+              : ""}
+          </div>
         </form>
       `;
     }

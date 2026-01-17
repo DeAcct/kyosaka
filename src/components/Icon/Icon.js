@@ -9,7 +9,7 @@ export const Icon = define("ky-icon", { raw, mapping })(
       // 🔍 브라우저에게 아이콘 폰트가 로드될 때까지 기다리라고 명령
       try {
         await document.fonts.load('18px "Material Symbols Outlined"');
-        this.setState({ loaded: true });
+        this.setState("loaded", { loaded: true });
         // ???
       } catch (e) {
         console.error("아이콘 폰트 로드 실패", e);

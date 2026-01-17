@@ -12,8 +12,37 @@ import { ChecklistControl } from "@/components/ChecklistControl/ChecklistControl
 
 export const ChecklistPage = define("page-checklist", { mapping, raw })(
   class extends Component {
+    state = {
+      mode: "view",
+      deleteSelected: [],
+    };
     setup() {
       this.subscribe(checklistStore);
+    }
+
+    onToggleItem({ detail }) {
+      if (this.state.mode === "edit") return;
+      checklistStore.toggleItem(detail.id);
+    }
+
+    onLongpressItem({ detail }) {
+      this.setState("mode", "edit");
+      this.setState("deleteSelected", [
+        ...this.state.deleteSelected,
+        detail.id,
+      ]);
+      console.log(this.state);
+    }
+
+    onClickItem(id) {
+      if (this.state.mode === "view") return;
+      const isSelected = this.state.deleteSelected.includes(id);
+      console.log(id, isSelected);
+      const result = isSelected
+        ? this.state.deleteSelected.filter((item) => item !== id)
+        : [...this.state.deleteSelected, id];
+
+      this.setState("deleteSelected", result);
     }
 
     template() {
@@ -28,7 +57,7 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
           <ky-progress
             :progress="${progress}"
             class="${this.styles.sticky}"
-            style="--list-length: ${items.length + 1}"
+            style="--list-length: ${items.length + 2}"
           >
             <span class="${this.styles.title}">체크리스트 완료 현황</span>
             <strong class="${this.styles.progress}">
@@ -38,27 +67,44 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
           <h2 class="${this.styles.title}">전체 체크리스트</h2>
           <ul class="${this.styles.list}">
             ${items.map(
-              (item) => html`
+              (item, index) => html`
                 <checklist-item
                   key="item-${item.id}"
+                  class="${this.styles
+                    .item} ${this.state.deleteSelected.includes(item.id)
+                    ? this.styles.selected
+                    : ""}"
+                  style="--i:${index}"
                   :item="${item}"
-                  @toggle="${({ detail }) => {
-                    checklistStore.toggleItem(detail.id);
+                  @toggle="${(e) => {
+                    this.onToggleItem(e);
                   }}"
-                  @longpress="${() => {
-                    console.log("longpress");
+                  @longpress="${(e) => {
+                    this.onLongpressItem(e);
                   }}"
-                  class="${this.styles.item}"
+                  @click="${() => {
+                    this.onClickItem(item.id);
+                  }}"
+                  :selectmode="${this.state.mode === "edit"}"
                 ></checklist-item>
               `
             )}
           </ul>
         </div>
         <checklist-control
-          class="${this.styles.input}"
+          class="${this.styles.control}"
           @add="${({ detail }) => {
             checklistStore.addItem(detail.text);
           }}"
+          @delete=${() => {
+            checklistStore.removeList(this.state.deleteSelected);
+            this.setState("mode", "view");
+          }}
+          @cancel=${() => {
+            this.setState("deleteSelected", []);
+            this.setState("mode", "view");
+          }}
+          :mode="${this.state.mode}"
         ></checklist-control>
       `;
     }

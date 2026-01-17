@@ -41,7 +41,7 @@
   position: relative;
   min-height: 0;
   background-color: var(--bg-200);
-  @include round-list;
+  @include round-list("y");
 
   @media screen and (min-width: 690px) {
     display: contents;

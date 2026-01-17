@@ -17,10 +17,10 @@ export class Component extends HTMLElement {
   $refs = {};
 
   static shadowOptions = { mode: "open" };
-
   _internals = null;
-  // 브라우저에게 이 컴포넌트가 폼과 연동될 수 있음을 알림 (기본값 false)
   static formAssociated = false;
+
+  _renderAnimationFrameId = null;
 
   constructor() {
     super();
@@ -35,9 +35,18 @@ export class Component extends HTMLElement {
     this.shadowRoot.adoptedStyleSheets = [sharedResetSheet];
   }
 
-  setState(newState) {
-    this.state = { ...this.state, ...newState };
-    this.render();
+  setState(key, newState) {
+    this.state = { ...this.state, [key]: newState };
+    this.queueRender();
+  }
+  queueRender() {
+    // 이미 예약된 프레임이 있다면 무시
+    if (this._renderAnimationFrameId) return;
+
+    this._renderAnimationFrameId = requestAnimationFrame(() => {
+      this.render();
+      this._renderAnimationFrameId = null; // 렌더링 후 ID 초기화
+    });
   }
 
   subscribe(store) {
@@ -57,6 +66,11 @@ export class Component extends HTMLElement {
   disconnectedCallback() {
     if (this._abortController) this._abortController.abort();
     this._unsubscribers.forEach((unsub) => unsub());
+
+    if (this._renderAnimationFrameId) {
+      cancelAnimationFrame(this._renderAnimationFrameId);
+      this._renderAnimationFrameId = null;
+    }
   }
 
   setup() {}
@@ -68,6 +82,11 @@ export class Component extends HTMLElement {
   }
 
   render() {
+    if (this._renderAnimationFrameId) {
+      cancelAnimationFrame(this._renderAnimationFrameId);
+      this._renderAnimationFrameId = null;
+    }
+
     const { mapping, stylesheet } = this.getStyles();
     this.styles = mapping;
 

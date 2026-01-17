@@ -21,18 +21,34 @@
   padding: var(--header-height) 0 10rem;
 }
 
-@mixin round-list {
+@mixin round-list($direction: "y") {
+  // 기본값은 'y' (세로)
   border-radius: 0.8rem;
   transition: opacity 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
     scale 150ms var(--ease-in-out-back) calc(30ms * var(--i));
+
   &:first-of-type {
-    border-top-left-radius: var(--card-radius-base);
-    border-top-right-radius: var(--card-radius-base);
+    @if $direction == "y" {
+      border-top-left-radius: var(--card-radius-base);
+      border-top-right-radius: var(--card-radius-base);
+    } @else {
+      // 'x' 방향 (왼쪽 모서리)
+      border-top-left-radius: var(--card-radius-base);
+      border-bottom-left-radius: var(--card-radius-base);
+    }
   }
+
   &:last-of-type {
-    border-bottom-left-radius: var(--card-radius-base);
-    border-bottom-right-radius: var(--card-radius-base);
+    @if $direction == "y" {
+      border-bottom-left-radius: var(--card-radius-base);
+      border-bottom-right-radius: var(--card-radius-base);
+    } @else {
+      // 'x' 방향 (오른쪽 모서리)
+      border-top-right-radius: var(--card-radius-base);
+      border-bottom-right-radius: var(--card-radius-base);
+    }
   }
+
   @media screen and (max-width: 689px) {
     @starting-style {
       opacity: 0;

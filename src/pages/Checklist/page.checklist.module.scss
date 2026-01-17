@@ -5,7 +5,7 @@
   @include safe-area;
   @include double-col-layout;
   min-height: 100dvh;
-  gap: 0.4rem;
+  row-gap: 0.4rem;
   align-content: start;
 }
 .sticky {
@@ -30,6 +30,7 @@
 }
 .title {
   font-size: 1.6rem;
+  anchor-name: --right-col;
 }
 .progress {
   margin-left: auto;
@@ -40,15 +41,28 @@
   display: contents;
 }
 .item {
-  @include round-list;
+  @include round-list("y");
   background-color: var(--bg-200);
+  border: 1px solid transparent;
+
+  &.selected {
+    border-color: var(--brand-500);
+  }
+  @starting-style {
+    opacity: 0;
+    scale: 0.9;
+  }
 }
 
-.input {
+.control {
   position: fixed;
   z-index: 110;
   bottom: calc(var(--navigation-height) + 1.2rem);
-  width: min(calc(100% - 4.8rem), 24rem);
   left: 50%;
   translate: -50% 0;
+  position-anchor: --right-col;
+
+  @media screen and (min-width: 690px) {
+    left: anchor(center);
+  }
 }

@@ -1,30 +1,65 @@
+@use "@/styles/layout/layout" as *;
+
 .form {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 0.8rem;
 }
 
 .input {
-  border: none;
   background-color: var(--bg-200);
   border-radius: var(--card-radius-base);
   height: calc(var(--card-radius-base) * 2);
-  padding: 0 1.6rem;
   font-size: 1.4rem;
-  flex-grow: 0;
-  min-width: 0;
   border: 2px solid transparent;
+
+  display: none;
+  width: calc(var(--card-radius-base) * 2);
+  transition: all 150ms var(--ease-in-out-quad);
+  transition-behavior: allow-discrete;
   &:focus {
-    border-color: var(--bg-400);
+    border-color: var(--bg-300);
+  }
+  &.show {
+    display: block;
+    width: 24rem;
+    opacity: 1;
+    padding: 0 1.6rem;
+    @starting-style {
+      width: calc(var(--card-radius-base) * 2);
+      opacity: 0;
+      padding: 0;
+    }
   }
 }
 
+.buttonWrap {
+  display: flex;
+  gap: 0.4rem;
+}
 .button {
   width: calc(var(--card-radius-base) * 2);
   height: calc(var(--card-radius-base) * 2);
   background-color: var(--brand-500);
   border-radius: 50%;
-  font-size: 2.4rem;
   color: var(--bg-100);
   flex-shrink: 0;
+  font-size: 2.4rem;
+  @include round-list("x");
+  transition: 150ms var(--ease-in-out-quad);
+
+  --rotation: 0;
+  &.cancel {
+    --rotation: 45deg;
+    .icon {
+      display: block;
+      rotate: var(--rotation);
+      transition: all 150ms var(--ease-in-out-quad);
+    }
+  }
+
+  @starting-style {
+    opacity: 0;
+  }
 }

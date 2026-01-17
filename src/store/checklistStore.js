@@ -56,9 +56,9 @@ class ChecklistStore extends Store {
     return newItems;
   }
 
-  removeItem(id) {
-    const newItems = this.items.filter((item) => item.id !== id);
-    return newItems;
+  removeList(idList) {
+    const newItems = this.items.filter(({ id }) => !idList.includes(id));
+    this.commit("items", newItems);
   }
 }
 
