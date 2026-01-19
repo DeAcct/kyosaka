@@ -112,17 +112,4 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  build: {
-    rollupOptions: {
-      output: {
-        // 폰트 파일명에서 [hash](-CJuje-Rk 등)를 제거하여 index.html 경로와 일치시킴
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name.endsWith(".woff2")) {
-            return "assets/fonts/[name][ext]";
-          }
-          return "assets/[name]-[hash][ext]";
-        },
-      },
-    },
-  },
 });
