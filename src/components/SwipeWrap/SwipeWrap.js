@@ -7,8 +7,8 @@ export const SwipeWrap = define("swipe-wrap")(
     setup() {
       this.subscribe(scheduleStore);
       this.swipe = useSwipe({
-        left: () => scheduleStore.nextDay(),
-        right: () => scheduleStore.prevDay(),
+        left: () => this.emit("swipe", { detail: { direction: "left" } }),
+        right: () => this.emit("swipe", { detail: { direction: "right" } }),
       });
     }
 
@@ -24,5 +24,5 @@ export const SwipeWrap = define("swipe-wrap")(
         <slot></slot>
       `;
     }
-  }
+  },
 );

@@ -1,8 +1,8 @@
 import { Component, define, html } from "@/lib/core";
 import { checklistStore } from "@/store/checklistStore";
 
-import mapping from "./page.checklist.module.scss";
-import raw from "./page.checklist.module.scss?inline";
+import mapping from "./checklist.page.module.scss";
+import raw from "./checklist.page.module.scss?inline";
 
 import { DaySelector } from "@/components/DaySelector/DaySelector";
 import { Schedule } from "@/components/Schedule/Schedule";
@@ -87,7 +87,7 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
                   }}"
                   :selectmode="${this.state.mode === "edit"}"
                 ></checklist-item>
-              `
+              `,
             )}
           </ul>
         </div>
@@ -108,5 +108,5 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
         ></checklist-control>
       `;
     }
-  }
+  },
 );

@@ -1,12 +1,12 @@
 import { Component, define, html } from "@/lib/core";
 
-import mapping from "./page.schedule.module.scss";
-import raw from "./page.schedule.module.scss?inline";
+import mapping from "./root.page.module.scss";
+import raw from "./root.page.module.scss?inline";
 
 import { DaySelector } from "@/components/DaySelector/DaySelector";
 import { Schedule } from "@/components/Schedule/Schedule";
 
-export const SchedulePage = define("page-schedule", { mapping, raw })(
+export const RootPage = define("page-root", { mapping, raw })(
   class extends Component {
     template() {
       return html`
@@ -18,5 +18,5 @@ export const SchedulePage = define("page-schedule", { mapping, raw })(
         </ky-schedule>
       `;
     }
-  }
+  },
 );

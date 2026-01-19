@@ -1,6 +1,5 @@
 import { Component, define, html } from "@/lib/core";
 import { Router } from "@/lib/router";
-import { routes } from "@/routes"; // 라우트 설정 파일
 
 import mapping from "./app.module.scss";
 import raw from "./app.module.scss?inline";
@@ -12,7 +11,7 @@ export const App = define("ky-app", { mapping, raw })(
   class extends Component {
     afterRender() {
       const $container = this.$selector("[data-router-view]");
-      new Router(routes, $container);
+      new Router($container);
     }
 
     template() {

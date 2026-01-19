@@ -26,6 +26,23 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
         .default(() => "❤️");
     }
 
+    daySwipe({ detail }) {
+      return switcher(detail)
+        .case(
+          ({ direction }) => direction === "left",
+          () => scheduleStore.nextDay(),
+        )
+        .case(
+          ({ direction }) => direction === "right",
+          () => scheduleStore.prevDay(),
+        )
+        .default(() => {
+          throw new Error(
+            `정의되지 않은 방향이 감지되었습니다.\n(Event detail: ${JSON.stringify(detail)})`,
+          );
+        });
+    }
+
     template() {
       const list = scheduleStore.currentDayList;
 
@@ -37,7 +54,11 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
         <div class="${this.styles.colBG}">
           <p class="${this.styles.emptyHolder}">일정을 누르면 열립니다</p>
         </div>
-        <swipe-wrap>
+        <swipe-wrap
+          @swipe="${(e) => {
+            this.daySwipe(e);
+          }}"
+        >
           ${list.schedule.map(
             (item, index) => html`
               <details
@@ -73,7 +94,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
                   ></ky-description>
                 </div>
               </details>
-            `
+            `,
           )}
         </swipe-wrap>
       `;
@@ -85,5 +106,5 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
       }
       this.$refs.details[0]?.setAttribute("open", "");
     }
-  }
+  },
 );
