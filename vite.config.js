@@ -10,7 +10,8 @@ export default defineConfig({
       registerType: "autoUpdate",
       workbox: {
         // 🔍 빌드된 모든 js, css, html, 리소스 파일을 캐싱 대상으로 지정
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,json}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,json,woff2}"],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
       devOptions: {
         enabled: true,

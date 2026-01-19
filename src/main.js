@@ -1,5 +1,6 @@
 import "./styles/variable/_color.scss";
 import "./styles/variable/_utils.scss";
+import "./styles/base/_fonts.scss";
 import "./styles/base/_reset.scss";
 import { App } from "@/components/App/App";
 
