@@ -9,36 +9,7 @@ import { Button } from "@/components/Button/Button";
 
 export const Fallback = define("ky-fallback", { mapping, raw })(
   class extends Component {
-    // setup(){
-    //   this.subscribe(travelData);
-    // }
-
-    getStyles() {
-      return {
-        mapping,
-        stylesheet,
-      };
-    }
-    template() {
-      return html`
-        <div class="${this.styles.fallback}">
-          <img
-            class="${this.styles.icon}"
-            src="./fallback.svg"
-            alt="파일을 등록해주세요"
-          />
-          <p class="${this.styles.text}">등록된 여행 일정이 없습니다.</p>
-          <ky-button>불러오기</ky-button>
-        </div>
-      `;
-    }
-    initEventListeners(signal) {
-      this.addEvent("ky-click", "ky-button", this.onJSONButtonClick, {
-        signal,
-      });
-    }
-
-    async onJSONButtonClick(e) {
+    async onJSONButtonClick() {
       try {
         const file = await getFileFromPrompt({
           types: [
@@ -53,13 +24,27 @@ export const Fallback = define("ky-fallback", { mapping, raw })(
 
         const tripData = await readJSONFile(file);
         scheduleStore.commit("list", tripData);
-        // localStorage.setItem("myKyotoTrip", JSON.stringify(tripData));
-        window.dispatchEvent(new CustomEvent("RENDER"));
       } catch (error) {
         console.log(error);
-      } finally {
-        e.target.value = "";
       }
     }
-  }
+    template() {
+      return html`
+        <div class="${this.styles.fallback}">
+          <img
+            class="${this.styles.icon}"
+            src="./fallback.svg"
+            alt="파일을 등록해주세요"
+          />
+          <p class="${this.styles.text}">등록된 여행 일정이 없습니다.</p>
+          <ky-button
+            @click="${(e) => {
+              this.onJSONButtonClick();
+            }}"
+            >불러오기</ky-button
+          >
+        </div>
+      `;
+    }
+  },
 );

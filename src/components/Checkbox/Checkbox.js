@@ -33,13 +33,6 @@ export const Checkbox = define("ky-checkbox", { mapping, raw })(
           ?checked="${isChecked}"
           class="${this.styles.input} sr-only"
           @change="${(e) => {
-            // 🔍 커스텀 이벤트 발생
-            // this.dispatchEvent(
-            //   new CustomEvent("change", {
-            //     bubbles: true, // 부모로 전파
-            //     composed: true, // Shadow DOM 경계 통과
-            //   })
-            // );
             this.emit("change", { bubbles: true, composed: true });
           }}"
           $input
@@ -49,5 +42,5 @@ export const Checkbox = define("ky-checkbox", { mapping, raw })(
         </ky-icon>
       `;
     }
-  }
+  },
 );

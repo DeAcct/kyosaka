@@ -11,19 +11,16 @@ import { NavigationBar } from "@/components/NavigationBar/NavigationBar";
 export const App = define("ky-app", { mapping, raw })(
   class extends Component {
     afterRender() {
-      // 🔍 1. 내부의 뷰 컨테이너를 찾습니다.
       const $container = this.$selector("[data-router-view]");
-      window.kyRouter = new Router(routes, $container);
+      new Router(routes, $container);
     }
 
     template() {
       return html`
         <ky-header></ky-header>
-
         <main data-router-view></main>
-
         <navigation-bar class="${this.styles.navigationBar}"></navigation-bar>
       `;
     }
-  }
+  },
 );

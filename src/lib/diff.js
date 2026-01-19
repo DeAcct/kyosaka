@@ -18,7 +18,7 @@ function renderValue(value, component) {
       (acc, str, i) =>
         acc + str + (i < value.values.length ? `__VAL_${i}__` : ""),
 
-      ""
+      "",
     );
     const fragment = temp.content;
 
@@ -54,7 +54,7 @@ function resolveMarkers(node, values, component) {
     updateAttrs(node, node, values);
     updateProps(node, node, values, component);
     Array.from(node.childNodes).forEach((child) =>
-      resolveMarkers(child, values, component)
+      resolveMarkers(child, values, component),
     );
   }
 
@@ -237,42 +237,70 @@ export function updateProps(blueprint, target, values, component) {
   const attrs = Array.from(blueprint.attributes || []);
 
   attrs.forEach(({ name, value }) => {
+    // 1. Ref 처리 ($canvas 등)
     if (name.startsWith("$") && component) {
-      const refName = name.slice(1); // '$canvas' -> 'canvas'
-
+      const refName = name.slice(1);
       const existing = component.$refs[refName];
-
       if (!existing) {
-        component.$refs[refName] = target; // 인스턴스에 저장
+        component.$refs[refName] = target;
       } else if (Array.isArray(existing)) {
-        existing.push(target);
-      } else {
+        if (!existing.includes(target)) existing.push(target);
+      } else if (existing !== target) {
         component.$refs[refName] = [existing, target];
       }
-
-      target.removeAttribute(name); // 깔끔하게 속성 제거
+      target.removeAttribute(name);
       return;
     }
 
-    const match = value.match(/__VAL_(\d+)__/);
+    if (name.startsWith("@")) {
+      const [eventName, ...modifiers] = name.slice(1).split(".");
 
-    if (!match) return;
+      // 값이 있으면 추출하고, 없으면 null 처리
+      const match = value.match(/__VAL_(\d+)__/);
+      const realValue = match ? values[match[1]] : null;
+
+      // 동일한 핸들러/접미어 조합이 이미 등록되어 있는지 확인
+      if (target[`_@${name}_`] !== realValue) {
+        if (target[`_@${name}_wrapped`]) {
+          target.removeEventListener(eventName, target[`_@${name}_wrapped`]);
+        }
+
+        const eventHandler = (e) => {
+          // 접미어 로직은 콜백 여부와 상관없이 항상 실행
+          if (modifiers.includes("prevent")) e.preventDefault();
+          if (modifiers.includes("stop")) e.stopPropagation();
+          if (modifiers.includes("self") && e.target !== e.currentTarget)
+            return;
+
+          // 콜백 함수(realValue)가 있을 때만 실행
+          if (typeof realValue === "function") {
+            return realValue.call(component, e);
+          }
+        };
+
+        const options = {
+          once: modifiers.includes("once"),
+          capture: modifiers.includes("capture"),
+        };
+
+        target.addEventListener(eventName, eventHandler, options);
+        target[`_@${name}_`] = realValue;
+        target[`_@${name}_wrapped`] = eventHandler;
+      }
+
+      target.removeAttribute(name);
+      return; // 이벤트 처리 끝났으므로 다음 속성으로
+    }
+
+    // 2. 나머지 일반 속성 및 프로퍼티(:) 처리
+    const match = value.match(/__VAL_(\d+)__/);
+    if (!match) return; // 여기서부터는 값이 없으면 무시
 
     const realValue = values[match[1]];
 
     if (name.startsWith(":")) {
       const propName = name.slice(1);
       if (target[propName] !== realValue) target[propName] = realValue;
-      target.removeAttribute(name);
-    } else if (name.startsWith("@")) {
-      const eventName = name.slice(1);
-
-      if (target[`_@${eventName}_`] !== realValue) {
-        target.removeEventListener(eventName, target[`_@${eventName}_`]);
-        target.addEventListener(eventName, realValue);
-        target[`_@${eventName}_`] = realValue;
-      }
-
       target.removeAttribute(name);
     }
   });

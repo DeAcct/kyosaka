@@ -6,9 +6,11 @@ import raw from "./checklistControl.module.scss?inline";
 
 export const ChecklistControl = define("checklist-control", { mapping, raw })(
   class extends Component {
-    handleSubmit(e) {
-      e.preventDefault();
-      console.log(this);
+    handleSubmit() {
+      if (this.mode === "edit") {
+        this.emit("cancel");
+        return;
+      }
       const $input = this.$refs.input;
       const text = $input.value.trim();
 
@@ -21,7 +23,12 @@ export const ChecklistControl = define("checklist-control", { mapping, raw })(
 
     template() {
       return html`
-        <form class="${this.styles.form}">
+        <form
+          class="${this.styles.form}"
+          @submit.prevent="${(e) => {
+            this.handleSubmit(e);
+          }}"
+        >
           <input
             name="newItem"
             type="text"
@@ -38,10 +45,6 @@ export const ChecklistControl = define("checklist-control", { mapping, raw })(
                 ? this.styles.cancel
                 : ""}"
               @click="${(e) => {
-                if (this.mode === "edit") {
-                  this.emit("cancel");
-                  return;
-                }
                 this.handleSubmit(e);
               }}"
             >
@@ -63,5 +66,5 @@ export const ChecklistControl = define("checklist-control", { mapping, raw })(
         </form>
       `;
     }
-  }
+  },
 );

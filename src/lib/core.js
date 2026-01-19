@@ -2,6 +2,7 @@
 
 import resetStyle from "@/styles/base/_reset.scss?inline";
 import { patch, updateAttrs, updateProps } from "./diff";
+import { createScheduler } from "./schedule";
 
 const sharedResetSheet = new CSSStyleSheet();
 sharedResetSheet.replaceSync(resetStyle);
@@ -26,6 +27,10 @@ export class Component extends HTMLElement {
     super();
     const options = this.constructor.shadowOptions || { mode: "open" };
 
+    const { schedule, cancel } = createScheduler(() => this.render());
+    this.queueRender = schedule;
+    this._cancelRender = cancel;
+
     if (!this.shadowRoot) {
       this.attachShadow(options);
     }
@@ -39,18 +44,9 @@ export class Component extends HTMLElement {
     this.state = { ...this.state, [key]: newState };
     this.queueRender();
   }
-  queueRender() {
-    // 이미 예약된 프레임이 있다면 무시
-    if (this._renderAnimationFrameId) return;
-
-    this._renderAnimationFrameId = requestAnimationFrame(() => {
-      this.render();
-      this._renderAnimationFrameId = null; // 렌더링 후 ID 초기화
-    });
-  }
 
   subscribe(store) {
-    const unsub = store.subscribe(() => this.render());
+    const unsub = store.subscribe(() => this.queueRender());
     this._unsubscribers.push(unsub);
   }
 
@@ -58,19 +54,14 @@ export class Component extends HTMLElement {
     this._abortController = new AbortController();
     const { signal } = this._abortController;
     this.setup();
-    this.setIsolatedEvent(signal);
-    this.render();
-    if (this.initEventListeners) this.initEventListeners(signal);
+    this.queueRender();
   }
 
   disconnectedCallback() {
     if (this._abortController) this._abortController.abort();
     this._unsubscribers.forEach((unsub) => unsub());
 
-    if (this._renderAnimationFrameId) {
-      cancelAnimationFrame(this._renderAnimationFrameId);
-      this._renderAnimationFrameId = null;
-    }
+    this._cancelRender();
   }
 
   setup() {}
@@ -82,10 +73,7 @@ export class Component extends HTMLElement {
   }
 
   render() {
-    if (this._renderAnimationFrameId) {
-      cancelAnimationFrame(this._renderAnimationFrameId);
-      this._renderAnimationFrameId = null;
-    }
+    this._cancelRender();
 
     const { mapping, stylesheet } = this.getStyles();
     this.styles = mapping;
@@ -100,7 +88,6 @@ export class Component extends HTMLElement {
       updateDOM(this.shadowRoot, templateResult, this);
     }
 
-    this.setEvent();
     this.afterRender();
   }
 
@@ -111,19 +98,6 @@ export class Component extends HTMLElement {
   }
 
   afterRender() {}
-  setEvent() {}
-  addEvent(type, selector, callback, options) {
-    this.shadowRoot.addEventListener(
-      type,
-      (event) => {
-        const target = event.target.closest(selector);
-        if (!target) return;
-        callback(event, target);
-      },
-      options
-    );
-  }
-  setIsolatedEvent() {}
 
   emit(eventName, option) {
     this.dispatchEvent(new CustomEvent(eventName, option));
@@ -208,7 +182,7 @@ export const updateDOM = (parent, templateResult, component) => {
   const { strings, values } = templateResult;
   const fullHTML = strings.reduce(
     (acc, str, i) => acc + str + (i < values.length ? `__VAL_${i}__` : ""),
-    ""
+    "",
   );
 
   const temp = document.createElement("template");
