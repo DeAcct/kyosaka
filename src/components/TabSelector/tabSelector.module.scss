@@ -1,0 +1,18 @@
+.tabs {
+  display: flex;
+  gap: 0.8rem;
+}
+.tab {
+  display: flex;
+  align-items: center;
+  font-size: 1.8rem;
+  font-weight: 500;
+  padding: 0 0.4rem;
+  height: calc(var(--card-radius-base) * 2);
+  border-bottom: 2px solid transparent;
+  transition: 150ms ease-out;
+  &[aria-selected="true"] {
+    border-color: var(--brand-400);
+    color: var(--brand-400);
+  }
+}

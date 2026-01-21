@@ -1,0 +1,12 @@
+@use "@/styles/layout/layout" as *;
+.gallery {
+  display: flex;
+  flex-direction: column;
+  @include safe-area;
+  margin: 0 auto;
+}
+
+.selector {
+  position: sticky;
+  top: var(--header-height);
+}

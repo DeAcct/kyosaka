@@ -1,33 +1,68 @@
-// import { Component, define, html } from "@/lib/core";
 import { Component, define, html } from "@/lib/core";
 
 export const RouterLink = define("router-link")(
   class extends Component {
     setup() {
       this.updateState();
-      // 🔍 전역 경로 변경 이벤트 구독
-      window.addEventListener("popstate", () => this.updateState());
-      // 2. 내부 소프트 라우팅 (우리가 만든 이벤트)
-      window.addEventListener("locationchange", () => this.updateState());
+    }
+
+    /**
+     * 🔍 'to'를 해석하여 문자열 URL로 변환
+     * 객체 형태: { path: '/gallery', query: { tab: 'memory' } }
+     */
+    get resolvedPath() {
+      // 1. 프로퍼티(this.to)나 속성(getAttribute)에서 값을 가져옴
+      const to = this.to || this.getAttribute("to");
+
+      if (!to) return "";
+
+      // 2. 문자열이면 그대로 반환
+      if (typeof to === "string") return to.toLowerCase();
+
+      // 3. 객체라면 경로와 쿼리 스트링 조합
+      if (typeof to === "object") {
+        const { path, query } = to;
+        let url = path || "";
+
+        if (query) {
+          const queryString = new URLSearchParams(query).toString();
+          url += `?${queryString}`;
+        }
+        return url.toLowerCase();
+      }
+
+      return "";
+    }
+
+    /**
+     * 매칭용 순수 경로 (쿼리 스트링 제외)
+     */
+    get purePath() {
+      return this.resolvedPath.split("?")[0];
     }
 
     updateState() {
-      const href = this.getAttribute("to");
-      if (!href) {
-        throw new Error("to가 정의되지 않았어요");
-      }
-      const isActive = window.location.pathname === href;
+      const current = location.pathname.toLowerCase();
+      const target = this.purePath;
+
+      if (!target) return;
+
+      const isActive =
+        target === "/" ? current === "/" : current.startsWith(target);
+
       this.setAttribute("aria-selected", isActive ? "true" : "false");
     }
 
     template() {
-      const to = this.getAttribute("to");
-
       return html`
-        <a href="${to}" data-link>
+        <global
+          @popstate="${() => this.updateState()}"
+          @locationchange="${() => this.updateState()}"
+        ></global>
+        <a href="${this.resolvedPath}" data-link>
           <slot></slot>
         </a>
       `;
     }
-  }
+  },
 );

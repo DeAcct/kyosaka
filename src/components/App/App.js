@@ -10,8 +10,12 @@ import { NavigationBar } from "@/components/NavigationBar/NavigationBar";
 export const App = define("ky-app", { mapping, raw })(
   class extends Component {
     afterRender() {
+      if (this.router) return;
       const $container = this.$selector("[data-router-view]");
-      new Router($container);
+      Router.redirects = {
+        "/gallery": "/gallery/memory",
+      };
+      this.router = new Router($container);
     }
 
     template() {
