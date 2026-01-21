@@ -1244,6 +1244,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@material-design-icons/svg@npm:^0.14.15":
+  version: 0.14.15
+  resolution: "@material-design-icons/svg@npm:0.14.15"
+  checksum: 10c0/f29c57fdd27d74dbef9cb673f707c29d9e808dc68511ea764f77d17d7d25599f8176f4ba0ffdc0bf64cb3dcda7e64e5b3cc061d113f8ae5c228a404e9a357917
+  languageName: node
+  linkType: hard
+
 "@napi-rs/wasm-runtime@npm:^1.1.0":
   version: 1.1.1
   resolution: "@napi-rs/wasm-runtime@npm:1.1.1"
@@ -3090,6 +3097,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "kyosaka@workspace:."
   dependencies:
+    "@material-design-icons/svg": "npm:^0.14.15"
     sass: "npm:^1.97.2"
     vite: "npm:^7.3.0"
     vite-plugin-pwa: "npm:^1.2.0"

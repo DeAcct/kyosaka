@@ -31,7 +31,6 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
         ...this.state.deleteSelected,
         detail.id,
       ]);
-      console.log(this.state);
     }
 
     onClickItem(id) {
@@ -69,7 +68,7 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
             ${items.map(
               (item, index) => html`
                 <checklist-item
-                  key="item-${item.id}"
+                  data-key="item-${item.id}"
                   class="${this.styles
                     .item} ${this.state.deleteSelected.includes(item.id)
                     ? this.styles.selected

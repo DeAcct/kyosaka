@@ -6,11 +6,11 @@ import { useSwipe } from "@/hooks/touch";
 import mapping from "./schedule.module.scss";
 import raw from "./schedule.module.scss?inline";
 
-import { Arrow } from "@/icons/Arrow";
 import { Description } from "@/components/Description/Description";
 import { Fallback } from "@/components/Fallback/Fallback";
 import { RouteCard } from "@/components/RouteCard/RouteCard";
 import { SwipeWrap } from "@/components/SwipeWrap/SwipeWrap";
+import { Icon } from "@/components/Icon/Icon";
 
 export const Schedule = define("ky-schedule", { mapping, raw })(
   class extends Component {
@@ -76,7 +76,10 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
                       ${item.time.from} ~ ${item.time.to}
                     </p>
                   </div>
-                  <icon-arrow class="${this.styles.arrow}"></icon-arrow>
+                  <ky-icon
+                    class="${this.styles.arrow}"
+                    name="chevron"
+                  ></ky-icon>
                 </summary>
 
                 <div class="${this.styles.content}">

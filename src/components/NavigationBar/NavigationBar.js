@@ -11,8 +11,8 @@ export const NavigationBar = define("navigation-bar", { mapping, raw })(
     get menu() {
       return [
         { to: "/", icon: "event", text: "일정" },
-        { to: "/checklist", icon: "list_alt_check", text: "체크리스트" },
-        { to: "/gallery", icon: "photo_library", text: "갤러리" },
+        { to: "/checklist", icon: "list", text: "체크리스트" },
+        { to: "/gallery", icon: "gallery", text: "갤러리" },
       ];
     }
     template() {
@@ -21,13 +21,13 @@ export const NavigationBar = define("navigation-bar", { mapping, raw })(
           ({ to, icon, text }) => html`
             <router-link to="${to}" class="${this.styles.link}">
               <div class="${this.styles.item}">
-                <ky-icon class="${this.styles.icon}">${icon}</ky-icon>
+                <ky-icon class="${this.styles.icon}" :name="${icon}"></ky-icon>
                 <span class="${this.styles.text}">${text}</span>
               </div>
             </router-link>
-          `
+          `,
         )}
       </nav>`;
     }
-  }
+  },
 );

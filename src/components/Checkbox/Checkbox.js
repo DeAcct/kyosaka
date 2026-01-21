@@ -37,8 +37,10 @@ export const Checkbox = define("ky-checkbox", { mapping, raw })(
           }}"
           $input
         />
-        <ky-icon class="${this.styles.real}">
-          ${isChecked ? "check_circle" : "circle"}
+        <ky-icon
+          class="${this.styles.real}"
+          :name="${isChecked ? "checked" : "circle"}"
+        >
         </ky-icon>
       `;
     }

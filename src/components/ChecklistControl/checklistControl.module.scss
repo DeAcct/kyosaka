@@ -39,6 +39,9 @@
   gap: 0.4rem;
 }
 .button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: calc(var(--card-radius-base) * 2);
   height: calc(var(--card-radius-base) * 2);
   background-color: var(--brand-500);
@@ -48,15 +51,14 @@
   font-size: 2.4rem;
   @include round-list("x");
   transition: 150ms var(--ease-in-out-quad);
-
   --rotation: 0;
+  .icon {
+    rotate: var(--rotation);
+    transition: all 150ms var(--ease-in-out-quad);
+  }
+
   &.cancel {
     --rotation: 45deg;
-    .icon {
-      display: block;
-      rotate: var(--rotation);
-      transition: all 150ms var(--ease-in-out-quad);
-    }
   }
 
   @starting-style {

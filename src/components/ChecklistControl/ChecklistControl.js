@@ -48,7 +48,7 @@ export const ChecklistControl = define("checklist-control", { mapping, raw })(
                 this.handleSubmit(e);
               }}"
             >
-              <ky-icon class="${this.styles.icon}">add</ky-icon>
+              <ky-icon class="${this.styles.icon}" name="add"></ky-icon>
             </button>
 
             ${this.mode === "edit"
@@ -59,7 +59,7 @@ export const ChecklistControl = define("checklist-control", { mapping, raw })(
                     this.emit("delete");
                   }}"
                 >
-                  <ky-icon class="${this.styles.icon}">delete</ky-icon>
+                  <ky-icon class="${this.styles.icon}" name="delete"></ky-icon>
                 </button>`
               : ""}
           </div>

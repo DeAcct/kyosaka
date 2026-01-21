@@ -89,6 +89,8 @@ export class Component extends HTMLElement {
     }
 
     this.afterRender();
+    if (!this.reRendered) this.afterOnce();
+    this.reRendered = true;
   }
 
   $selector(query, all = false) {
@@ -98,6 +100,7 @@ export class Component extends HTMLElement {
   }
 
   afterRender() {}
+  afterOnce() {}
 
   emit(eventName, option) {
     this.dispatchEvent(new CustomEvent(eventName, option));

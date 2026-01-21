@@ -1,53 +1,93 @@
 //lib/diff.js
 
 /**
-
- * html`...` 결과물이나 배열을 실제 DOM 노드로 변환
-
+ * 🔥 배열 렌더링 추적 시스템
  */
 
+// 배열 앵커 생성
+function createArrayAnchor(markerId) {
+  const comment = document.createComment(`array-${markerId}`);
+  comment._arrayMarker = markerId;
+  return comment;
+}
+
+/**
+ * html`...` 결과물이나 배열을 실제 DOM 노드로 변환
+ */
 function renderValue(value, component) {
   if (Array.isArray(value)) {
     const fragment = document.createDocumentFragment();
-    value.forEach((item) => fragment.appendChild(renderValue(item, component)));
+    value.forEach((item) => {
+      fragment.appendChild(renderValue(item, component));
+    });
     return fragment;
   }
+
   if (value && typeof value === "object" && value.strings) {
     const temp = document.createElement("template");
     temp.innerHTML = value.strings.reduce(
       (acc, str, i) =>
         acc + str + (i < value.values.length ? `__VAL_${i}__` : ""),
-
       "",
     );
     const fragment = temp.content;
 
-    // 생성된 프래그먼트 내부의 마커들도 해소 (values를 알 수 없으므로 nestedValues 사용)
     Array.from(fragment.childNodes).forEach((node) => {
       resolveMarkers(node, value.values, component);
     });
     return fragment;
   }
+
   return document.createTextNode(String(value ?? ""));
 }
 
 /**
-
- * 단순 마커 치환 (속성, 프로퍼티, 일반 텍스트용)
-
+ * 초기 렌더링 시 마커 해석
  */
-
 function resolveMarkers(node, values, component) {
   if (node.nodeType === Node.TEXT_NODE) {
     const text = node.textContent;
     const match = text.match(/__VAL_(\d+)__/);
+
     if (match) {
-      const realValue = values[match[1]];
-      // 🔍 배열이나 TemplateResult인 경우 통째로 교체
-      if (Array.isArray(realValue) || (realValue && realValue.strings)) {
-        node.parentNode.replaceChild(renderValue(realValue, component), node);
-        return true;
+      const markerId = match[1];
+      const realValue = values[markerId];
+
+      // 🔥 배열: 앵커 + 즉시 렌더링
+      if (Array.isArray(realValue)) {
+        const anchor = createArrayAnchor(markerId);
+        const parent = node.parentNode;
+        const nextSibling = node.nextSibling;
+
+        // 앵커 삽입
+        parent.insertBefore(anchor, node);
+
+        // 배열 아이템들 즉시 렌더링
+        realValue.forEach((item) => {
+          const rendered = renderValue(item, component);
+
+          if (rendered.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+            const children = Array.from(rendered.childNodes);
+            children.forEach((child) => {
+              parent.insertBefore(child, nextSibling);
+            });
+          } else {
+            parent.insertBefore(rendered, nextSibling);
+          }
+        });
+
+        // 마커 노드 제거
+        node.remove();
+        return;
       }
+
+      // 중첩 템플릿
+      if (realValue && typeof realValue === "object" && realValue.strings) {
+        node.parentNode.replaceChild(renderValue(realValue, component), node);
+        return;
+      }
+
+      // 일반 문자열
       node.textContent = text.replace(/__VAL_(\d+)__/g, (_, i) => values[i]);
     }
   } else if (node.nodeType === Node.ELEMENT_NODE) {
@@ -57,20 +97,70 @@ function resolveMarkers(node, values, component) {
       resolveMarkers(child, values, component),
     );
   }
+}
 
-  return false;
+/**
+ * 🎯 배열 전용 렌더링 (단순 교체 방식)
+ */
+function patchArrayContent(parent, anchorNode, arrayData, values, component) {
+  const markerId = anchorNode._arrayMarker;
+
+  // 1. 기존 배열 노드들 수집 및 제거
+  const nodesToRemove = [];
+  let current = anchorNode.nextSibling;
+
+  while (current) {
+    if (current.nodeType === Node.COMMENT_NODE) {
+      break;
+    }
+    nodesToRemove.push(current);
+    current = current.nextSibling;
+  }
+
+  nodesToRemove.forEach((node) => {
+    cleanupEventListeners(node);
+    node.remove();
+  });
+
+  // 2. 새 배열 아이템들 렌더링 및 삽입
+  const refNode = anchorNode.nextSibling;
+
+  arrayData.forEach((item) => {
+    const rendered = renderValue(item, component);
+    parent.insertBefore(rendered, refNode);
+  });
 }
 
 export function patch(parent, newNode, oldNode, index, values, component) {
-  // 1. 삭제 처리
+  // 🎯 배열 앵커 처리
+  if (
+    oldNode?.nodeType === Node.COMMENT_NODE &&
+    oldNode._arrayMarker !== undefined
+  ) {
+    const markerId = oldNode._arrayMarker;
+    const realValue = values[markerId];
+
+    if (Array.isArray(realValue)) {
+      patchArrayContent(parent, oldNode, realValue, values, component);
+      return;
+    }
+  }
+
+  // 1. 삭제
   if (!newNode && oldNode) {
+    if (
+      oldNode.nodeType === Node.COMMENT_NODE &&
+      oldNode._arrayMarker !== undefined
+    ) {
+      return; // 앵커는 유지
+    }
     cleanupEventListeners(oldNode);
     return oldNode.remove();
   }
+
   let targetNode = oldNode;
 
-  // 2. 생성 및 교체 로직
-
+  // 2. 생성/교체
   if (
     !oldNode ||
     newNode.nodeType !== oldNode.nodeType ||
@@ -78,41 +168,50 @@ export function patch(parent, newNode, oldNode, index, values, component) {
   ) {
     if (oldNode) cleanupEventListeners(oldNode);
     targetNode = newNode.cloneNode(true);
+
     if (!oldNode) parent.appendChild(targetNode);
     else parent.replaceChild(targetNode, oldNode);
   }
 
-  // 3. 텍스트 노드 처리
-
+  // 3. 텍스트 노드
   if (newNode.nodeType === Node.TEXT_NODE) {
     const text = newNode.textContent;
     const match = text.match(/__VAL_(\d+)__/);
+
     if (match) {
-      const realValue = values[match[1]];
-      // 🔍 배열이나 중첩 템플릿인 경우: 노드 교체 후 즉시 종료
-      if (
-        Array.isArray(realValue) ||
-        (typeof realValue === "object" &&
-          realValue !== null &&
-          realValue.strings)
-      ) {
-        parent.replaceChild(renderValue(realValue, component), targetNode);
-        return; // 이 경로는 하위 자식이 없으므로 종료
+      const markerId = match[1];
+      const realValue = values[markerId];
+
+      // 배열: 앵커로 변환
+      if (Array.isArray(realValue)) {
+        const anchor = createArrayAnchor(markerId);
+        parent.replaceChild(anchor, targetNode);
+
+        // 즉시 배열 내용 렌더링
+        patchArrayContent(parent, anchor, realValue, values, component);
+        return;
       }
 
-      // 일반 문자열 치환
+      // 중첩 템플릿
+      if (realValue && typeof realValue === "object" && realValue.strings) {
+        parent.replaceChild(renderValue(realValue, component), targetNode);
+        return;
+      }
+
+      // 일반 문자열
       const finalValue = text.replace(/__VAL_(\d+)__/g, (_, i) => values[i]);
-      if (targetNode.textContent !== finalValue)
+      if (targetNode.textContent !== finalValue) {
         targetNode.textContent = finalValue;
+      }
     }
     return;
   }
 
-  // 4. 엘리먼트 노드 처리
-
+  // 4. 엘리먼트 노드
   if (newNode.nodeType === Node.ELEMENT_NODE) {
     updateAttrs(newNode, targetNode, values);
     updateProps(newNode, targetNode, values, component);
+
     if (
       targetNode.tagName.includes("-") &&
       typeof targetNode.render === "function"
@@ -120,11 +219,11 @@ export function patch(parent, newNode, oldNode, index, values, component) {
       targetNode.render();
     }
 
-    // 자식 패치 재귀
-
+    // 자식 패치
     const newChildren = Array.from(newNode.childNodes);
     const oldChildren = Array.from(targetNode.childNodes);
     const max = Math.max(newChildren.length, oldChildren.length);
+
     for (let i = 0; i < max; i++) {
       patch(targetNode, newChildren[i], oldChildren[i], i, values, component);
     }
@@ -132,51 +231,36 @@ export function patch(parent, newNode, oldNode, index, values, component) {
 }
 
 /**
-
- * 🔍 요소 파기 시 자동 청소 설계
-
- * 요소에 직접 붙은 @ 핸들러와 자식들의 핸들러를 재귀적으로 제거합니다.
-
+ * 이벤트 리스너 정리
  */
-
 function cleanupEventListeners(node) {
   if (!node || node.nodeType !== Node.ELEMENT_NODE) return;
-
-  // 1. 해당 요소의 핸들러 제거
-
-  // Object.keys로 _@ 접두사가 붙은 속성을 찾아 리스너를 해제합니다.
 
   Object.keys(node).forEach((key) => {
     if (key.startsWith("_@")) {
       const eventName = key.replace("_@", "");
       node.removeEventListener(eventName, node[key]);
-      delete node[key]; // 참조 삭제
+      delete node[key];
     }
   });
-
-  // 2. 자식 요소들도 모두 뒤져서 청소 (재귀)
-
-  // 부모가 사라지면 자식들도 DOM에서 떨어지므로 함께 청소해야 합니다.
 
   Array.from(node.childNodes).forEach(cleanupEventListeners);
 }
 
 export function updateAttrs(blueprint, target, values) {
   const attrs = Array.from(blueprint.attributes || []);
+
   attrs.forEach(({ name, value }) => {
-    // 1. 특수 바인딩($ , : , @)은 건드리지 않음
     if (name.startsWith(":") || name.startsWith("@") || name.startsWith("$"))
       return;
-    if (name === "checked" || name === "disabled") {
-      // 속성이 아닌 DOM 프로퍼티를 직접 수정해야 UI가 즉각 반응합니다.
 
+    if (name === "checked" || name === "disabled") {
       target[name] = Boolean(value);
       if (value) target.setAttribute(name, "");
       else target.removeAttribute(name);
       return;
     }
 
-    // 🔍 2. value 프로퍼티 처리
     if (
       name === "value" &&
       (target.tagName === "INPUT" || target.tagName === "TEXTAREA")
@@ -185,46 +269,33 @@ export function updateAttrs(blueprint, target, values) {
       return;
     }
 
-    // 2. 🔍 물음표(?) 접두사 처리 (불리언 속성 전용)
-
-    // 예: <details ?open="${index === 0}">
-
     if (name.startsWith("?")) {
-      const realName = name.slice(1); // '?open' -> 'open'
+      const realName = name.slice(1);
       const match = value.match(/__VAL_(\d+)__/);
-      if (match) {
-        // 실제 데이터(values)에서 불리언 값을 가져옴
 
+      if (match) {
         const boolValue = !!values[match[1]];
         if (boolValue) {
-          target.setAttribute(realName, ""); // open 속성 추가
+          target.setAttribute(realName, "");
         } else {
-          target.removeAttribute(realName); // 🎯 확실히 제거해서 details를 닫음
+          target.removeAttribute(realName);
         }
       }
-
-      // 브라우저가 생성한 가짜 속성(?open)은 DOM에서 즉시 제거
 
       target.removeAttribute(name);
       return;
     }
-
-    // 3. 🔍 이름 자체가 마커인 경우 처리 (예: <details __VAL_2__>)
-
-    // `${index === 0 ? 'open' : ''}` 같은 코드를 처리합니다.
 
     const nameMatch = name.match(/^__val_(\d+)__$/i);
 
     if (nameMatch) {
       const realValue = values[nameMatch[1]];
       if (realValue && typeof realValue === "string") {
-        target.setAttribute(realValue, ""); // 'open' 주입
+        target.setAttribute(realValue, "");
       }
-      target.removeAttribute(name); // 쓰레기 마커 삭제
+      target.removeAttribute(name);
       return;
     }
-
-    // 4. 일반 속성 처리 (class, id 등)
 
     const finalValue = value.replace(/__VAL_(\d+)__/g, (_, i) => values[i]);
     if (target.getAttribute(name) !== finalValue) {
@@ -237,10 +308,10 @@ export function updateProps(blueprint, target, values, component) {
   const attrs = Array.from(blueprint.attributes || []);
 
   attrs.forEach(({ name, value }) => {
-    // 1. Ref 처리 ($canvas 등)
     if (name.startsWith("$") && component) {
       const refName = name.slice(1);
       const existing = component.$refs[refName];
+
       if (!existing) {
         component.$refs[refName] = target;
       } else if (Array.isArray(existing)) {
@@ -248,31 +319,27 @@ export function updateProps(blueprint, target, values, component) {
       } else if (existing !== target) {
         component.$refs[refName] = [existing, target];
       }
+
       target.removeAttribute(name);
       return;
     }
 
     if (name.startsWith("@")) {
       const [eventName, ...modifiers] = name.slice(1).split(".");
-
-      // 값이 있으면 추출하고, 없으면 null 처리
       const match = value.match(/__VAL_(\d+)__/);
       const realValue = match ? values[match[1]] : null;
 
-      // 동일한 핸들러/접미어 조합이 이미 등록되어 있는지 확인
       if (target[`_@${name}_`] !== realValue) {
         if (target[`_@${name}_wrapped`]) {
           target.removeEventListener(eventName, target[`_@${name}_wrapped`]);
         }
 
         const eventHandler = (e) => {
-          // 접미어 로직은 콜백 여부와 상관없이 항상 실행
           if (modifiers.includes("prevent")) e.preventDefault();
           if (modifiers.includes("stop")) e.stopPropagation();
           if (modifiers.includes("self") && e.target !== e.currentTarget)
             return;
 
-          // 콜백 함수(realValue)가 있을 때만 실행
           if (typeof realValue === "function") {
             return realValue.call(component, e);
           }
@@ -289,12 +356,11 @@ export function updateProps(blueprint, target, values, component) {
       }
 
       target.removeAttribute(name);
-      return; // 이벤트 처리 끝났으므로 다음 속성으로
+      return;
     }
 
-    // 2. 나머지 일반 속성 및 프로퍼티(:) 처리
     const match = value.match(/__VAL_(\d+)__/);
-    if (!match) return; // 여기서부터는 값이 없으면 무시
+    if (!match) return;
 
     const realValue = values[match[1]];
 

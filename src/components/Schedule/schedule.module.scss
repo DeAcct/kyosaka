@@ -23,7 +23,9 @@
       font-size: 1.6rem;
       color: var(--text-500);
       opacity: 1;
-      transition: opacity 150ms ease-out, display 150ms ease-out allow-discrete;
+      transition:
+        opacity 150ms ease-out,
+        display 150ms ease-out allow-discrete;
 
       @starting-style {
         opacity: 0;
@@ -52,7 +54,8 @@
     align-items: center;
     gap: 0.8rem;
     padding: 1.6rem;
-    transition: opacity 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
+    transition:
+      opacity 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
       scale 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
       background-color 150ms var(--ease-out-expo);
     @media screen and (min-width: 690px) {
@@ -88,8 +91,7 @@
     color: var(--text-500);
   }
   .arrow {
-    width: 2.4rem;
-    height: 2.4rem;
+    font-size: 3.6rem;
     margin-left: auto;
     transition: rotate 150ms var(--ease-out-expo);
     rotate: 90deg;

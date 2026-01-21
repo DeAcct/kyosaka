@@ -4,8 +4,6 @@ import { Component, define, html, kyFor } from "@/lib/core";
 import mapping from "./daySelector.module.scss";
 import raw from "./daySelector.module.scss?inline";
 
-import { Calendar } from "@/icons/Calendar";
-
 export const DaySelector = define("day-selector", { mapping, raw })(
   class extends Component {
     setup() {
@@ -18,7 +16,6 @@ export const DaySelector = define("day-selector", { mapping, raw })(
         return;
       }
       scheduleStore.commit("selectedDay", index);
-      // this.centerActiveButton();
     }
     afterRender() {
       this.centerActiveButton();
@@ -29,9 +26,9 @@ export const DaySelector = define("day-selector", { mapping, raw })(
       if (this.$refs.button) {
         const $button = this.$refs.button[selectedDay];
         $button.scrollIntoView({
-          behavior: "smooth", // 부드럽게
-          inline: "center", // 👈 핵심: 가로 중앙 정렬
-          block: "nearest", // 세로 위치는 유지
+          behavior: "smooth",
+          inline: "center",
+          block: "nearest",
         });
       }
     }
@@ -60,7 +57,7 @@ export const DaySelector = define("day-selector", { mapping, raw })(
                 ({ name, day, description }, index) => html`
                   <li
                     class="${this.styles.item}"
-                    key="${this.formatter(day)}, ${name}"
+                    data-key="${this.formatter(day)}, ${name}"
                   >
                     <button
                       class="${this.styles.button} ${selectedDay === index
@@ -73,12 +70,12 @@ export const DaySelector = define("day-selector", { mapping, raw })(
                       <strong> ${this.formatter(day)} </strong>
                     </button>
                   </li>
-                `
+                `,
               )}
             </ul>
           </div>
         </div>
       `;
     }
-  }
+  },
 );

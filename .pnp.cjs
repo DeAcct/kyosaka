@@ -28,6 +28,7 @@ const RAW_RUNTIME_STATE =
       [null, {\
         "packageLocation": "./",\
         "packageDependencies": [\
+          ["@material-design-icons/svg", "npm:0.14.15"],\
           ["kyosaka", "workspace:."],\
           ["sass", "npm:1.97.2"],\
           ["vite", [\
@@ -2155,6 +2156,15 @@ const RAW_RUNTIME_STATE =
           ["@jridgewell/resolve-uri", "npm:3.1.2"],\
           ["@jridgewell/sourcemap-codec", "npm:1.5.5"],\
           ["@jridgewell/trace-mapping", "npm:0.3.31"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@material-design-icons/svg", [\
+      ["npm:0.14.15", {\
+        "packageLocation": "../../../C:/Users/isac1/AppData/Local/Yarn/Berry/cache/@material-design-icons-svg-npm-0.14.15-8a2656f5ba-10c0.zip/node_modules/@material-design-icons/svg/",\
+        "packageDependencies": [\
+          ["@material-design-icons/svg", "npm:0.14.15"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4338,6 +4348,7 @@ const RAW_RUNTIME_STATE =
       ["workspace:.", {\
         "packageLocation": "./",\
         "packageDependencies": [\
+          ["@material-design-icons/svg", "npm:0.14.15"],\
           ["kyosaka", "workspace:."],\
           ["sass", "npm:1.97.2"],\
           ["vite", [\

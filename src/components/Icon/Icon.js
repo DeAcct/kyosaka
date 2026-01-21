@@ -1,30 +1,47 @@
 import { Component, define, html } from "@/lib/core";
+import { iconLoader } from "@/icons/iconLoader";
 
 import mapping from "./icon.module.scss";
 import raw from "./icon.module.scss?inline";
 
-export const Icon = define("ky-icon", { raw, mapping })(
+export const Icon = define("ky-icon", { mapping, raw })(
   class extends Component {
-    async setup() {
-      // 🔍 브라우저에게 아이콘 폰트가 로드될 때까지 기다리라고 명령
+    _lastLoadedName = null;
+    state = { d: "", loaded: false };
+
+    afterRender() {
+      const currentName = this.name || this.getAttribute("name");
+
+      if (!currentName || currentName === this._lastLoadedName) {
+        return;
+      }
+      this._lastLoadedName = currentName;
+      this.loadIcon(currentName);
+    }
+
+    async loadIcon(name) {
+      if (!name || !iconLoader[name]) return;
+
       try {
-        await document.fonts.load('18px "Material Symbols Outlined"');
+        const { d } = await iconLoader[name]();
+        this.setState("d", d);
         this.setState("loaded", true);
-        // ???
-      } catch (e) {
-        console.error("아이콘 폰트 로드 실패", e);
+      } catch (err) {
+        console.error(`Failed to load icon: ${name}`, err);
       }
     }
+
     template() {
-      const { loaded } = this.state;
       return html`
-        <i
-          class="material-symbols-outlined ${this.styles.icon} ${loaded
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 -960 960 960"
+          class="${this.styles.icon} ${this.state.loaded
             ? this.styles.loaded
             : ""}"
         >
-          <slot></slot>
-        </i>
+          <path d="${this.state.d}" />
+        </svg>
       `;
     }
   },
