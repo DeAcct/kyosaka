@@ -1,0 +1,15 @@
+.viewChanger {
+  display: flex;
+  gap: 0.4rem;
+  background-color: var(--bg-200);
+  padding: 0.2rem;
+  border-radius: 0.8rem;
+}
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  width: 2.8rem;
+  height: 2.8rem;
+}

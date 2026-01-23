@@ -1,11 +1,16 @@
 import { updateDOM, html } from "./core";
 import { createScheduler } from "./schedule";
 
+let instance = null;
+
 export class Router {
   static redirects = {};
   lastPath = null;
 
   constructor(container) {
+    if (instance) return instance;
+    console.log("init!");
+
     this.container = container;
     this.routes = this._generateAutoRoutes();
 
@@ -13,6 +18,7 @@ export class Router {
     this.queueRender = schedule;
 
     this.init();
+    instance = this;
   }
 
   _generateAutoRoutes() {
@@ -122,4 +128,15 @@ export class Router {
       updateDOM(this.container, targetRoute.component());
     }
   }
+
+  static getInstance() {
+    return instance;
+  }
 }
+
+export const router = {
+  get current() {
+    return instance;
+  },
+  navigate: (path, replace) => instance?.navigate(path, replace),
+};

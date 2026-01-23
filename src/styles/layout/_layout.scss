@@ -24,7 +24,8 @@
 @mixin round-list($direction: "y") {
   // 기본값은 'y' (세로)
   border-radius: 0.8rem;
-  transition: opacity 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
+  transition:
+    opacity 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
     scale 150ms var(--ease-in-out-back) calc(30ms * var(--i));
 
   &:first-of-type {

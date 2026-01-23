@@ -11,7 +11,7 @@ export const NavigationBar = define("navigation-bar", { mapping, raw })(
     get menu() {
       return [
         { to: "/", icon: "event", text: "일정" },
-        { to: "/checklist", icon: "list", text: "체크리스트" },
+        { to: "/checklist", icon: "checklist", text: "체크리스트" },
         { to: "/gallery", icon: "gallery", text: "갤러리" },
       ];
     }

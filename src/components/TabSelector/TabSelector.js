@@ -7,7 +7,7 @@ export const TabSelector = define("tab-selector", { mapping, raw })(
   class extends Component {
     template() {
       return html`
-        <nav class="${this.styles.tabs}">
+        <div class="${this.styles.tabs}">
           ${this.tabs.map(
             ({ name, to }) => html`
               <router-link class="${this.styles.tab}" to="${to}">
@@ -15,7 +15,7 @@ export const TabSelector = define("tab-selector", { mapping, raw })(
               </router-link>
             `,
           )}
-        </nav>
+        </div>
       `;
     }
   },

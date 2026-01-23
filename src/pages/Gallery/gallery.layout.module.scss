@@ -6,7 +6,13 @@
   margin: 0 auto;
 }
 
-.selector {
+.controller {
+  display: flex;
+  align-items: center;
   position: sticky;
   top: var(--header-height);
+}
+
+.viewChanger {
+  margin-left: auto;
 }
