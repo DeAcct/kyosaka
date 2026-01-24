@@ -35,7 +35,7 @@ export const ChecklistItem = define("checklist-item", { mapping, raw })(
         >
           <label class="${this.styles.label}">
             <ky-checkbox
-              ?checked="${checked}"
+              :checked="${checked}"
               @change="${() => {
                 this.emit("toggle", { detail: { id } });
               }}"
@@ -46,5 +46,5 @@ export const ChecklistItem = define("checklist-item", { mapping, raw })(
         </li>
       `;
     }
-  }
+  },
 );

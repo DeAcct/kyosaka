@@ -13,6 +13,21 @@
   top: var(--header-height);
 }
 
-.viewChanger {
-  margin-left: auto;
+.upload {
+  position: fixed;
+  bottom: calc(var(--navigation-height) + 1.2rem);
+  left: 50%;
+  translate: -50% 0;
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+
+  @include ky-button;
+
+  .icon {
+    font-size: 1.8rem;
+  }
+  .text {
+    font-size: 1.6rem;
+  }
 }

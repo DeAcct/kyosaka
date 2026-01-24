@@ -5,8 +5,6 @@ import { scheduleStore } from "@/store/scheduleStore";
 import mapping from "./fallback.module.scss";
 import raw from "./fallback.module.scss?inline";
 
-import { Button } from "@/components/Button/Button";
-
 export const Fallback = define("ky-fallback", { mapping, raw })(
   class extends Component {
     async onJSONButtonClick() {
@@ -37,12 +35,15 @@ export const Fallback = define("ky-fallback", { mapping, raw })(
             alt="파일을 등록해주세요"
           />
           <p class="${this.styles.text}">등록된 여행 일정이 없습니다.</p>
-          <ky-button
+          <button
             @click="${(e) => {
               this.onJSONButtonClick();
             }}"
-            >불러오기</ky-button
+            type="button"
+            class="${this.styles.button}"
           >
+            불러오기
+          </button>
         </div>
       `;
     }

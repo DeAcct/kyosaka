@@ -1,4 +1,5 @@
 import { Component, define, html } from "@/lib/core";
+import { Router } from "@/lib/router";
 
 export const RouterLink = define("router-link")(
   class extends Component {
@@ -6,10 +7,6 @@ export const RouterLink = define("router-link")(
       this.updateState();
     }
 
-    /**
-     * 🔍 'to'를 해석하여 문자열 URL로 변환
-     * 객체 형태: { path: '/gallery', query: { tab: 'memory' } }
-     */
     get resolvedPath() {
       // 1. 프로퍼티(this.to)나 속성(getAttribute)에서 값을 가져옴
       const to = this.to || this.getAttribute("to");
@@ -44,11 +41,17 @@ export const RouterLink = define("router-link")(
     updateState() {
       const current = location.pathname.toLowerCase();
       const target = this.purePath;
-
       if (!target) return;
 
+      const rootPath = `/${Router.rootPath.toLowerCase()}`;
+      const normalizedCurrent =
+        current === rootPath || current === rootPath + "/" ? "/" : current;
+
+      // 🔍 3. 정규화된 경로와 비교
       const isActive =
-        target === "/" ? current === "/" : current.startsWith(target);
+        target === "/"
+          ? normalizedCurrent === "/"
+          : normalizedCurrent.startsWith(target);
 
       this.setAttribute("aria-selected", isActive ? "true" : "false");
     }

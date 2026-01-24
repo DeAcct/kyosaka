@@ -1,0 +1,46 @@
+@use "@/styles/layout/layout" as *;
+
+.uploadSheet {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 1.8rem;
+  margin-bottom: 1.4rem;
+}
+
+.types {
+  margin-bottom: 1.2rem;
+}
+
+.picker {
+  @include ky-button;
+  display: flex;
+  padding: 0.4rem;
+  gap: 1.2rem;
+  background-color: var(--bg-200);
+}
+
+.button {
+  @include ky-button;
+  height: 4rem;
+  font-size: 1.6rem;
+  background-color: var(--bg-100);
+  color: var(--text-100);
+  gap: 0.8rem;
+  .icon {
+    font-size: 1.8rem;
+  }
+}
+
+.fileName {
+  flex: 1 0 0;
+  padding: 0 1.2rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0.8rem;
+  &:focus {
+    border-color: var(--brand-500);
+  }
+}

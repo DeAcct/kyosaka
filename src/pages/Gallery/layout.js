@@ -7,6 +7,8 @@ import raw from "./gallery.layout.module.scss?inline";
 
 import { TabSelector } from "@/components/TabSelector/TabSelector";
 import { SwipeWrap } from "@/components/SwipeWrap/SwipeWrap";
+import { Icon } from "@/components/Icon/Icon";
+import { UploadSheet } from "@/components/UploadSheet/UploadSheet";
 
 const TABS = [
   {
@@ -23,24 +25,18 @@ export const GalleryLayout = define("layout-gallery", { mapping, raw })(
     gallerySwipe({ detail }) {
       const { pathname } = location;
       const nowIndex = TABS.findIndex(({ to }) => to === pathname);
-      const nextIndex = switcher(detail)
-        .case(
-          ({ direction }) => direction === "left",
-          () => (nowIndex + 2 - 1) % 2,
-        )
-        .case(
-          ({ direction }) => direction === "right",
-          () => (nowIndex + 1) % 2,
-        )
-        .default(() => {});
+      const step = detail.direction === "right" ? 1 : -1;
+      const nextIndex = (nowIndex + TABS.length + step) % 2;
       router.navigate(TABS[nextIndex].to);
     }
+
     template() {
       return html`
         <div class="${this.styles.gallery}">
           <nav class="${this.styles.controller}">
             <tab-selector :tabs="${TABS}"></tab-selector>
           </nav>
+
           <swipe-wrap
             @swipe="${(e) => {
               this.gallerySwipe(e);
@@ -48,6 +44,19 @@ export const GalleryLayout = define("layout-gallery", { mapping, raw })(
           >
             <slot></slot>
           </swipe-wrap>
+
+          <button
+            class="${this.styles.upload}"
+            type="button"
+            @click="${() => {
+              this.$refs.uploadSheet.open();
+            }}"
+          >
+            <ky-icon name="upload" class="${this.styles.icon}"></ky-icon>
+            <span class="${this.styles.text}">새 사진</span>
+          </button>
+
+          <upload-sheet $upload-sheet></upload-sheet>
         </div>
       `;
     }

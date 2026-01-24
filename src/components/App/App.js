@@ -15,6 +15,7 @@ export const App = define("ky-app", { mapping, raw })(
       Router.redirects = {
         "/gallery": "/gallery/memory",
       };
+      Router.rootPath = "schedule";
       this.router = new Router($container);
     }
 

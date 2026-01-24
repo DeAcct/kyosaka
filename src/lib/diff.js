@@ -265,7 +265,12 @@ export function updateAttrs(blueprint, target, values) {
       name === "value" &&
       (target.tagName === "INPUT" || target.tagName === "TEXTAREA")
     ) {
-      target.value = value;
+      // 🔍 마커(__VAL_0__)를 실제 values 배열의 값으로 치환하는 로직 추가
+      const resolvedValue = value.replace(
+        /__VAL_(\d+)__/g,
+        (_, i) => values[i],
+      );
+      target.value = resolvedValue;
       return;
     }
 
@@ -309,7 +314,11 @@ export function updateProps(blueprint, target, values, component) {
 
   attrs.forEach(({ name, value }) => {
     if (name.startsWith("$") && component) {
-      const refName = name.slice(1);
+      // 1. $를 제거하고, 그 뒤의 kebab-case를 camelCase로 변환합니다.
+      const refName = name
+        .slice(1)
+        .replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+
       const existing = component.$refs[refName];
 
       if (!existing) {

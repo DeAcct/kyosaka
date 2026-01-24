@@ -1,5 +1,5 @@
 import { Component, define, html } from "@/lib/core";
-import { iconLoader } from "@/icons/iconLoader";
+import { IconLoader } from "@/lib/icon";
 
 import mapping from "./icon.module.scss";
 import raw from "./icon.module.scss?inline";
@@ -20,10 +20,10 @@ export const Icon = define("ky-icon", { mapping, raw })(
     }
 
     async loadIcon(name) {
-      if (!name || !iconLoader[name]) return;
+      if (!name || !IconLoader[name]) return;
 
       try {
-        const { d } = await iconLoader[name]();
+        const d = await IconLoader[name]();
         this.setState("d", d);
         this.setState("loaded", true);
       } catch (err) {

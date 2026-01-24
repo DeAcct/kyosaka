@@ -1,3 +1,5 @@
+@use "@/styles/layout/layout" as *;
+
 .fallback {
   display: flex;
   flex-direction: column;
@@ -13,5 +15,9 @@
   }
   .text {
     font-size: 1.6rem;
+  }
+
+  .button {
+    @include ky-button;
   }
 }

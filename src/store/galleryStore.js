@@ -1,13 +1,9 @@
 // store/galleryStore.js
-import { Store } from "@/lib/store";
+import Store from "@/lib/store";
 
 class GalleryStore extends Store {
-  constructor() {
-    // items에는 { id, type, name }만 저장 (LocalStorage로 자동 동기화됨)
-
-    this.CACHE_NAME = "kyosaka-gallery-v1";
-    this.tempUrls = new Map(); // 🔍 세션 동안만 유지할 URL 캐시 (Store 상태 아님)
-  }
+  CACHE_NAME = "kyosaka-gallery";
+  tempUrls = new Map();
 
   /**
    * 🔍 앱 로드 시 실행: 메타데이터는 이미 LocalStorage에서 복구되었음.
