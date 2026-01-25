@@ -6,21 +6,6 @@ import raw from "./checklistControl.module.scss?inline";
 
 export const ChecklistControl = define("checklist-control", { mapping, raw })(
   class extends Component {
-    handleSubmit() {
-      if (this.mode === "edit") {
-        this.emit("cancel");
-        return;
-      }
-      const $input = this.$refs.input;
-      const text = $input.value.trim();
-
-      if (text) {
-        this.emit("add", { detail: { text } });
-        $input.value = "";
-        $input.focus();
-      }
-    }
-
     template() {
       return html`
         <form
@@ -29,40 +14,18 @@ export const ChecklistControl = define("checklist-control", { mapping, raw })(
             this.handleSubmit(e);
           }}"
         >
-          <input
-            name="newItem"
-            type="text"
-            $input
-            placeholder="체크리스트 추가"
-            class="${this.styles.input} ${this.mode === "view"
-              ? this.styles.show
-              : ""}"
-          />
-          <div class="${this.styles.buttonWrap}">
-            <button
-              type="button"
-              class="${this.styles.button} ${this.mode === "edit"
-                ? this.styles.cancel
-                : ""}"
-              @click="${(e) => {
-                this.handleSubmit(e);
-              }}"
-            >
-              <ky-icon class="${this.styles.icon}" name="add"></ky-icon>
-            </button>
-
-            ${this.mode === "edit"
-              ? html`<button
-                  type="button"
-                  class="${this.styles.button}"
-                  @click="${(e) => {
-                    this.emit("delete");
-                  }}"
-                >
-                  <ky-icon class="${this.styles.icon}" name="delete"></ky-icon>
-                </button>`
-              : ""}
-          </div>
+          <slot></slot>
+          ${this.mode === "edit"
+            ? html`<button
+                type="button"
+                class="${this.styles.button}"
+                @click="${(e) => {
+                  this.emit("delete");
+                }}"
+              >
+                <ky-icon class="${this.styles.icon}" name="delete"></ky-icon>
+              </button>`
+            : ""}
         </form>
       `;
     }

@@ -44,6 +44,22 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
       this.setState("deleteSelected", result);
     }
 
+    handleNew() {
+      if (this.state.mode === "edit") {
+        this.setState("deleteSelected", []);
+        this.setState("mode", "view");
+        return;
+      }
+      const $input = this.$refs.input;
+      const text = $input.value.trim();
+
+      if (text) {
+        checklistStore.addItem(text);
+        $input.value = "";
+        $input.focus();
+      }
+    }
+
     template() {
       const {
         percentage: percent,
@@ -92,19 +108,33 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
         </div>
         <checklist-control
           class="${this.styles.control}"
-          @add="${({ detail }) => {
-            checklistStore.addItem(detail.text);
-          }}"
           @delete=${() => {
             checklistStore.removeList(this.state.deleteSelected);
             this.setState("mode", "view");
           }}
-          @cancel=${() => {
-            this.setState("deleteSelected", []);
-            this.setState("mode", "view");
-          }}
           :mode="${this.state.mode}"
-        ></checklist-control>
+        >
+          <input
+            name="newItem"
+            type="text"
+            $input
+            placeholder="체크리스트 추가"
+            class="${this.styles.input} ${this.state.mode === "view"
+              ? this.styles.show
+              : ""}"
+          />
+          <button
+            type="button"
+            class="${this.styles.button} ${this.state.mode === "edit"
+              ? this.styles.cancel
+              : ""}"
+            @click="${(e) => {
+              this.handleNew(e);
+            }}"
+          >
+            <ky-icon class="${this.styles.icon}" name="add"></ky-icon>
+          </button>
+        </checklist-control>
       `;
     }
   },

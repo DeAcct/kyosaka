@@ -11,6 +11,9 @@
   align-items: center;
   position: sticky;
   top: var(--header-height);
+  z-index: 100;
+  background-color: var(--bg-100);
+  @include round-mask(calc(var(--card-radius-base) * 2));
 }
 
 .upload {

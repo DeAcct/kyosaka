@@ -1,9 +1,8 @@
 .radioGroup {
   display: flex;
-  gap: 0.4rem;
-  background-color: var(--bg-200);
+  background-color: var(--bg-300);
   padding: 0.4rem;
-  border-radius: 0.8rem;
+  border-radius: 1.6rem;
 }
 .tab {
   display: flex;
@@ -11,10 +10,14 @@
   align-items: center;
   justify-content: center;
   font-size: 1.8rem;
-  height: 3.2rem;
-  border-radius: 0.4rem;
+  height: 3.6rem;
+  border-radius: 1.2rem;
   transition: 150ms ease-out;
+  font-weight: 500;
+  color: var(--gray-200);
   &:has(:checked) {
+    font-weight: 600;
+    color: var(--gray-100);
     background-color: var(--bg-100);
   }
 }

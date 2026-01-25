@@ -1,0 +1,16 @@
+.grid {
+  display: grid;
+  --grid-columns: 2;
+  grid-template-columns: repeat(var(--grid-columns), 1fr);
+  gap: 0.4rem;
+  @media screen and (min-width: 690px) {
+    --grid-columns: 3;
+  }
+  border-radius: var(--card-radius-base);
+  overflow: hidden;
+
+  transition: opacity 150ms var(--ease-in-out-back);
+  @starting-style {
+    opacity: 0;
+  }
+}

@@ -18,7 +18,7 @@ export const BottomSheet = define("bottom-sheet", { mapping, raw })(
     }
 
     close() {
-      this.$refs.content.style.translate = `-50% 150%`;
+      this.$refs.content.style.translate = `-50% 100%`;
       this.$refs.content.style.opacity = 0;
       this.emit("close");
       this.$refs.dialog.close();

@@ -1,19 +1,28 @@
 @use "@/styles/layout/layout" as *;
 
+:host {
+  display: flex;
+  justify-content: center;
+}
+
 .form {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.4rem;
+  border-radius: 9999px;
+  overflow: hidden;
+  & > * {
+    border-radius: 0.8rem;
+  }
 }
 
 .input {
   background-color: var(--bg-200);
-  border-radius: var(--card-radius-base);
+  flex-grow: 1;
   height: calc(var(--card-radius-base) * 2);
   font-size: 1.4rem;
   border: 2px solid transparent;
-
   display: none;
   width: calc(var(--card-radius-base) * 2);
   transition: all 150ms var(--ease-in-out-quad);
@@ -34,22 +43,14 @@
   }
 }
 
-.buttonWrap {
-  display: flex;
-  gap: 0.4rem;
-}
 .button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include ky-button;
+  border-radius: 0.8rem;
   width: calc(var(--card-radius-base) * 2);
   height: calc(var(--card-radius-base) * 2);
-  background-color: var(--brand-500);
-  border-radius: 50%;
-  color: var(--bg-100);
   flex-shrink: 0;
   font-size: 2.4rem;
-  @include round-list("x");
+
   transition: 150ms var(--ease-in-out-quad);
   --rotation: 0;
   .icon {

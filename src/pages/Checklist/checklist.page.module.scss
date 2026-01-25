@@ -56,6 +56,7 @@
 
 .control {
   position: fixed;
+  width: min(calc(100% - 4.8rem), 47.5rem);
   z-index: 110;
   bottom: calc(var(--navigation-height) + 1.2rem);
   left: 50%;
@@ -64,5 +65,59 @@
 
   @media screen and (min-width: 690px) {
     left: anchor(center);
+  }
+
+  .input {
+    border-radius: var(--card-radius-base) 0.8rem 0.8rem var(--card-radius-base);
+    background-color: var(--bg-200);
+    flex-grow: 1;
+    height: calc(var(--card-radius-base) * 2);
+    font-size: 1.4rem;
+    display: none;
+    width: calc(var(--card-radius-base) * 2);
+    transition: all 150ms var(--ease-in-out-quad);
+    transition-behavior: allow-discrete;
+    border: none;
+    &:focus {
+      background-color: var(--brand-900);
+    }
+    &.show {
+      display: block;
+      width: 24rem;
+      opacity: 1;
+      padding: 0 1.6rem;
+      @starting-style {
+        width: calc(var(--card-radius-base) * 2);
+        opacity: 0;
+        padding: 0;
+      }
+    }
+    &::placeholder {
+      color: var(--gray-500);
+    }
+  }
+
+  .button {
+    @include ky-button;
+    border-radius: 0.8rem;
+    width: calc(var(--card-radius-base) * 2);
+    height: calc(var(--card-radius-base) * 2);
+    flex-shrink: 0;
+    font-size: 2.4rem;
+
+    transition: 150ms var(--ease-in-out-quad);
+    --rotation: 0;
+    .icon {
+      rotate: var(--rotation);
+      transition: all 150ms var(--ease-in-out-quad);
+    }
+
+    &.cancel {
+      --rotation: 45deg;
+    }
+
+    @starting-style {
+      opacity: 0;
+    }
   }
 }

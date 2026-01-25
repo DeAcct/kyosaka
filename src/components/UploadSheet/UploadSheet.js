@@ -17,12 +17,45 @@ export const UploadSheet = define("upload-sheet", { mapping, raw })(
       };
     }
     reset() {
+      // 1. 기존 ObjectURL 해제 (메모리 누수 방지)
+      if (this.state.previewUrl) {
+        URL.revokeObjectURL(this.state.previewUrl);
+      }
+
+      // 2. 상태 초기화 (사용자님 스타일: "key", value)
       this.setState("pendingFile", null);
+      this.setState("previewUrl", "");
       this.setState("name", "");
+      this.setState("selectedType", "memory");
+
+      // 3. 네이티브 input 값 초기화 (같은 파일을 다시 올릴 때 change 이벤트 보장)
+      if (this.$refs.fileInput) {
+        this.$refs.fileInput.value = "";
+      }
     }
 
     open() {
       this.$refs.sheet.open();
+    }
+
+    openFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // 이전 프리뷰가 있다면 메모리 해제
+      if (this.state.previewUrl) {
+        URL.revokeObjectURL(this.state.previewUrl);
+      }
+
+      const imageUrl = URL.createObjectURL(file);
+
+      this.setState("pendingFile", file);
+      this.setState("previewUrl", imageUrl);
+
+      // 이름이 비어있을 때만 파일명으로 채움
+      if (!this.state.name) {
+        this.setState("name", file.name.split(".")[0]);
+      }
     }
 
     async handleUpload() {
@@ -30,15 +63,19 @@ export const UploadSheet = define("upload-sheet", { mapping, raw })(
       if (!pendingFile) return;
 
       await galleryStore.saveItem(pendingFile, selectedType, name);
-      this.reset();
       this.$refs.sheet.close();
+      this.reset();
     }
 
     template() {
-      const { name, selectedType, pendingFile } = this.state;
+      const { name, selectedType, pendingFile, previewUrl } = this.state;
+
+      const previewStyle = previewUrl
+        ? `background-image: linear-gradient(rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.3)), url(${previewUrl}); color: white;`
+        : "";
       return html`
         <bottom-sheet $sheet @close="${this.reset}">
-          <form class="${this.styles.uploadSheet}">
+          <div class="${this.styles.uploadSheet}">
             <h3 class="${this.styles.title}">새 사진 추가</h3>
 
             <radio-group
@@ -51,52 +88,56 @@ export const UploadSheet = define("upload-sheet", { mapping, raw })(
               @change="${(e) => this.setState("selectedType", e.detail.value)}"
             ></radio-group>
 
-            <div class="${this.styles.picker}">
-              <button
-                class="${this.styles.button}"
-                @click="${() => this.$refs.fileInput.click()}"
-                type="button"
-              >
-                <ky-icon
-                  :name="${pendingFile ? "checked" : "gallery"}"
-                  class="${this.styles.icon}"
-                ></ky-icon>
-                ${pendingFile ? "파일 선택됨" : "이미지 선택"}
-              </button>
-              <input
-                type="file"
-                $file-input
-                hidden
-                @change="${(e) => {
-                  const file = e.target.files[0];
-                  this.setState("pendingFile", file);
-                  if (this.state.name) return;
-                  this.setState("name", file.name.split(".")[0]);
-                }}"
-              />
-              <input
-                class="${this.styles.fileName}"
-                type="text"
-                value="${name}"
-                @input="${(e) => this.setState("name", e.target.value)}"
-                placeholder="사진 이름 입력"
-              />
-            </div>
+            <button
+              class="${this.styles.picker}"
+              @click="${() => this.$refs.fileInput.click()}"
+              style="${previewStyle}"
+              type="button"
+              $preview
+            >
+              <ky-icon
+                :name="${pendingFile ? "checked" : "gallery"}"
+                class="${this.styles.icon}"
+              ></ky-icon>
+              ${pendingFile ? "파일 선택됨" : "이미지 선택"}
+            </button>
+            <input
+              type="file"
+              $file-input
+              hidden
+              @change="${(e) => {
+                this.openFile(e);
+              }}"
+              accept="image/*"
+            />
+            <input
+              class="${this.styles.fileName}"
+              type="text"
+              value="${name}"
+              @input="${(e) => this.setState("name", e.target.value)}"
+              placeholder="사진 이름 입력"
+              name="fileName"
+              required
+            />
 
-            <div class="actions">
-              <button @click="${() => this.$refs.sheet.close()}" type="button">
-                닫기
+            <div class="${this.styles.actions}">
+              <button
+                @click="${() => this.$refs.sheet.close()}"
+                type="button"
+                class="${this.styles.button}"
+              >
+                취소
               </button>
               <button
-                class="primary"
+                class="${this.styles.button} ${this.styles.primary}"
                 @click="${() => this.handleUpload()}"
                 ?disabled="${!this.state.pendingFile || !this.state.name}"
                 type="button"
               >
-                확인
+                업로드
               </button>
             </div>
-          </form>
+          </div>
         </bottom-sheet>
       `;
     }

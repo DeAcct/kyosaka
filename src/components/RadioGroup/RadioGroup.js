@@ -57,8 +57,7 @@ export const RadioGroup = define("radio-group", { mapping, raw })(
                   value="${key}"
                   ?checked="${selectedValue === key}"
                   @change="${(e) => this.handleChange(e)}"
-                />
-                <span class="${this.styles.text}">${text}</span>
+                />${text}
               </label>
             `,
           )}

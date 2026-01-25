@@ -10,8 +10,13 @@
     top: var(--header-height);
     z-index: 20;
     margin-bottom: 0.8rem;
+    @include round-mask(0);
     @media screen and (min-width: 690px) {
       margin-bottom: 0;
+      &::after,
+      &::before {
+        content: none;
+      }
     }
   }
 }
