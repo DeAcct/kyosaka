@@ -19,26 +19,24 @@ export const MemoryItem = define("memory-item", { mapping, raw })(
     }
 
     template() {
-      const { pointerdown, pointerup, pointerleave, contextmenu } =
-        this.longPressHandlers;
+      const { pointerdown, pointerup, pointerleave } = this.longPressHandlers;
 
       const { id, name } = this.item;
       const validUrl = galleryStore.tempUrls.get(id) || "";
       return html`
-        <li
-          class="${this.styles.item}"
+        <host
           key="${id}"
           @pointerdown="${pointerdown}"
           @pointerup="${pointerup}"
           @pointerleave="${pointerleave}"
-          @contextmenu="${contextmenu}"
-        >
-          <img
-            src="${validUrl}"
-            alt="${name}"
-            class="${this.styles.img} ${validUrl ? this.styles.loaded : ""}"
-          />
-        </li>
+          @contextmenu.prevent="${() => {}}"
+        ></host>
+        <img
+          src="${validUrl}"
+          alt="${name}"
+          class="${this.styles.img} ${validUrl ? this.styles.loaded : ""}"
+        />
+        <slot></slot>
       `;
     }
   },

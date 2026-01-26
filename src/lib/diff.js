@@ -313,28 +313,37 @@ export function updateProps(blueprint, target, values, component) {
   const attrs = Array.from(blueprint.attributes || []);
 
   attrs.forEach(({ name, value }) => {
-    if (name.startsWith("$") && component) {
-      // 1. $를 제거하고, 그 뒤의 kebab-case를 camelCase로 변환합니다.
-      const refName = name
-        .slice(1)
-        .replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+    // 1. 공통 변환 로직: 특수문자($ , : , @) 제거 및 케밥 -> 카멜 변환
+    const cleanName = name.replace(/^[$:@]/, "");
+    const camelName = cleanName.replace(/-([a-z])/g, (_, letter) =>
+      letter.toUpperCase(),
+    );
 
-      const existing = component.$refs[refName];
+    // 2. $refs 처리
+    if (name.startsWith("$") && component) {
+      const existing = component.$refs[camelName];
 
       if (!existing) {
-        component.$refs[refName] = target;
+        component.$refs[camelName] = target;
       } else if (Array.isArray(existing)) {
         if (!existing.includes(target)) existing.push(target);
       } else if (existing !== target) {
-        component.$refs[refName] = [existing, target];
+        component.$refs[camelName] = [existing, target];
       }
 
       target.removeAttribute(name);
       return;
     }
 
+    // 3. 이벤트 리스너 (@) 처리
     if (name.startsWith("@")) {
-      const [eventName, ...modifiers] = name.slice(1).split(".");
+      // 이벤트는 camelName 대신 원본에서 수식어(modifiers)를 분리해야 함
+      const [rawEventName, ...modifiers] = name.slice(1).split(".");
+      // 이벤트명 자체도 케밥케이스일 수 있으므로 변환 (예: @custom-event -> customEvent)
+      const eventName = rawEventName.replace(/-([a-z])/g, (_, l) =>
+        l.toUpperCase(),
+      );
+
       const match = value.match(/__VAL_(\d+)__/);
       const realValue = match ? values[match[1]] : null;
 
@@ -354,12 +363,10 @@ export function updateProps(blueprint, target, values, component) {
           }
         };
 
-        const options = {
+        target.addEventListener(eventName, eventHandler, {
           once: modifiers.includes("once"),
           capture: modifiers.includes("capture"),
-        };
-
-        target.addEventListener(eventName, eventHandler, options);
+        });
         target[`_@${name}_`] = realValue;
         target[`_@${name}_wrapped`] = eventHandler;
       }
@@ -368,15 +375,16 @@ export function updateProps(blueprint, target, values, component) {
       return;
     }
 
-    const match = value.match(/__VAL_(\d+)__/);
-    if (!match) return;
-
-    const realValue = values[match[1]];
-
+    // 4. 프로퍼티 바인딩 (:) 처리
     if (name.startsWith(":")) {
-      const propName = name.slice(1);
-      if (target[propName] !== realValue) target[propName] = realValue;
-      target.removeAttribute(name);
+      const match = value.match(/__VAL_(\d+)__/);
+      if (match) {
+        const realValue = values[match[1]];
+        if (target[camelName] !== realValue) {
+          target[camelName] = realValue;
+        }
+        target.removeAttribute(name);
+      }
     }
   });
 }

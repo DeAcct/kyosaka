@@ -1,18 +1,3 @@
-@use "@/styles/layout/layout" as *;
-
-.item {
-  aspect-ratio: 1 / 1;
-  border-radius: 0.8rem;
-  overflow: hidden;
-  @include loading-target;
-  transition:
-    opacity 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
-    scale 150ms var(--ease-in-out-back) calc(30ms * var(--i));
-  @starting-style {
-    opacity: 0;
-    scale: 0.9;
-  }
-}
 .img {
   display: block;
   width: 100%;

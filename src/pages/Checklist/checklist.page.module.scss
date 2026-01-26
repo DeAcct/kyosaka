@@ -67,10 +67,13 @@
     left: anchor(center);
   }
 
+  .counter {
+    font-size: 1.6rem;
+  }
+
   .input {
     border-radius: var(--card-radius-base) 0.8rem 0.8rem var(--card-radius-base);
     background-color: var(--bg-200);
-    flex-grow: 1;
     height: calc(var(--card-radius-base) * 2);
     font-size: 1.4rem;
     display: none;
@@ -83,7 +86,7 @@
     }
     &.show {
       display: block;
-      width: 24rem;
+      width: min(calc(100dvw - 10rem), 42.3rem);
       opacity: 1;
       padding: 0 1.6rem;
       @starting-style {

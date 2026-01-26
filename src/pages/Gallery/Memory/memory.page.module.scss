@@ -1,3 +1,5 @@
+@use "@/styles/layout/layout" as *;
+
 .grid {
   display: grid;
   --grid-columns: 2;
@@ -12,5 +14,42 @@
   transition: opacity 150ms var(--ease-in-out-back);
   @starting-style {
     opacity: 0;
+  }
+}
+
+.item {
+  aspect-ratio: 1 / 1;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  @include loading-target;
+  transition:
+    opacity 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
+    scale 150ms var(--ease-in-out-back) calc(30ms * var(--i));
+  box-shadow: 0.4rem 0.4rem 0 transparent;
+  @starting-style {
+    opacity: 0;
+    scale: 0.9;
+  }
+
+  &.selected {
+    transition: all 150ms var(--ease-in-out-back);
+    scale: 0.95;
+    box-shadow: 0.4rem 0.4rem 0 var(--brand-500);
+  }
+  position: relative;
+}
+
+.checked {
+  position: absolute;
+  left: 0.8rem;
+  top: 0.8rem;
+  color: var(--gray-950);
+  font-size: 2rem;
+  opacity: 0;
+  transition: 150ms var(--ease-in-out-back);
+  background: var(--brand-500);
+  border-radius: 50%;
+  &.show {
+    opacity: 1;
   }
 }

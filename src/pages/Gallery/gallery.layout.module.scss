@@ -6,7 +6,7 @@
   margin: 0 auto;
 }
 
-.controller {
+.tabBar {
   display: flex;
   align-items: center;
   position: sticky;
@@ -16,21 +16,47 @@
   @include round-mask(calc(var(--card-radius-base) * 2));
 }
 
-.upload {
+.controller {
   position: fixed;
+  width: min(calc(100% - 4.8rem), 47.5rem);
+  z-index: 110;
   bottom: calc(var(--navigation-height) + 1.2rem);
   left: 50%;
   translate: -50% 0;
-  display: flex;
+
+  @media screen and (min-width: 690px) {
+    left: anchor(center);
+  }
+}
+
+.upload {
+  @include ky-button;
   gap: 0.4rem;
   align-items: center;
+  width: auto;
+  interpolate-size: allow-keywords;
+  white-space: nowrap;
+  transition: all 150ms var(--ease-in-out-quad);
+  transition-behavior: allow-discrete;
 
-  @include ky-button;
+  &.cancel {
+    width: calc(var(--card-radius-base) * 2);
+    opacity: 1;
+    padding: 0 1.6rem;
+    border-radius: var(--card-radius-base) 0.8rem 0.8rem var(--card-radius-base);
+  }
 
   .icon {
-    font-size: 1.8rem;
+    font-size: 2.4rem;
   }
   .text {
+    display: none;
+    opacity: 0;
     font-size: 1.6rem;
+    transition: all 150ms var(--ease-in-out-quad);
+    &.show {
+      display: block;
+      opacity: 1;
+    }
   }
 }

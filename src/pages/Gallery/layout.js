@@ -1,13 +1,15 @@
 import { Component, define, html } from "@/lib/core";
 import { router } from "@/lib/router";
 import { switcher } from "@/lib/switcher";
+import { galleryStore } from "@/store/galleryStore";
 
 import mapping from "./gallery.layout.module.scss";
 import raw from "./gallery.layout.module.scss?inline";
 
-import { TabSelector } from "@/components/TabSelector/TabSelector";
-import { SwipeWrap } from "@/components/SwipeWrap/SwipeWrap";
+import { ControlBar } from "@/components/ControlBar/ControlBar";
 import { Icon } from "@/components/Icon/Icon";
+import { SwipeWrap } from "@/components/SwipeWrap/SwipeWrap";
+import { TabSelector } from "@/components/TabSelector/TabSelector";
 import { UploadSheet } from "@/components/UploadSheet/UploadSheet";
 
 const TABS = [
@@ -22,6 +24,10 @@ const TABS = [
 ];
 export const GalleryLayout = define("layout-gallery", { mapping, raw })(
   class extends Component {
+    setup() {
+      this.subscribe(galleryStore);
+    }
+
     gallerySwipe({ detail }) {
       const { pathname } = location;
       const nowIndex = TABS.findIndex(({ to }) => to === pathname);
@@ -33,10 +39,9 @@ export const GalleryLayout = define("layout-gallery", { mapping, raw })(
     template() {
       return html`
         <div class="${this.styles.gallery}">
-          <nav class="${this.styles.controller}">
+          <nav class="${this.styles.tabBar}">
             <tab-selector :tabs="${TABS}"></tab-selector>
           </nav>
-
           <swipe-wrap
             @swipe="${(e) => {
               this.gallerySwipe(e);
@@ -45,16 +50,39 @@ export const GalleryLayout = define("layout-gallery", { mapping, raw })(
             <slot></slot>
           </swipe-wrap>
 
-          <button
-            class="${this.styles.upload}"
-            type="button"
-            @click="${() => {
-              this.$refs.uploadSheet.open();
-            }}"
+          <control-bar
+            class="${this.styles.controller}"
+            @delete=${() => {
+              galleryStore.deleteSelectedItems();
+            }}
+            :mode="${galleryStore.mode}"
           >
-            <ky-icon name="upload" class="${this.styles.icon}"></ky-icon>
-            <span class="${this.styles.text}">새 사진</span>
-          </button>
+            <span slot="counter">${galleryStore.selected.length}개 선택됨</span>
+            <button
+              class="${this.styles.upload} ${galleryStore.mode === "edit"
+                ? this.styles.cancel
+                : ""}"
+              type="button"
+              @click="${() => {
+                if (galleryStore.mode === "view") {
+                  this.$refs.uploadSheet.open();
+                } else {
+                  galleryStore.toggleUIMode();
+                }
+              }}"
+            >
+              <ky-icon
+                :name="${galleryStore.mode === "view" ? "upload" : "add"}"
+                class="${this.styles.icon}"
+              ></ky-icon>
+              <span
+                class="${this.styles.text} ${galleryStore.mode === "view"
+                  ? this.styles.show
+                  : ""}"
+                >새 사진</span
+              >
+            </button>
+          </control-bar>
 
           <upload-sheet $upload-sheet></upload-sheet>
         </div>

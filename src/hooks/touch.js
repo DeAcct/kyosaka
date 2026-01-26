@@ -1,6 +1,6 @@
 //lib/hooks.js
 
-export function useSwipe(callbacks, threshold = 5) {
+export function useSwipe(callbacks, threshold = 3) {
   let startPos = { x: 0, y: 0 };
   let isDown = false;
   let isTriggered = false;
@@ -33,7 +33,6 @@ export function useSwipe(callbacks, threshold = 5) {
   };
 }
 
-// src/hooks/useLongPress.js
 export const useLongPress = (callback, { delay = 600 } = {}) => {
   let timer = null;
 
@@ -63,6 +62,5 @@ export const useLongPress = (callback, { delay = 600 } = {}) => {
     pointerdown: start,
     pointerup: clear,
     pointerleave: clear,
-    contextmenu: (e) => e.preventDefault(),
   };
 };

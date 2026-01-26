@@ -10,102 +10,104 @@ sharedResetSheet.replaceSync(resetStyle);
 /**
  * 베이스 컴포넌트 클래스
  */
-export class Component extends HTMLElement {
-  state = {};
-  _unsubscribers = [];
-  _abortController = null;
-  styles = {};
-  $refs = {};
+export const withComponent = (Base = HTMLElement) =>
+  class extends Base {
+    state = {};
+    _unsubscribers = [];
+    styles = {};
+    $refs = {};
 
-  static shadowOptions = { mode: "open" };
-  _internals = null;
-  static formAssociated = false;
+    static shadowOptions = { mode: "open" };
+    _internals = null;
+    static formAssociated = false;
 
-  _renderAnimationFrameId = null;
+    _renderAnimationFrameId = null;
 
-  constructor() {
-    super();
-    const options = this.constructor.shadowOptions || { mode: "open" };
+    constructor() {
+      super();
+      const options = this.constructor.shadowOptions || { mode: "open" };
 
-    const { schedule, cancel } = createScheduler(() => this.render());
-    this.queueRender = schedule;
-    this._cancelRender = cancel;
+      const { schedule, cancel } = createScheduler(() => this.render());
+      this.queueRender = schedule;
+      this._cancelRender = cancel;
 
-    if (!this.shadowRoot) {
-      this.attachShadow(options);
-    }
-    if (this.constructor.formAssociated) {
-      this._internals = this.attachInternals();
-    }
-    this.shadowRoot.adoptedStyleSheets = [sharedResetSheet];
-  }
-
-  setState(key, newState) {
-    this.state = { ...this.state, [key]: newState };
-    this.queueRender();
-  }
-
-  subscribe(store) {
-    const unsub = store.subscribe(() => this.queueRender());
-    this._unsubscribers.push(unsub);
-  }
-
-  connectedCallback() {
-    this._abortController = new AbortController();
-    const { signal } = this._abortController;
-    this.setup();
-    this.queueRender();
-  }
-
-  disconnectedCallback() {
-    if (this._abortController) this._abortController.abort();
-    this._unsubscribers.forEach((unsub) => unsub());
-
-    this._cancelRender();
-  }
-
-  setup() {}
-  template() {
-    return html``;
-  }
-  getStyles() {
-    return { mapping: {}, stylesheet: null };
-  }
-
-  render() {
-    this._cancelRender();
-
-    const { mapping, stylesheet } = this.getStyles();
-    this.styles = mapping;
-
-    if (stylesheet instanceof CSSStyleSheet) {
-      this.shadowRoot.adoptedStyleSheets = [sharedResetSheet, stylesheet];
+      if (!this.shadowRoot) {
+        this.attachShadow(options);
+      }
+      if (this.constructor.formAssociated) {
+        this._internals = this.attachInternals();
+      }
+      this.shadowRoot.adoptedStyleSheets = [sharedResetSheet];
     }
 
-    const templateResult = this.template();
-    if (templateResult) {
-      this.$refs = {};
-      updateDOM(this.shadowRoot, templateResult, this);
+    setState(key, newState) {
+      this.state = { ...this.state, [key]: newState };
+      this.queueRender();
     }
 
-    this.afterRender();
-    if (!this.reRendered) this.afterOnce();
-    this.reRendered = true;
-  }
+    subscribe(store) {
+      const unsub = store.subscribe(() => this.queueRender());
+      this._unsubscribers.push(unsub);
+    }
 
-  $selector(query, all = false) {
-    return all
-      ? this.shadowRoot.querySelectorAll(query)
-      : this.shadowRoot.querySelector(query);
-  }
+    connectedCallback() {
+      this.setup();
+      this.queueRender();
+    }
 
-  afterRender() {}
-  afterOnce() {}
+    disconnectedCallback() {
+      this._unsubscribers.forEach((unsub) => unsub());
 
-  emit(eventName, option) {
-    this.dispatchEvent(new CustomEvent(eventName, option));
-  }
-}
+      this._cancelRender();
+      this.onDisconnected();
+    }
+
+    setup() {}
+    template() {
+      return html``;
+    }
+    getStyles() {
+      return { mapping: {}, stylesheet: null };
+    }
+
+    render() {
+      this._cancelRender();
+
+      const { mapping, stylesheet } = this.getStyles();
+      this.styles = mapping;
+
+      if (stylesheet instanceof CSSStyleSheet) {
+        this.shadowRoot.adoptedStyleSheets = [sharedResetSheet, stylesheet];
+      }
+
+      const templateResult = this.template();
+      if (templateResult) {
+        this.$refs = {};
+        updateDOM(this.shadowRoot, templateResult, this);
+      }
+
+      this.afterRender();
+      if (!this.reRendered) this.afterOnce();
+      this.reRendered = true;
+    }
+
+    $selector(query, all = false) {
+      return all
+        ? this.shadowRoot.querySelectorAll(query)
+        : this.shadowRoot.querySelector(query);
+    }
+
+    afterRender() {}
+    afterOnce() {}
+
+    onDisconnected() {}
+
+    emit(eventName, option) {
+      this.dispatchEvent(new CustomEvent(eventName, option));
+    }
+  };
+
+export class Component extends withComponent(HTMLElement) {}
 
 /**
  * 상태가 없는 단순 컴포넌트용 클래스
@@ -135,27 +137,34 @@ export class Stateless extends HTMLElement {
   }
 }
 
-/** * 1. 복잡한 컴포넌트용 define (SCSS 매핑 포함)
+/** 상태가 포함된 컴포넌트를 정의합니다.
  */
 export const define =
-  (tagName, { mapping, raw } = { mapping: {}, raw: "" }) =>
+  (
+    tagName,
+    { mapping, raw, extends: extendTag } = {
+      mapping: {},
+      raw: "",
+      extends: null,
+    },
+  ) =>
   (ComponentClass) => {
     const stylesheet = new CSSStyleSheet();
     if (raw) stylesheet.replaceSync(raw);
 
-    // 프로토타입에 스타일 주입 로직 오버라이딩
     ComponentClass.prototype.getStyles = function () {
       return { mapping: mapping || {}, stylesheet };
     };
 
     if (!customElements.get(tagName)) {
-      customElements.define(tagName, ComponentClass);
+      // 3번째 인자로 extends 옵션 전달
+      const options = extendTag ? { extends: extendTag } : undefined;
+      customElements.define(tagName, ComponentClass, options);
     }
     return ComponentClass;
   };
 
-/**
- * 2. 단순 컴포넌트용 define
+/**상태가 없는 불변 컴포넌트를 정의합니다.
  */
 export const defineStateless = (tagName) => (ComponentClass) => {
   if (!customElements.get(tagName)) {

@@ -22,28 +22,25 @@ export const ChecklistItem = define("checklist-item", { mapping, raw })(
 
     template() {
       const { checked, text, id } = this.item;
-      const { pointerdown, pointerup, pointerleave, contextmenu } =
-        this.longPressHandlers;
+      const { pointerdown, pointerup, pointerleave } = this.longPressHandlers;
 
       return html`
-        <li
-          class="${this.styles.item}"
+        <host
           @pointerdown="${pointerdown}"
           @pointerup="${pointerup}"
           @pointerleave="${pointerleave}"
-          @contextmenu="${contextmenu}"
-        >
-          <label class="${this.styles.label}">
-            <ky-checkbox
-              :checked="${checked}"
-              @change="${() => {
-                this.emit("toggle", { detail: { id } });
-              }}"
-              ?disabled="${this.selectmode}"
-            ></ky-checkbox>
-            <span>${text}</span>
-          </label>
-        </li>
+          @contextmenu.prevent="${() => {}}"
+        ></host>
+        <label class="${this.styles.label}">
+          <ky-checkbox
+            :checked="${checked}"
+            @change="${() => {
+              this.emit("toggle", { detail: { id } });
+            }}"
+            ?disabled="${this.selectmode}"
+          ></ky-checkbox>
+          <span>${text}</span>
+        </label>
       `;
     }
   },
