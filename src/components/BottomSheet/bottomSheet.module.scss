@@ -9,6 +9,8 @@
   max-height: none;
   padding: 0;
   margin: 0;
+  position: fixed;
+  bottom: 0;
   transition:
     opacity 300ms var(--ease-out-expo),
     display 300ms allow-discrete,
