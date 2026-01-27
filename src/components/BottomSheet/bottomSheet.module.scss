@@ -30,8 +30,6 @@
   }
 
   &::backdrop {
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px);
     transition:
       opacity 300ms var(--ease-out-expo),
       display 300ms allow-discrete,

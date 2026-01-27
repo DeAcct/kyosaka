@@ -6,6 +6,7 @@ import raw from "./app.module.scss?inline";
 
 import { Header } from "@/components/Header/Header";
 import { NavigationBar } from "@/components/NavigationBar/NavigationBar";
+import { PWASheet } from "../PWASheet/PWASheet";
 import { ToastConsumer } from "@/components/ToastConsumer/ToastConsumer";
 
 export const App = define("ky-app", { mapping, raw })(
@@ -22,6 +23,7 @@ export const App = define("ky-app", { mapping, raw })(
 
     template() {
       return html`
+        <pwa-sheet></pwa-sheet>
         <ky-header></ky-header>
         <main data-router-view></main>
         <toast-consumer></toast-consumer>

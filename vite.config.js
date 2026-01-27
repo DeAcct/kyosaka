@@ -18,7 +18,7 @@ export default defineConfig({
       },
       manifest: {
         name: "쿄사카",
-        short_name: "쿄",
+        short_name: "쿄사카",
         categories: ["travel", "schedule", "todo"],
         description: "여행계획을 읽고, 쓰고, 공유하자",
         display: "standalone",
@@ -39,53 +39,36 @@ export default defineConfig({
         id: "/",
         icons: [
           {
-            src: "icon-192x192.png",
+            src: "/icons/icon-192x192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "icon-256x256.png",
+            src: "/icons/icon-256x256.png",
             sizes: "256x256",
             type: "image/png",
           },
           {
-            src: "icon-384x384.png",
+            src: "/icons/icon-384x384.png",
             sizes: "384x384",
             type: "image/png",
           },
           {
-            src: "icon-512x512.png",
+            src: "/icons/icon-512x512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "any",
+            purpose: "any maskable",
           },
           {
-            src: "icon-maskable.webp",
+            src: "/icons/icon-512x512.webp",
             sizes: "512x512",
             type: "image/webp",
-            purpose: "maskable",
+            purpose: "any maskable",
           },
           {
-            src: "favicon.svg",
-            sizes: "512x512",
+            src: "/icons/favicon.svg",
+            sizes: "24x24",
             type: "image/svg",
-          },
-        ],
-        screenshots: [
-          {
-            src: "screenshot_home.webp",
-            sizes: "1082x2402",
-            type: "image/webp",
-          },
-          {
-            src: "screenshot_my.webp",
-            sizes: "1082x2402",
-            type: "image/webp",
-          },
-          {
-            src: "screenshot_player.webp",
-            sizes: "1082x2402",
-            type: "image/webp",
           },
         ],
         shortcuts: [
