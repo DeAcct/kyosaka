@@ -1,0 +1,49 @@
+.list {
+  display: grid;
+  --grid-columns: 1;
+  grid-template-columns: repeat(var(--grid-columns), 1fr);
+  gap: 0.4rem;
+  @media screen and (min-width: 690px) {
+    --grid-columns: 2;
+  }
+  @media screen and (min-width: 1024px) {
+    --grid-columns: 3;
+  }
+  border-radius: var(--card-radius-base);
+  overflow: hidden;
+
+  transition: opacity 150ms var(--ease-in-out-back);
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+.item {
+  display: flex;
+  gap: 1rem;
+  padding: 1.6rem;
+  background-color: var(--bg-200);
+  border-radius: 0.8rem;
+  border: 1px solid transparent;
+  transition: all 150ms var(--ease-in-out-back);
+  &::part(image) {
+    aspect-ratio: 1 / 1;
+    width: 7.2rem;
+    border-radius: 0.8rem;
+  }
+  .fileName {
+    font-size: 1.6rem;
+    line-height: 1.2;
+  }
+
+  @starting-style {
+    opacity: 0;
+    scale: 0.9;
+  }
+
+  &.selected {
+    border-color: var(--brand-500);
+    scale: 0.95;
+  }
+  position: relative;
+}

@@ -36,6 +36,12 @@ export const GalleryLayout = define("layout-gallery", { mapping, raw })(
       router.navigate(TABS[nextIndex].to);
     }
 
+    get nowPage() {
+      const { pathname } = location;
+      const [, , leafNode] = pathname.split("/");
+      return leafNode;
+    }
+
     template() {
       return html`
         <div class="${this.styles.gallery}">
@@ -47,7 +53,9 @@ export const GalleryLayout = define("layout-gallery", { mapping, raw })(
               this.gallerySwipe(e);
             }}"
           >
-            <slot></slot>
+            <div class="${this.styles.swipeHitArea}">
+              <slot></slot>
+            </div>
           </swipe-wrap>
 
           <control-bar
@@ -83,8 +91,10 @@ export const GalleryLayout = define("layout-gallery", { mapping, raw })(
               >
             </button>
           </control-bar>
-
-          <upload-sheet $upload-sheet></upload-sheet>
+          <upload-sheet
+            $upload-sheet
+            :selected="${this.nowPage}"
+          ></upload-sheet>
         </div>
       `;
     }

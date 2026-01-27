@@ -3,10 +3,10 @@ import { useGalleryData } from "@/hooks/gallery";
 import { useLongPress } from "@/hooks/touch";
 import { galleryStore } from "@/store/galleryStore";
 
-import mapping from "./memoryItem.module.scss";
-import raw from "./memoryItem.module.scss?inline";
+import mapping from "./galleryItem.module.scss";
+import raw from "./galleryItem.module.scss?inline";
 
-export const MemoryItem = define("memory-item", { mapping, raw })(
+export const GalleryItem = define("gallery-item", { mapping, raw })(
   class extends Component {
     setup() {
       this.longPressHandlers = useLongPress(() => {
@@ -19,19 +19,21 @@ export const MemoryItem = define("memory-item", { mapping, raw })(
     }
 
     template() {
-      const { pointerdown, pointerup, pointerleave } = this.longPressHandlers;
+      const { pointerdown, pointermove, pointerup, pointerleave } =
+        this.longPressHandlers;
 
       const { id, name } = this.item;
       const validUrl = galleryStore.tempUrls.get(id) || "";
       return html`
         <host
-          key="${id}"
           @pointerdown="${pointerdown}"
           @pointerup="${pointerup}"
+          @pointermove="${pointermove}"
           @pointerleave="${pointerleave}"
           @contextmenu.prevent="${() => {}}"
         ></host>
         <img
+          part="image"
           src="${validUrl}"
           alt="${name}"
           class="${this.styles.img} ${validUrl ? this.styles.loaded : ""}"

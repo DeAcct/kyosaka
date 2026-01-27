@@ -1,11 +1,7 @@
 @use "@/styles/layout/layout" as *;
 
-:host {
-  display: flex;
-  justify-content: center;
-}
-
 .form {
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -40,6 +36,8 @@
 
 .box {
   display: flex;
+  justify-content: center;
+  flex-grow: 1;
   border-radius: 9999px;
   overflow: hidden;
   gap: 0.4rem;

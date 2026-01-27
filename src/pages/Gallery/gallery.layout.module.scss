@@ -14,10 +14,19 @@
   z-index: 100;
   background-color: var(--bg-100);
   @include round-mask(calc(var(--card-radius-base) * 2));
+  anchor-name: --gallery-grid;
+}
+
+.swipeHitArea {
+  min-height: calc(
+    100dvh - var(--header-height) - var(--card-radius-base) *
+      2 - var(--navigation-height) - 2rem
+  );
 }
 
 .controller {
   position: fixed;
+  position-anchor: --gallery-grid;
   width: min(calc(100% - 4.8rem), 47.5rem);
   z-index: 110;
   bottom: calc(var(--navigation-height) + 1.2rem);
@@ -36,14 +45,21 @@
   width: auto;
   interpolate-size: allow-keywords;
   white-space: nowrap;
-  transition: all 150ms var(--ease-in-out-quad);
   transition-behavior: allow-discrete;
+  @starting-style {
+    width: calc(var(--card-radius-base) * 2);
+    opacity: 0;
+    padding: 0;
+  }
 
   &.cancel {
     width: calc(var(--card-radius-base) * 2);
     opacity: 1;
     padding: 0 1.6rem;
-    border-radius: var(--card-radius-base) 0.8rem 0.8rem var(--card-radius-base);
+    border-radius: 0.8rem;
+    .icon {
+      rotate: 45deg;
+    }
   }
 
   .icon {

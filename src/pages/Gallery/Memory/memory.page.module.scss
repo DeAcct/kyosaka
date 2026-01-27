@@ -8,6 +8,9 @@
   @media screen and (min-width: 690px) {
     --grid-columns: 3;
   }
+  @media screen and (min-width: 1024px) {
+    --grid-columns: 4;
+  }
   border-radius: var(--card-radius-base);
   overflow: hidden;
 
@@ -18,7 +21,7 @@
 }
 
 .item {
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1;
   border-radius: 0.8rem;
   overflow: hidden;
   @include loading-target;

@@ -22,12 +22,14 @@ export const ChecklistItem = define("checklist-item", { mapping, raw })(
 
     template() {
       const { checked, text, id } = this.item;
-      const { pointerdown, pointerup, pointerleave } = this.longPressHandlers;
+      const { pointerdown, pointermove, pointerup, pointerleave } =
+        this.longPressHandlers;
 
       return html`
         <host
           @pointerdown="${pointerdown}"
           @pointerup="${pointerup}"
+          @pointermove="${pointermove}"
           @pointerleave="${pointerleave}"
           @contextmenu.prevent="${() => {}}"
         ></host>

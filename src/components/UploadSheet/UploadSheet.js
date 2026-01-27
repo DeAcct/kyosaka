@@ -17,7 +17,6 @@ export const UploadSheet = define("upload-sheet", { mapping, raw })(
       };
     }
     reset() {
-      // 1. 기존 ObjectURL 해제 (메모리 누수 방지)
       if (this.state.previewUrl) {
         URL.revokeObjectURL(this.state.previewUrl);
       }
@@ -31,6 +30,12 @@ export const UploadSheet = define("upload-sheet", { mapping, raw })(
       // 3. 네이티브 input 값 초기화 (같은 파일을 다시 올릴 때 change 이벤트 보장)
       if (this.$refs.fileInput) {
         this.$refs.fileInput.value = "";
+      }
+    }
+
+    set selected(value) {
+      if (value) {
+        this.setState("selectedType", value);
       }
     }
 
@@ -69,6 +74,7 @@ export const UploadSheet = define("upload-sheet", { mapping, raw })(
 
     template() {
       const { name, selectedType, pendingFile, previewUrl } = this.state;
+      console.log(selectedType);
 
       const previewStyle = previewUrl
         ? `background-image: linear-gradient(rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.3)), url(${previewUrl}); color: white;`

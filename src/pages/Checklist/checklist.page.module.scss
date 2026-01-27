@@ -56,7 +56,7 @@
 
 .control {
   position: fixed;
-  width: min(calc(100% - 4.8rem), 47.5rem);
+  width: anchor-size(width);
   z-index: 110;
   bottom: calc(var(--navigation-height) + 1.2rem);
   left: 50%;
@@ -86,7 +86,7 @@
     }
     &.show {
       display: block;
-      width: min(calc(100dvw - 10rem), 42.3rem);
+      width: 100%;
       opacity: 1;
       padding: 0 1.6rem;
       @starting-style {

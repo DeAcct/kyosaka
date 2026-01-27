@@ -6,7 +6,7 @@ import { galleryStore } from "@/store/galleryStore";
 import mapping from "./memory.page.module.scss";
 import raw from "./memory.page.module.scss?inline";
 
-import { MemoryItem } from "@/components/MemoryItem/MemoryItem";
+import { GalleryItem } from "@/components/GalleryItem/GalleryItem";
 import { Icon } from "@/components/Icon/Icon";
 
 export const MemoryPage = define("page-memory", { mapping, raw })(
@@ -31,7 +31,7 @@ export const MemoryPage = define("page-memory", { mapping, raw })(
           ${items.map((item, index) => {
             const isSelected = selected.includes(item.id);
             return html`
-              <memory-item
+              <gallery-item
                 data-key="item-${item.id}"
                 class="${this.styles.item} ${isSelected
                   ? this.styles.selected
@@ -44,7 +44,6 @@ export const MemoryPage = define("page-memory", { mapping, raw })(
                   galleryStore.toggleUIMode(item.id);
                 }}"
                 @click="${() => {
-                  // 🎯 편집 모드일 때만 선택 토글, 아니면 일반 클릭(상세보기 등)
                   if (mode === "edit") {
                     galleryStore.toggleItemSelection(item.id);
                   } else {
@@ -59,7 +58,7 @@ export const MemoryPage = define("page-memory", { mapping, raw })(
                     ? this.styles.show
                     : ""}"
                 ></ky-icon>
-              </memory-item>
+              </gallery-item>
             `;
           })}
         </section>
