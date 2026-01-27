@@ -38,7 +38,10 @@ function renderValue(value, component) {
     return fragment;
   }
 
-  return document.createTextNode(String(value ?? ""));
+  // 🎯 undefined나 null일 경우 "undefined" 문자가 아니라 빈 문자열 노드 생성
+  return document.createTextNode(
+    value === undefined || value === null ? "" : String(value),
+  );
 }
 
 /**
@@ -47,52 +50,44 @@ function renderValue(value, component) {
 function resolveMarkers(node, values, component) {
   if (node.nodeType === Node.TEXT_NODE) {
     const text = node.textContent;
-    const match = text.match(/__VAL_(\d+)__/);
+    const markerRegex = /(__VAL_\d+__)/g; // 🔍 마커를 캡처 그룹으로 분리
 
-    if (match) {
-      const markerId = match[1];
-      const realValue = values[markerId];
+    if (markerRegex.test(text)) {
+      const parent = node.parentNode;
+      const parts = text.split(markerRegex); // 🎯 마커와 일반 텍스트를 배열로 쪼갬
 
-      // 🔥 배열: 앵커 + 즉시 렌더링
-      if (Array.isArray(realValue)) {
-        const anchor = createArrayAnchor(markerId);
-        const parent = node.parentNode;
-        const nextSibling = node.nextSibling;
+      parts.forEach((part) => {
+        if (!part) return;
 
-        // 앵커 삽입
-        parent.insertBefore(anchor, node);
+        const match = part.match(/__VAL_(\d+)__/);
+        if (match) {
+          const markerId = match[1];
+          const realValue = values[markerId];
 
-        // 배열 아이템들 즉시 렌더링
-        realValue.forEach((item) => {
-          const rendered = renderValue(item, component);
+          // 🎯 여기서 renderValue를 실행하여 배열이나 템플릿을 실제 노드로 변환
+          const rendered = renderValue(realValue, component);
 
-          if (rendered.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-            const children = Array.from(rendered.childNodes);
-            children.forEach((child) => {
-              parent.insertBefore(child, nextSibling);
-            });
+          if (Array.isArray(realValue)) {
+            // 배열이면 앵커(Comment)를 만들고 그 뒤에 렌더링 결과 삽입
+            const anchor = createArrayAnchor(markerId);
+            parent.insertBefore(anchor, node);
+            parent.insertBefore(rendered, node);
           } else {
-            parent.insertBefore(rendered, nextSibling);
+            parent.insertBefore(rendered, node);
           }
-        });
+        } else {
+          // 마커가 아닌 순수 텍스트 조각
+          parent.insertBefore(document.createTextNode(part), node);
+        }
+      });
 
-        // 마커 노드 제거
-        node.remove();
-        return;
-      }
-
-      // 중첩 템플릿
-      if (realValue && typeof realValue === "object" && realValue.strings) {
-        node.parentNode.replaceChild(renderValue(realValue, component), node);
-        return;
-      }
-
-      // 일반 문자열
-      node.textContent = text.replace(/__VAL_(\d+)__/g, (_, i) => values[i]);
+      node.remove(); // 🎯 모든 조각을 삽입했으므로 원본 마커 텍스트 노드 제거
+      return;
     }
   } else if (node.nodeType === Node.ELEMENT_NODE) {
     updateAttrs(node, node, values);
     updateProps(node, node, values, component);
+    // 🔍 자식 순회 시 Array.from으로 스냅샷을 찍어야 노드 삭제/추가 시 인덱스가 안 꼬임
     Array.from(node.childNodes).forEach((child) =>
       resolveMarkers(child, values, component),
     );

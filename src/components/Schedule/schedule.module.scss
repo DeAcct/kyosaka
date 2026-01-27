@@ -134,6 +134,7 @@
     flex-direction: column;
     gap: 1rem;
     padding: 1.6rem;
+
     @media screen and (min-width: 690px) {
       padding: 0 1.6rem 1.6rem;
     }
@@ -148,5 +149,20 @@
       align-content: center;
       line-height: 1.2;
     }
+  }
+}
+
+.reload {
+  @include ky-button;
+  gap: 0.4rem;
+  position: fixed;
+  left: 50%;
+  translate: -50% 0;
+  bottom: calc(var(--navigation-height) + 1.2rem);
+  font-size: 1.6rem;
+  margin-top: 1.2rem;
+  white-space: nowrap;
+  .icon {
+    font-size: 2.4rem;
   }
 }

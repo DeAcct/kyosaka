@@ -6,6 +6,7 @@ import raw from "./app.module.scss?inline";
 
 import { Header } from "@/components/Header/Header";
 import { NavigationBar } from "@/components/NavigationBar/NavigationBar";
+import { ToastConsumer } from "@/components/ToastConsumer/ToastConsumer";
 
 export const App = define("ky-app", { mapping, raw })(
   class extends Component {
@@ -23,6 +24,7 @@ export const App = define("ky-app", { mapping, raw })(
       return html`
         <ky-header></ky-header>
         <main data-router-view></main>
+        <toast-consumer></toast-consumer>
         <navigation-bar class="${this.styles.navigationBar}"></navigation-bar>
       `;
     }

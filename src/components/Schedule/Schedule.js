@@ -1,16 +1,18 @@
 import { Component, define, html } from "@/lib/core";
 import { switcher } from "@/lib/switcher";
 import { scheduleStore } from "@/store/scheduleStore";
+import { useJSONUpload } from "@/hooks/file";
 import { useSwipe } from "@/hooks/touch";
 
 import mapping from "./schedule.module.scss";
 import raw from "./schedule.module.scss?inline";
 
+import { PositionBox } from "@/components/PositionBox/PositionBox";
 import { Description } from "@/components/Description/Description";
 import { Fallback } from "@/components/Fallback/Fallback";
+import { Icon } from "@/components/Icon/Icon";
 import { RouteCard } from "@/components/RouteCard/RouteCard";
 import { SwipeWrap } from "@/components/SwipeWrap/SwipeWrap";
-import { Icon } from "@/components/Icon/Icon";
 
 export const Schedule = define("ky-schedule", { mapping, raw })(
   class extends Component {
@@ -41,6 +43,12 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
             `정의되지 않은 방향이 감지되었습니다.\n(Event detail: ${JSON.stringify(detail)})`,
           );
         });
+    }
+
+    async onJSONButtonClick() {
+      await useJSONUpload((data) => {
+        scheduleStore.commit("list", data);
+      });
     }
 
     template() {
@@ -86,11 +94,19 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
                   <strong class="${this.styles.contentTitle}">
                     ${item.name}
                   </strong>
+
                   ${item.route
                     ? html`<route-card
                         :from="${item.route.from}"
                         :to="${item.route.to}"
                       ></route-card>`
+                    : ""}
+                  ${item.position
+                    ? item.position.map(
+                        (location) =>
+                          html`<position-box :data="${location}">
+                          </position-box>`,
+                      )
                     : ""}
                   <ky-description
                     :list="${item.description || []}"
@@ -100,6 +116,14 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
             `,
           )}
         </swipe-wrap>
+        <button
+          type="button"
+          class="${this.styles.reload}"
+          @click="${this.onJSONButtonClick}"
+        >
+          <ky-icon name="upload" class="${this.styles.icon}"></ky-icon>
+          다른 스케줄 업로드
+        </button>
       `;
     }
     afterRender() {

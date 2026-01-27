@@ -4,6 +4,10 @@
   margin: 0 auto;
   @include safe-area;
   @include double-col-layout;
+  padding-bottom: calc(
+    var(--navigation-height) + 1.2rem + var(--card-radius-base) * 2 + 1.2rem
+  );
+
   .daySelector {
     width: 100%;
     position: sticky;

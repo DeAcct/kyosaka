@@ -1,6 +1,6 @@
 import { Component, define, html } from "@/lib/core";
-import { getFileFromPrompt, readJSONFile } from "@/lib/file";
 import { scheduleStore } from "@/store/scheduleStore";
+import { useJSONUpload } from "@/hooks/file";
 
 import mapping from "./fallback.module.scss";
 import raw from "./fallback.module.scss?inline";
@@ -8,23 +8,9 @@ import raw from "./fallback.module.scss?inline";
 export const Fallback = define("ky-fallback", { mapping, raw })(
   class extends Component {
     async onJSONButtonClick() {
-      try {
-        const file = await getFileFromPrompt({
-          types: [
-            {
-              description: "계획표 파일",
-              accept: { "application/json": [".json"] },
-            },
-          ],
-          multiple: false,
-        });
-        if (!file) return;
-
-        const tripData = await readJSONFile(file);
-        scheduleStore.commit("list", tripData);
-      } catch (error) {
-        console.log(error);
-      }
+      await useJSONUpload((data) => {
+        scheduleStore.commit("list", data);
+      });
     }
     template() {
       return html`

@@ -18,7 +18,7 @@
 @mixin safe-area {
   width: min(calc(100% - 4.8rem), 1080px);
   min-height: 100dvh;
-  padding: var(--header-height) 0 10rem;
+  padding: var(--header-height) 0 calc(var(--navigation-height) + 2rem);
 }
 
 @mixin round-list($direction: "y") {
