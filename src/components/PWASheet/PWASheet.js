@@ -25,6 +25,10 @@ export const PWASheet = define("pwa-sheet", { mapping, raw })(
       this.$refs.sheet.close();
     }
 
+    handleCancel() {
+      this.$refs.sheet.close();
+    }
+
     reset() {
       this.deferredPrompt = null;
     }

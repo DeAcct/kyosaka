@@ -1,0 +1,547 @@
+[
+  {
+    "name": "1일차",
+    "day": "2026-02-03",
+    "description": "오하요~",
+    "schedule": [
+      {
+        "name": "공항버스",
+        "type": "transport",
+        "time": { "from": "09:06", "to": "10:25" },
+        "description": ["정류장까지 도보 이동", "1234 버스 탑승"],
+        "budget": 32100,
+        "route": { "from": "아파트 입구", "to": "인천공항" }
+      },
+      {
+        "name": "탑승수속",
+        "type": "transport",
+        "time": { "from": "11:00", "to": "12:00" },
+        "description": ["탑승수속 및 대기"],
+        "budget": 0
+      },
+      {
+        "name": "점심식사",
+        "type": "food",
+        "time": { "from": "12:00", "to": "14:10" },
+        "description": ["공항 내 식당", "편의점 이용"],
+        "budget": 36000
+      },
+      {
+        "name": "비행기 이동",
+        "type": "transport",
+        "time": { "from": "14:10", "to": "15:50" },
+        "description": ["제주항공 123456"],
+        "budget": 1075790,
+        "route": { "from": "인천", "to": "간사이" }
+      },
+      {
+        "name": "입국 수속 및 하루카 발권",
+        "type": "transport",
+        "time": { "from": "15:50", "to": "17:46" },
+        "description": [
+          "입국 수속 진행",
+          "이코카 교통카드 발급",
+          "세븐뱅크 현금인출"
+        ],
+        "budget": 90000
+      },
+      {
+        "name": "하루카",
+        "type": "transport",
+        "time": { "from": "17:46", "to": "19:04" },
+        "description": ["하루카 특급열차"],
+        "budget": 57102,
+        "route": { "from": "간사이공항", "to": "교토역" }
+      },
+      {
+        "name": "호텔 체크인",
+        "type": "hotel",
+        "time": { "from": "19:04", "to": "19:10" },
+        "position": [
+          {
+            "name": "미야코 호텔 교토 하치죠",
+            "address": "17 Nishikujo Inmachi, Minami Ward, Kyoto, 601-8412 일본",
+            "map": "https://maps.app.goo.gl/WtnUNTXx6snazqMv6"
+          }
+        ],
+        "description": ["숙박세는 약 15000원(예산에 포함, 현금으로 준비)"],
+        "budget": 230856,
+        "route": { "from": "교토역", "to": "숙소" }
+      },
+      {
+        "name": "저녁식사",
+        "type": "food",
+        "time": { "from": "19:10", "to": "20:00" },
+        "description": ["편의점 또는 열려있는 식당 이용"],
+        "budget": 36000
+      },
+      {
+        "name": "이나리역 이동",
+        "type": "transport",
+        "time": { "from": "20:00", "to": "20:10" },
+        "description": ["JR나라선"],
+        "budget": 0,
+        "route": { "from": "교토역", "to": "이나리역" }
+      },
+      {
+        "name": "후시미이나리신사",
+        "type": "sightseeing",
+        "time": { "from": "20:10", "to": "20:50" },
+        "description": ["숙소 인근 식당 이용"],
+        "budget": 0,
+        "position": [
+          {
+            "name": "후시미 이나리 신사",
+            "address": "68 Fukakusa Yabunouchicho, Fushimi Ward, Kyoto, 612-0882 일본",
+            "map": "https://maps.app.goo.gl/J8QwCTEvfZQfzrEr9"
+          }
+        ]
+      },
+      {
+        "name": "숙소 복귀",
+        "type": "transport",
+        "time": { "from": "20:50", "to": "21:00" },
+        "description": ["JR나라선"],
+        "budget": 20000,
+        "route": { "from": "이나리역", "to": "교토역" }
+      }
+    ]
+  },
+  {
+    "name": "2일차",
+    "day": "2026-02-04",
+    "description": "교토에 푹 빠지다",
+    "schedule": [
+      {
+        "name": "아침식사",
+        "type": "food",
+        "time": { "from": "07:30", "to": "08:30" },
+        "description": ["일본가정식 체인점"],
+        "budget": 30000,
+        "position": [
+          {
+            "name": "야요이켄 교토역 하치조구치점",
+            "address": "45 Nishikujo Kitanouchicho, Minami Ward, Kyoto, 601-8411 일본",
+            "map": "https://maps.app.goo.gl/FWdPY7ewVCjvbLRv6"
+          }
+        ]
+      },
+      {
+        "name": "가라스마선으로 이동",
+        "type": "transport",
+        "route": { "from": "교토역", "to": "시조역" },
+        "time": { "from": "08:30", "to": "09:00" },
+        "description": ["시조역 하차, 도보 10분"],
+        "budget": 0
+      },
+      {
+        "name": "아침 간식 - 화과자/빵집",
+        "type": "food",
+        "route": { "from": "교토역", "to": "시조역" },
+        "time": { "from": "08:30", "to": "09:00" },
+        "description": [
+          "카메야 요시나가(얇게 잘린 양갱과 버터)->식빵 위에 올리면 바로 앙버터토스트로 만들 수 있는 제품",
+          "Croix-Rousse(작은 빵집)"
+        ],
+        "budget": 60000,
+        "position": [
+          {
+            "name": "카메야 요시나가",
+            "address": "일본 〒600-8498 Kyoto, Shimogyo Ward, Kashiwayacho, 17-19",
+            "map": "https://maps.app.goo.gl/vzRnVKmvgHTPH9hw9"
+          },
+          {
+            "name": "Croix-Rousse",
+            "address": "일본 〒604-8225 Kyoto, Nakagyo Ward, Toroyamacho, 468-4e",
+            "map": "https://maps.app.goo.gl/JGTpG5fSauFW7Rx77"
+          }
+        ]
+      },
+      {
+        "name": "207 버스로 이동",
+        "type": "transport",
+        "time": { "from": "09:00", "to": "09:30" },
+        "description": ["만약 빵집을 갔다면 시조니시노토인 정류장에서 탑승"],
+        "budget": 0,
+        "route": {
+          "from": "시조호리카와",
+          "to": "기요미즈미치"
+        }
+      },
+      {
+        "name": "기요미즈데라 구경",
+        "type": "sightseeing",
+        "time": { "from": "09:30", "to": "12:00" },
+        "description": ["오토와 폭포에서 세 줄기 물 받아 마시기"],
+        "budget": 15000,
+        "position": [
+          {
+            "name": "기요미즈데라",
+            "address": "1 Chome-294 Kiyomizu, Higashiyama Ward, Kyoto, 605-0862 일본",
+            "map": "https://maps.app.goo.gl/1QkZtdU8oqdbLSkF9"
+          }
+        ]
+      },
+      {
+        "name": "내려가는 길 점심식사",
+        "type": "food",
+        "time": { "from": "12:00", "to": "14:00" },
+        "description": [
+          "쿄노 아지토코로 우에무라(튀김정식/장어덮밥/소바 등)",
+          "규카츠 교토가츠규 기요미즈 고조자카"
+        ],
+        "budget": 90000,
+        "position": [
+          {
+            "name": "쿄노 아지토코로 우에무라",
+            "address": "3 Chome-318 Kiyomizu, Higashiyama Ward, Kyoto, 605-0862 일본",
+            "map": "https://maps.app.goo.gl/xNMHV9u8noxv7FC66"
+          },
+          {
+            "name": "규카츠 아지토코로 우에무라",
+            "address": "6 Chome-583 Gojobashihigashi, Higashiyama Ward, Kyoto, 605-0846 일본",
+            "map": "https://maps.app.goo.gl/shRgFfsrQUAdYshx6"
+          }
+        ]
+      },
+      {
+        "name": "203 버스로 이동",
+        "type": "transport",
+        "time": { "from": "14:00", "to": "14:40" },
+        "description": [
+          "버스 혹은 택시 이동",
+          "마루야마 공원 거쳐서 도보로 이동도 가능(44분)"
+        ],
+        "budget": 10000,
+        "route": { "from": "기온", "to": "히가시텐노초" }
+      },
+      {
+        "name": "난젠지 + 수로각 + 젠린지",
+        "type": "sightseeing",
+        "time": { "from": "14:40", "to": "16:00" },
+        "description": [
+          "난젠지 입장료: 600엔",
+          "젠린지 입장료: 600엔",
+          "추천 순서는 젠린지->난젠지->수로각"
+        ],
+        "budget": 18000,
+        "position": [
+          {
+            "name": "난젠지",
+            "address": "86 Nanzenji Fukuchicho, Sakyo Ward, Kyoto, 606-8435 일본",
+            "map": "https://maps.app.goo.gl/nqcFLZm1ogosVsg79"
+          },
+          {
+            "name": "수로각",
+            "address": "86 Nanzenji Fukuchicho, Sakyo Ward, Kyoto, 606-8435 일본",
+            "map": "https://maps.app.goo.gl/3soXgCcBEx36dabF6"
+          },
+          {
+            "name": "젠린지",
+            "address": "48 Eikandocho, Sakyo Ward, Kyoto, 606-8445 일본",
+            "map": "https://maps.app.goo.gl/cQxfWv6iXUMVhGhb9"
+          }
+        ]
+      },
+      {
+        "name": "시내 이동(도보/도자이선)",
+        "type": "transport",
+        "time": { "from": "16:00", "to": "16:30" },
+        "route": { "from": "히가시텐노초", "to": "시조호리카와" },
+        "description": ["203번 버스"],
+        "budget": 0
+      },
+      {
+        "name": "저녁식사",
+        "type": "food",
+        "time": { "from": "18:30", "to": "20:00" },
+        "description": ["쿄우나와/우나기 -> 장어집", "스키야키"],
+        "budget": 30000,
+        "position": [
+          {
+            "name": "쿄우나와 본점",
+            "address": "553-2 Yaoyacho, Nakagyo Ward, Kyoto, 604-8123 일본",
+            "map": "https://maps.app.goo.gl/RHK64x2KnpWqLoYY9"
+          },
+          {
+            "name": "대중 스키야키 호쿠토 시조 가라스마",
+            "address": "일본 〒604-8143 Kyoto, Nakagyo Ward, Bantoyacho, 658 都証券ビル 2F",
+            "map": "https://maps.app.goo.gl/xAxc3dcVHj32knvw5"
+          }
+        ]
+      },
+      {
+        "name": "숙소 복귀",
+        "type": "transport",
+        "time": { "from": "20:00", "to": "20:40" },
+        "description": ["7번 버스"],
+        "budget": 0,
+        "route": { "from": "긴카쿠지미치", "to": "교토에키마에" }
+      }
+    ]
+  },
+  {
+    "name": "3일차",
+    "day": "2026-02-05",
+    "description": "미식과 전통의 오사카",
+    "schedule": [
+      {
+        "name": "체크아웃 및 교토역 이동",
+        "type": "hotel",
+        "time": { "from": "08:00", "to": "09:00" },
+        "budget": 0
+      },
+      {
+        "name": "역 주변 아침식사",
+        "type": "food",
+        "time": { "from": "09:00", "to": "10:00" },
+        "description": ["JR 열차 이용"],
+        "budget": 30000
+      },
+      {
+        "name": "JR교토선",
+        "type": "transport",
+        "time": { "from": "10:00", "to": "10:30" },
+        "description": [
+          "4, 5번 승강장에서 신쾌속 탑승(되도록 앞쪽으로 -> 특실피하기)"
+        ],
+        "budget": 0,
+        "route": { "from": "교토역", "to": "오사카우메다역" }
+      },
+      {
+        "name": "미도스지선",
+        "type": "transport",
+        "time": { "from": "10:30", "to": "11:00" },
+        "description": ["신사이바시 하차 후 약 10분 걷기"],
+        "budget": 0,
+        "route": { "from": "오사카우메다역", "to": "신사이바시역" }
+      },
+      {
+        "name": "호텔 체크인",
+        "type": "hotel",
+        "time": { "from": "11:00", "to": "11:10" },
+        "position": [
+          {
+            "name": "칸데오 호텔 오사카 난바",
+            "address": "2 Chome-2-5 Higashishinsaibashi, Chuo Ward, Osaka, 542-0083 일본",
+            "map": "https://maps.app.goo.gl/r7HrwUArXTFstoQC9"
+          }
+        ],
+        "description": ["숙박세는 약 12000원(예산에 포함, 현금으로 준비)"],
+        "budget": 263969
+      },
+      {
+        "name": "점심식사",
+        "type": "food",
+        "time": { "from": "11:10", "to": "12:30" },
+        "description": [
+          "아지노야 A세트 기준 63500원",
+          "오꼬노미야끼 맛집 - 치보, 아지노야, 미즈노"
+        ],
+        "budget": 63500,
+        "position": [
+          {
+            "name": "치보 오코노미야키",
+            "address": "일본 〒542-0071 Osaka, Chuo Ward, Dotonbori, 1 Chome-5-5 道頓堀ビル 1~6F 千房",
+            "map": "https://maps.app.goo.gl/Eh1ErYNroudtpKUg9"
+          },
+          {
+            "name": "아지노야",
+            "address": "일본 〒542-0076 Osaka, Chuo Ward, Namba, 1 Chome-7-16 現代こいさんビル 2F",
+            "map": "https://maps.app.goo.gl/qMMUMFbAg7pS3vS39"
+          },
+          {
+            "name": "미즈노",
+            "address": "1 Chome-4-15 Dotonbori, Chuo Ward, Osaka, 542-0071 일본",
+            "map": "https://maps.app.goo.gl/pATHGyvEkjCdPFQN7"
+          }
+        ]
+      },
+      {
+        "name": "도톤보리 + 돈키호테 + 글리코상",
+        "type": "sightseeing",
+        "time": { "from": "12:30", "to": "13:15" },
+        "description": [
+          "쿠츠리 마츠모토 키요시",
+          "글리코상 앞에서 사진찍기",
+          "돈키호테 기념품"
+        ],
+        "budget": 0
+      },
+      {
+        "name": "긴테스 나라선",
+        "type": "transport",
+        "time": { "from": "13:15", "to": "14:37" },
+        "route": { "from": "난바역", "to": "쓰루하시역" },
+        "description": ["환승유의"],
+        "budget": 0
+      },
+      {
+        "name": "오사카순환선",
+        "type": "transport",
+        "time": { "from": "13:37", "to": "14:00" },
+        "route": { "from": "쓰루하시역", "to": "모리노미야역" },
+        "description": ["환승유의"],
+        "budget": 0
+      },
+      {
+        "name": "오사카성 로드트레인 탑승",
+        "type": "sightseeing",
+        "time": { "from": "14:00", "to": "14:15" },
+        "description": [
+          "모리노미야역 3-B 출구 공원입구 ~ 고쿠라쿠바시(극락교)행 탑승"
+        ],
+        "budget": 12000
+      },
+      {
+        "name": "오사카성 고자부네",
+        "type": "sightseeing",
+        "time": { "from": "14:15", "to": "14:50" },
+        "description": ["오사카성 해자 놀잇배"],
+        "budget": 54000
+      },
+      {
+        "name": "오사카성 천수각",
+        "type": "sightseeing",
+        "time": { "from": "14:50", "to": "16:00" },
+        "description": ["오사카성 해자 놀잇배"],
+        "budget": 18000,
+        "position": [
+          {
+            "name": "오사카 성",
+            "address": "1-1 Osakajo, Chuo Ward, Osaka, 540-0002 일본",
+            "map": "https://maps.app.goo.gl/PX6oguurRQR2AQX48"
+          }
+        ]
+      },
+      {
+        "name": "오사카순환선",
+        "type": "transport",
+        "time": { "from": "16:00", "to": "16:40" },
+        "route": { "from": "모리노미야역", "to": "오사카우메다역" },
+        "description": [],
+        "budget": 0
+      },
+      {
+        "name": "우메다 스카이 빌딩",
+        "type": "sightseeing",
+        "time": { "from": "16:40", "to": "18:30" },
+        "description": [],
+        "budget": 51000,
+        "position": [
+          {
+            "name": "우메다 스카이빌딩",
+            "address": "일본 〒531-6039 Osaka, Kita Ward, Oyodonaka, 1 Chome-1-88 梅田スカイビル",
+            "map": "https://maps.app.goo.gl/AhvLC9ZqstZthDXP9"
+          }
+        ]
+      },
+      {
+        "name": "저녁식사",
+        "type": "food",
+        "time": { "from": "18:30", "to": "19:30" },
+        "description": ["타키미코지 식당가"],
+        "budget": 45000
+      },
+      {
+        "name": "미도스지선",
+        "type": "transport",
+        "time": { "from": "19:30", "to": "20:00" },
+        "route": { "from": "오사카우메다역", "to": "신사이바시역" },
+        "description": ["신사이바시 하차 후 호텔까지 약 10분 걷기"],
+        "budget": 0
+      }
+    ]
+  },
+  {
+    "name": "4일차",
+    "day": "2026-02-06",
+    "description": "마타미테네!",
+    "schedule": [
+      {
+        "name": "호텔 조식",
+        "type": "food",
+        "time": { "from": "07:30", "to": "09:00" },
+        "description": ["여유로운 아침 식사"],
+        "budget": 0
+      },
+      {
+        "name": "체크아웃, 난카이난바역 짐 보관",
+        "type": "hotel",
+        "time": { "from": "09:00", "to": "09:20" },
+        "description": [
+          "2층 중앙 개찰구 앞 또는 3층 북쪽 개찰구",
+          "\"난카이난바\"임에 유의",
+          "물품보관료 약 7000원"
+        ],
+        "budget": 21000
+      },
+      {
+        "name": "도보 이동",
+        "type": "transport",
+        "time": { "from": "09:20", "to": "09:40" },
+        "description": [],
+        "budget": 0
+      },
+      {
+        "name": "돈키호테 구경 2",
+        "type": "sightseeing",
+        "time": { "from": "09:40", "to": "11:00" },
+        "description": [],
+        "budget": 0
+      },
+      {
+        "name": "점심식사, 난바파크스 내 유니클로 구경",
+        "type": "sightseeing",
+        "time": { "from": "11:00", "to": "12:00" },
+        "description": [],
+        "budget": 39000
+      },
+      {
+        "name": "짐찾기, 난카이라피트 탑승준비",
+        "type": "transport",
+        "time": { "from": "12:00", "to": "12:20" },
+        "description": [],
+        "budget": 0
+      },
+      {
+        "name": "난카이라피트",
+        "type": "transport",
+        "time": { "from": "13:08", "to": "13:52" },
+        "description": [],
+        "budget": 38010,
+        "route": { "from": "난카이난바역", "to": "간사이공항역" }
+      },
+      {
+        "name": "탑승수속",
+        "type": "transport",
+        "time": { "from": "13:52", "to": "16:30" },
+        "description": [],
+        "budget": 0
+      },
+      {
+        "name": "비행기 이동",
+        "type": "transport",
+        "time": { "from": "16:30", "to": "18:10" },
+        "description": [],
+        "budget": 38010,
+        "route": { "from": "간사이공항", "to": "김포공항" }
+      },
+      {
+        "name": "짐찾기",
+        "type": "transport",
+        "time": { "from": "18:10", "to": "20:20" },
+        "description": [],
+        "budget": 0
+      },
+      {
+        "name": "집으로",
+        "type": "transport",
+        "time": { "from": "20:20", "to": "22:07" },
+        "description": [],
+        "budget": 28500,
+        "route": { "from": "김포공항", "to": "동수원" }
+      }
+    ]
+  }
+]

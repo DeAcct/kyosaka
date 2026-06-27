@@ -1,7 +1,6 @@
 // vite.config.js / vite.config.ts
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
-import mkcert from "vite-plugin-mkcert";
 import path from "node:path";
 
 export default defineConfig({
@@ -90,11 +89,18 @@ export default defineConfig({
         ],
       },
     }),
-    mkcert(),
   ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  root: ".",
+  server: {
+    fs: {
+      strict: false,
+      allow: ["/"],
+    },
+  },
+  cacheDir: ".vite",
 });

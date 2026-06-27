@@ -66,7 +66,7 @@ export const DaySelector = define("day-selector", { mapping, raw })(
                       @click="${(e) => this.onDayClick(e, index)}"
                       $button
                     >
-                      <span>${index + 1}일차</span>
+                      <span>${name}</span>
                       <strong> ${this.formatter(day)} </strong>
                     </button>
                   </li>

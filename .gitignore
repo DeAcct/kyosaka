@@ -7,6 +7,9 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+.yarn
+.vite
+
 node_modules
 dist
 dist-ssr
@@ -27,3 +30,5 @@ mock.json
 시안.png
 test.jpg
 시간표.json
+
+icons.ai
