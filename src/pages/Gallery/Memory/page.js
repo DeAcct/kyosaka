@@ -1,5 +1,6 @@
 import { Component, define, html, flushSync } from "@/lib/core";
 import { useGalleryData } from "@/hooks/gallery";
+import { useOverlayTransition } from "@/hooks/overlayMotion";
 
 import { galleryStore } from "@/store/galleryStore";
 
@@ -20,13 +21,6 @@ export const MemoryPage = define("page-memory", { mapping, raw })(
     }
     onDisconnected() {
       galleryStore.clearUI();
-    }
-    requestOverlayTransition(id) {
-      document.startViewTransition(() => {
-        flushSync(() => {
-          galleryStore.openOverlay(id);
-        });
-      });
     }
 
     template() {
@@ -59,7 +53,11 @@ export const MemoryPage = define("page-memory", { mapping, raw })(
                   if (mode === "edit") {
                     galleryStore.toggleItemSelection(item.id);
                   } else {
-                    this.requestOverlayTransition(item.id);
+                    useOverlayTransition(() => {
+                      flushSync(() => {
+                        galleryStore.openOverlay(item.id);
+                      });
+                    });
                   }
                 }}"
                 style="--i:${index}"

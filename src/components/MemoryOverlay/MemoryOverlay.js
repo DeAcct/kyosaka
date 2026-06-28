@@ -1,5 +1,6 @@
 import { Component, define, html, flushSync } from "@/lib/core";
 import { galleryStore } from "@/store/galleryStore";
+import { useOverlayTransition } from "@/hooks/overlayMotion";
 
 import mapping from "./memoryOverlay.module.scss";
 import raw from "./memoryOverlay.module.scss?inline";
@@ -7,12 +8,7 @@ import raw from "./memoryOverlay.module.scss?inline";
 export const MemoryOverlay = define("memory-overlay", { mapping, raw })(
   class extends Component {
     closeOverlay() {
-      if (!document.startViewTransition) {
-        return;
-      }
-
-      // 닫을 때도 트랜지션으로 감싸주면 역재생(축소) 애니메이션이 적용됩니다.
-      document.startViewTransition(() => {
+      useOverlayTransition(() => {
         flushSync(() => {
           galleryStore.clearUI();
         });

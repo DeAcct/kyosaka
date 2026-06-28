@@ -1,5 +1,6 @@
-import { Component, define, html } from "@/lib/core";
+import { Component, define, html, flushSync } from "@/lib/core";
 import { useGalleryData } from "@/hooks/gallery";
+import { useOverlayTransition } from "@/hooks/overlayMotion";
 
 import { galleryStore } from "@/store/galleryStore";
 
@@ -8,7 +9,6 @@ import raw from "./private.page.module.scss?inline";
 
 import { GalleryItem } from "@/components/GalleryItem/GalleryItem";
 import { Icon } from "@/components/Icon/Icon";
-
 export const PrivatePage = define("page-private", { mapping, raw })(
   class extends Component {
     setup() {
@@ -49,8 +49,11 @@ export const PrivatePage = define("page-private", { mapping, raw })(
                   if (mode === "edit") {
                     galleryStore.toggleItemSelection(item.id);
                   } else {
-                    galleryStore.openOverlay(item.id);
-                    console.log(galleryStore.selected);
+                    useOverlayTransition(() => {
+                      flushSync(() => {
+                        galleryStore.openOverlay(item.id);
+                      });
+                    });
                   }
                 }}"
                 style="--i:${index}"
