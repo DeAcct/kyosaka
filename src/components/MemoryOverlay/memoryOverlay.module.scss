@@ -1,0 +1,12 @@
+.overlay {
+  position: fixed;
+  display: flex;
+  inset: 0;
+  z-index: 10000;
+  background-color: oklch(from var(--gray-000) l c h / 0.3);
+
+  .image {
+    width: 100vw;
+    object-fit: contain;
+  }
+}

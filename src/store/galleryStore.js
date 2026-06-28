@@ -26,7 +26,8 @@ class GalleryStore extends Store {
   }
 
   async saveItem(file, type, customName) {
-    const id = `/gallery/${Date.now()}_${file.name}`;
+    const id = crypto.randomUUID();
+
     const cache = await caches.open(this.CACHE_NAME);
 
     // 1. 파일은 캐시에 저장
@@ -36,7 +37,7 @@ class GalleryStore extends Store {
     const url = URL.createObjectURL(file);
     this.tempUrls.set(id, url);
 
-    // 3. 🔍 중요: commit 시에는 'url'을 빼고 메타데이터만 저장!
+    // 3. 메타데이터 저장
     const newItem = { id, type, name: customName || file.name };
     this.commit("items", [...this.state.items, newItem]);
   }
@@ -44,18 +45,24 @@ class GalleryStore extends Store {
   /**
    * 🔍 편집 모드 진입 시 특정 ID를 즉시 선택하도록 수정
    */
-  toggleUIMode(initialId = null) {
-    const currentMode = this.state.ui.mode;
-    const nextMode = currentMode === "view" ? "edit" : "view";
+  // toggleUIMode(initialId = null) {
+  //   const currentMode = this.state.ui.mode;
+  //   const nextMode = currentMode === "view" ? "edit" : "view";
 
+  //   this.commit("ui/mode", nextMode);
+
+  //   if (nextMode === "view") {
+  //     this.commit("ui/selected", []);
+  //   } else if (initialId) {
+  //     // 🎯 편집 모드 진입과 동시에 해당 아이템 선택
+  //     this.commit("ui/selected", [initialId]);
+  //   }
+  // }
+
+  toggleEditMode() {
+    this.commit("ui/selected", []);
+    const nextMode = this.mode === "view" ? "edit" : "view";
     this.commit("ui/mode", nextMode);
-
-    if (nextMode === "view") {
-      this.commit("ui/selected", []);
-    } else if (initialId) {
-      // 🎯 편집 모드 진입과 동시에 해당 아이템 선택
-      this.commit("ui/selected", [initialId]);
-    }
   }
 
   /**
@@ -101,10 +108,17 @@ class GalleryStore extends Store {
 
     // 3. 일괄 커밋: 데이터와 UI 상태를 동시에 정렬
     this.commit("items", nextItems);
-    this.commit("ui/selected", []);
-    this.commit("ui/mode", "view");
+    // this.commit("ui/selected", []);
+    // this.commit("ui/mode", "view");
+    this.clearUI();
 
     console.log(`[Gallery] ${targets.length}개의 항목이 영구 삭제되었습니다.`);
+  }
+
+  openOverlay(id) {
+    // this.commit("ui", { overlay: id, mode: "overlay" });
+    this.commit("ui", { selected: [id], mode: "overlay" });
+    // this.commit("ui/overlay", mode:)
   }
 
   clearUI() {
@@ -127,6 +141,7 @@ export const galleryStore = new GalleryStore(
     isLoading: false,
     ui: {
       selected: [],
+      // overlay: null,
       mode: "view",
     },
   },

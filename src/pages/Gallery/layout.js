@@ -8,6 +8,7 @@ import raw from "./gallery.layout.module.scss?inline";
 
 import { ControlBar } from "@/components/ControlBar/ControlBar";
 import { Icon } from "@/components/Icon/Icon";
+import { MemoryOverlay } from "@/components/MemoryOverlay/MemoryOverlay";
 import { SwipeWrap } from "@/components/SwipeWrap/SwipeWrap";
 import { TabSelector } from "@/components/TabSelector/TabSelector";
 import { UploadSheet } from "@/components/UploadSheet/UploadSheet";
@@ -75,16 +76,16 @@ export const GalleryLayout = define("layout-gallery", { mapping, raw })(
                 if (galleryStore.mode === "view") {
                   this.$refs.uploadSheet.open();
                 } else {
-                  galleryStore.toggleUIMode();
+                  galleryStore.toggleEditMode();
                 }
               }}"
             >
               <ky-icon
-                :name="${galleryStore.mode === "view" ? "upload" : "add"}"
+                :name="${galleryStore.mode === "edit" ? "add" : "upload"}"
                 class="${this.styles.icon}"
               ></ky-icon>
               <span
-                class="${this.styles.text} ${galleryStore.mode === "view"
+                class="${this.styles.text} ${galleryStore.mode !== "edit"
                   ? this.styles.show
                   : ""}"
                 >새 사진</span
@@ -95,6 +96,10 @@ export const GalleryLayout = define("layout-gallery", { mapping, raw })(
             $upload-sheet
             :selected="${this.nowPage}"
           ></upload-sheet>
+
+          ${galleryStore.mode === "overlay"
+            ? html` <memory-overlay></memory-overlay> `
+            : ""}
         </div>
       `;
     }

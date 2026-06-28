@@ -21,7 +21,6 @@ export const UploadSheet = define("upload-sheet", { mapping, raw })(
         URL.revokeObjectURL(this.state.previewUrl);
       }
 
-      // 2. 상태 초기화 (사용자님 스타일: "key", value)
       this.setState("pendingFile", null);
       this.setState("previewUrl", "");
       this.setState("name", "");

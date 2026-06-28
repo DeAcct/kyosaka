@@ -39,17 +39,32 @@ export class Router {
 
     const rootDir = Router.rootPath.toLowerCase();
 
-    // 2. 라우트 생성
     return Object.entries(map)
       .filter(([_, data]) => data.files.page || data.files.index)
       .map(([lowDir, data]) => {
-        // 🔍 경로 매핑 로직 (rootPath 폴더를 '/'로 취급)
         let path = lowDir === "" || lowDir === rootDir ? "/" : `/${lowDir}`;
 
-        // 중첩 경로에서 rootPath 제거 (예: schedule/sub -> /sub)
         if (lowDir.startsWith(rootDir + "/")) {
           path = lowDir.replace(rootDir, "");
         }
+
+        // 🔍 동적 파라미터 추출 로직 추가
+        const paramKeys = [];
+
+        // 1) [id] 형태 지원
+        let regexPath = path.replace(/\[([^\]]+)\]/g, (_, key) => {
+          paramKeys.push(key);
+          return "([^/]+)";
+        });
+
+        // 2) :id 형태 지원
+        regexPath = regexPath.replace(/:([^\/]+)/g, (_, key) => {
+          paramKeys.push(key);
+          return "([^/]+)";
+        });
+
+        // 슬래시 이스케이프 처리
+        regexPath = regexPath.replace(/\//g, "\\/");
 
         const parts = data.raw.split("/");
         const pageTag = `page-${(parts[parts.length - 1] || "root").toLowerCase()}`;
@@ -69,9 +84,9 @@ export class Router {
 
         return {
           path,
+          paramKeys, // 🔍 추출한 파라미터 키 배열 저장
           component: () => html([component]),
-          // 슬래시 허용 정규식
-          regex: new RegExp(`^${path.replace(/\//g, "\\/")}\\/?$`, "i"),
+          regex: new RegExp(`^${regexPath}\\/?$`, "i"),
         };
       });
   }
@@ -131,11 +146,21 @@ export class Router {
     if (this.lastPath === path) return;
 
     // 3. 실제 매칭 시도
-    const match = this.routes.find((r) => r.regex.test(path));
-    const targetRoute = match || this.routes.find((r) => r.path === "/");
+    const matchRoute = this.routes.find((r) => r.regex.test(path));
+    const targetRoute = matchRoute || this.routes.find((r) => r.path === "/");
 
     if (targetRoute) {
       this.lastPath = path;
+
+      // 🔍 URL에서 파라미터 값 추출하여 instance에 저장
+      this.params = {};
+      if (matchRoute && matchRoute.paramKeys.length > 0) {
+        const matchedValues = path.match(matchRoute.regex).slice(1);
+        matchRoute.paramKeys.forEach((key, index) => {
+          this.params[key] = matchedValues[index];
+        });
+      }
+
       updateDOM(this.container, targetRoute.component());
     }
   }
@@ -148,6 +173,10 @@ export class Router {
 export const router = {
   get current() {
     return instance;
+  },
+  // 🔍 params getter 추가
+  get params() {
+    return instance?.params || {};
   },
   navigate: (path, replace) => instance?.navigate(path, replace),
 };

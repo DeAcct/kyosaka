@@ -7,6 +7,17 @@ import { createScheduler } from "./schedule";
 const sharedResetSheet = new CSSStyleSheet();
 sharedResetSheet.replaceSync(resetStyle);
 
+let isSyncMode = false;
+export const flushSync = (callback) => {
+  const prev = isSyncMode;
+  isSyncMode = true;
+  try {
+    callback(); // 이 안에서 발생하는 모든 setState는 동기적으로 처리됨
+  } finally {
+    isSyncMode = prev; // 원래 모드(비동기)로 복구
+  }
+};
+
 /**
  * 베이스 컴포넌트 클래스
  */
@@ -28,7 +39,13 @@ export const withComponent = (Base = HTMLElement) =>
       const options = this.constructor.shadowOptions || { mode: "open" };
 
       const { schedule, cancel } = createScheduler(() => this.render());
-      this.queueRender = schedule;
+      this.queueRender = () => {
+        if (isSyncMode) {
+          this.render();
+        } else {
+          schedule();
+        }
+      };
       this._cancelRender = cancel;
 
       if (!this.shadowRoot) {

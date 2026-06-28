@@ -1,3 +1,4 @@
+// GalleryItem.js
 import { Component, define, html } from "@/lib/core";
 import { useGalleryData } from "@/hooks/gallery";
 import { useLongPress } from "@/hooks/touch";
@@ -24,6 +25,10 @@ export const GalleryItem = define("gallery-item", { mapping, raw })(
 
       const { id, name } = this.item;
       const validUrl = galleryStore.tempUrls.get(id) || "";
+
+      // View Transition 고유 식별자
+      const transitionStyle = `view-transition-name: memory-${id};`;
+
       return html`
         <host
           @pointerdown="${pointerdown}"
@@ -36,6 +41,7 @@ export const GalleryItem = define("gallery-item", { mapping, raw })(
           part="image"
           src="${validUrl}"
           alt="${name}"
+          style="${transitionStyle}"
           class="${this.styles.img} ${validUrl ? this.styles.loaded : ""}"
         />
         <slot></slot>

@@ -29,7 +29,7 @@ export const PrivatePage = define("page-private", { mapping, raw })(
       return html`
         <section class="${this.styles.list}">
           ${items.map((item, index) => {
-            const isSelected = selected.includes(item.id);
+            const isSelected = mode === "edit" && selected.includes(item.id);
             return html`
               <gallery-item
                 data-key="item-${item.id}"
@@ -41,14 +41,16 @@ export const PrivatePage = define("page-private", { mapping, raw })(
                   if (mode === "edit") {
                     return;
                   }
-                  galleryStore.toggleUIMode(item.id);
+                  galleryStore.toggleEditMode();
+                  galleryStore.toggleItemSelection(item.id);
                 }}"
                 @click="${() => {
                   // 🎯 편집 모드일 때만 선택 토글, 아니면 일반 클릭(상세보기 등)
                   if (mode === "edit") {
                     galleryStore.toggleItemSelection(item.id);
                   } else {
-                    console.log("상세보기 이동:", item.id);
+                    galleryStore.openOverlay(item.id);
+                    console.log(galleryStore.selected);
                   }
                 }}"
                 style="--i:${index}"

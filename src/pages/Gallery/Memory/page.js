@@ -1,4 +1,4 @@
-import { Component, define, html } from "@/lib/core";
+import { Component, define, html, flushSync } from "@/lib/core";
 import { useGalleryData } from "@/hooks/gallery";
 
 import { galleryStore } from "@/store/galleryStore";
@@ -21,15 +21,24 @@ export const MemoryPage = define("page-memory", { mapping, raw })(
     onDisconnected() {
       galleryStore.clearUI();
     }
+    requestOverlayTransition(id) {
+      document.startViewTransition(() => {
+        flushSync(() => {
+          galleryStore.openOverlay(id);
+        });
+      });
+    }
 
     template() {
       const { items } = useGalleryData("memory");
-      const { mode, selected } = galleryStore.state.ui;
+      const { mode, selected } = galleryStore;
+
+      console.log(mode, selected);
 
       return html`
         <section class="${this.styles.grid}">
           ${items.map((item, index) => {
-            const isSelected = selected.includes(item.id);
+            const isSelected = mode === "edit" && selected.includes(item.id);
             return html`
               <gallery-item
                 data-key="item-${item.id}"
@@ -38,16 +47,19 @@ export const MemoryPage = define("page-memory", { mapping, raw })(
                   : ""}"
                 :item="${item}"
                 @longpress="${(e) => {
+                  console.log("longpress", mode);
                   if (mode === "edit") {
                     return;
                   }
-                  galleryStore.toggleUIMode(item.id);
+                  galleryStore.toggleEditMode();
+                  galleryStore.toggleItemSelection(item.id);
                 }}"
                 @click="${() => {
+                  console.log("click", mode);
                   if (mode === "edit") {
                     galleryStore.toggleItemSelection(item.id);
                   } else {
-                    console.log("상세보기 이동:", item.id);
+                    this.requestOverlayTransition(item.id);
                   }
                 }}"
                 style="--i:${index}"

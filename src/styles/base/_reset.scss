@@ -141,6 +141,12 @@ summary {
   border-radius: 9999px;
 }
 
+dialog {
+  all: unset;
+  display: none;
+  border: none;
+}
+
 // #Overay {
 //   position: fixed;
 //   bottom: 0;
