@@ -131,6 +131,9 @@ class GalleryStore extends Store {
   get selected() {
     return this.state.ui.selected;
   }
+  findItemById(targetId) {
+    return this.state.items.find(({ id }) => id === targetId);
+  }
 }
 
 // 초기 상태 정의

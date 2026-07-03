@@ -1,12 +1,55 @@
 .overlay {
   position: fixed;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.6rem;
   inset: 0;
   z-index: 10000;
-  background-color: oklch(from var(--gray-000) l c h / 0.3);
+  background-color: var(--gray-000);
 
   .image {
     width: 100vw;
     object-fit: contain;
+  }
+
+  .info {
+    position: absolute;
+    z-index: 100;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 6rem;
+    transition: 150ms ease-out;
+    @starting-style {
+      opacity: 0;
+    }
+  }
+
+  .title {
+    padding: var(--inner-padding);
+    color: var(--gray-950);
+    width: 100%;
+    font-size: 2rem;
+    background: linear-gradient(
+      oklch(from var(--gray-950) l c h / 0.5),
+      transparent
+    );
+  }
+
+  .close {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 6rem;
+    width: 4.8rem;
+    height: 4.8rem;
+    background-color: var(--gray-950);
+    font-size: 2.4rem;
+    border-radius: 50%;
+    pointer-events: all;
   }
 }

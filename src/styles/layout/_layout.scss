@@ -16,7 +16,7 @@
 }
 
 @mixin safe-area {
-  width: min(calc(100% - 4.8rem), 1080px);
+  width: min(calc(100% - calc(var(--inner-padding) * 2)), 1080px);
   min-height: 100dvh;
   padding: var(--header-height) 0
     calc(
@@ -121,7 +121,7 @@
 @mixin bottom-sheet-content {
   position: absolute;
   bottom: calc(2.4rem + env(safe-area-inset-bottom));
-  width: min(47.5rem, calc(100% - 4.8rem));
+  width: min(47.5rem, calc(100% - calc(var(--inner-padding) * 2)));
   left: 50%;
   background: var(--bg-100);
   border-radius: calc(var(--card-radius-base) * 1.5);

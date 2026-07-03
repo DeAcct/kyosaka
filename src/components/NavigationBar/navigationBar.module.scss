@@ -1,7 +1,7 @@
 .navigationBar {
   display: flex;
   align-items: center;
-  padding: 1.2rem max(2.4rem, ((100dvw - 108rem) / 2))
+  padding: 1.2rem max(var(--inner-padding), ((100dvw - 108rem) / 2))
     calc(env(safe-area-inset-bottom) + 2.4rem);
   background-color: var(--bg-300);
   height: var(--navigation-height);

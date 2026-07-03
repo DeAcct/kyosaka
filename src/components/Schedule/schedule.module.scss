@@ -13,8 +13,8 @@
     position: fixed;
 
     /* 기존 inset 값 유지 */
-    inset: var(--header-height) max(2.4rem, calc(50dvw - 54rem)) 10rem
-      calc(50% + 1rem);
+    inset: var(--header-height) max(var(--inner-padding), calc(50dvw - 54rem))
+      10rem calc(50% + 1rem);
     border-radius: 0.8rem;
     background-color: var(--bg-200);
 

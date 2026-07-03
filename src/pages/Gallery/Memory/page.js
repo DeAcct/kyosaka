@@ -1,6 +1,6 @@
 import { Component, define, html, flushSync } from "@/lib/core";
 import { useGalleryData } from "@/hooks/gallery";
-import { useOverlayTransition } from "@/hooks/overlayMotion";
+import { useOverlayTransition, stackIn } from "@/hooks/overlayMotion";
 
 import { galleryStore } from "@/store/galleryStore";
 
@@ -53,7 +53,7 @@ export const MemoryPage = define("page-memory", { mapping, raw })(
                   if (mode === "edit") {
                     galleryStore.toggleItemSelection(item.id);
                   } else {
-                    useOverlayTransition(() => {
+                    useOverlayTransition(stackIn, () => {
                       flushSync(() => {
                         galleryStore.openOverlay(item.id);
                       });
