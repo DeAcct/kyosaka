@@ -11,6 +11,11 @@ import { ToastConsumer } from "@/components/ToastConsumer/ToastConsumer";
 
 export const App = define("ky-app", { mapping, raw })(
   class extends Component {
+    state = {
+      scrollAmout: 0
+    }
+
+
     afterRender() {
       if (this.router) return;
       const $container = this.$selector("[data-router-view]");
@@ -21,8 +26,13 @@ export const App = define("ky-app", { mapping, raw })(
       this.router = new Router($container);
     }
 
+    navbarControl(e){
+      this.setState("scrollAmount", e)
+    }
+
     template() {
       return html`
+        <global @scroll="${(e) =>{ this.navbarControl(e)}}"></global>
         <pwa-sheet></pwa-sheet>
         <ky-header></ky-header>
         <main data-router-view></main>
