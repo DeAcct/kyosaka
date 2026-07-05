@@ -1,5 +1,7 @@
 import { Component, define, html } from "@/lib/core";
 
+import { Icon } from '@/components/Icon/Icon';
+
 import mapping from "./header.module.scss";
 import raw from "./header.module.scss?inline";
 
@@ -8,7 +10,8 @@ export const Header = define("ky-header", { mapping, raw })(
     template() {
       return html`
         <header class="${this.styles.header}">
-          <h1>쿄사카</h1>
+        <ky-icon name="hamburger" class="${this.styles.icon}"></ky-icon>
+          <h1 class="${this.styles.text}">쿄사카</h1>
         </header>
       `;
     }
