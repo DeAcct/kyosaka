@@ -11,7 +11,6 @@ export const Checkbox = define("ky-checkbox", { mapping, raw })(
     };
 
     setup() {
-      // 🔍 초기 상태 설정 (setState "key", value 준수)
       this.state = { checked: this.hasAttribute("checked") };
     }
 

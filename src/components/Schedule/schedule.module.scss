@@ -13,8 +13,9 @@
     position: fixed;
 
     /* 기존 inset 값 유지 */
-    inset: var(--header-height) max(var(--inner-padding), calc(50dvw - 54rem))
-      10rem calc(50% + 1rem);
+    // inset: calc(var(--header-height) + 0.4rem)
+    //   max(var(--inner-padding), calc(50dvw - 54rem)) 10rem calc(50% + 1rem);
+    inset: 0 0 0 calc(50% + 1rem);
     border-radius: 0.8rem;
     background-color: var(--bg-200);
 
@@ -70,8 +71,9 @@
     @media screen and (min-width: 690px) {
       background-color: var(--bg-200);
       position: sticky;
-      top: calc(var(--header-height) + var(--card-radius-base) * 2 + 1.2rem);
+      top: calc(var(--card-radius-base) * 2 + 1.6rem);
       z-index: 110;
+      margin-top: -0.8rem;
     }
   }
   .icon {

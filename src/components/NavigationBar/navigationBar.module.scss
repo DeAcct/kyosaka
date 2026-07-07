@@ -1,3 +1,21 @@
+:host {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 1000;
+  width: 100%;
+  transition: bottom 150ms ease-out;
+
+  @starting-style {
+    bottom: -100%;
+  }
+
+  &:has(.hidden) {
+    bottom: -100%;
+  }
+}
+
 .navigationBar {
   display: flex;
   align-items: center;
