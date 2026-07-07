@@ -1,7 +1,7 @@
 import { Component, define, html } from "@/lib/core";
 
-import mapping from "./nav-rail.module.scss";
-import raw from "./nav-rail.module.scss?inline";
+import mapping from "./navRail.module.scss";
+import raw from "./navRail.module.scss?inline";
 
 export const NavRail = define("nav-rail", { mapping, raw })(
   class extends Component {
