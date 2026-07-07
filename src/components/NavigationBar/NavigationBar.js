@@ -24,12 +24,29 @@ export const NavigationBar = define("navigation-bar", { mapping, raw })(
     }
 
     handleScroll() {
-      const shouldHide = window.scrollY > 0;
+      const currentScrollY = window.scrollY;
 
-      // 🔍 불필요한 중복 리렌더링 방지 가드
+      // 1. 페이지 최상단에 도달하면 무조건 네비게이션 바를 보여줌 (모바일 바운스 효과 대응)
+      if (currentScrollY <= 0) {
+        if (this.state.isHidden) {
+          this.setState("isHidden", false);
+        }
+        this.lastScrollY = currentScrollY;
+        return;
+      }
+
+      // 2. 스크롤 방향 판단
+      // 현재 좌표가 이전 좌표보다 작으면 '위로 스크롤' 중인 상태
+      const isScrollingUp = currentScrollY < this.lastScrollY;
+      const shouldHide = !isScrollingUp;
+
+      // 상태 변화가 일어날 때만 동기적으로 setState 트리거
       if (this.state.isHidden !== shouldHide) {
         this.setState("isHidden", shouldHide);
       }
+
+      // 다음 비교를 위해 현재 위치를 저장
+      this.lastScrollY = currentScrollY;
     }
 
     template() {

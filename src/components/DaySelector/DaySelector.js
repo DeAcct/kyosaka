@@ -10,21 +10,20 @@ export const DaySelector = define("day-selector", { mapping, raw })(
       this.subscribe(scheduleStore);
     }
     onDayClick(e, index) {
-      const { selectedDay } = scheduleStore.data;
+      const currentPlan = scheduleStore.selectedPlan;
 
-      if (selectedDay === index) {
-        return;
+      if (currentPlan && currentPlan.selected !== index) {
+        scheduleStore.changeDay(index);
       }
-      scheduleStore.commit("selectedDay", index);
     }
     afterRender() {
       this.centerActiveButton();
     }
     centerActiveButton() {
-      const { selectedDay } = scheduleStore.data;
+      const { selected, data } = scheduleStore.selectedPlan;
 
       if (this.$refs.button) {
-        const $button = this.$refs.button[selectedDay];
+        const $button = this.$refs.button[selected];
         $button.scrollIntoView({
           behavior: "smooth",
           inline: "center",
@@ -33,11 +32,14 @@ export const DaySelector = define("day-selector", { mapping, raw })(
       }
     }
     get days() {
-      return scheduleStore.allList.map(({ name, day, description }) => ({
-        name,
-        day,
-        description,
-      }));
+      // 🔍 selectedPlan이나 내부 data 배열이 없는 순간에는 안전하게 빈 배열([])을 반환
+      return (
+        scheduleStore.selectedPlan?.data?.map(({ name, day, description }) => ({
+          name,
+          day,
+          description,
+        })) || []
+      );
     }
     formatter(day) {
       return Intl.DateTimeFormat("ko-KR", {
@@ -47,7 +49,7 @@ export const DaySelector = define("day-selector", { mapping, raw })(
     }
 
     template() {
-      const { selectedDay } = scheduleStore.data;
+      const { selected, data } = scheduleStore.selectedPlan;
       return html`
         <global @resize="${this.centerActiveButton}"></global>
         <div class="${this.styles.daySelector}">
@@ -60,7 +62,7 @@ export const DaySelector = define("day-selector", { mapping, raw })(
                     data-key="${this.formatter(day)}, ${name}"
                   >
                     <button
-                      class="${this.styles.button} ${selectedDay === index
+                      class="${this.styles.button} ${selected === index
                         ? this.styles.selected
                         : ""}"
                       @click="${(e) => this.onDayClick(e, index)}"

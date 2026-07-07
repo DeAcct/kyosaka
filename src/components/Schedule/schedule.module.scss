@@ -138,7 +138,8 @@
     padding: 1.6rem;
 
     @media screen and (min-width: 690px) {
-      padding: 0 1.6rem 1.6rem;
+      padding: 0 0 0 2rem;
+      margin-top: calc(var(--header-height) * -1);
     }
   }
   .contentTitle {

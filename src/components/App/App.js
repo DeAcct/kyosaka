@@ -3,7 +3,8 @@ import { Router } from "@/lib/router";
 
 import { Header } from "@/components/Header/Header";
 import { NavigationBar } from "@/components/NavigationBar/NavigationBar";
-import { PWASheet } from "../PWASheet/PWASheet";
+import { NavRail } from "@/components/NavRail/NavRail";
+import { PWASheet } from "@/components/PWASheet/PWASheet";
 import { ToastConsumer } from "@/components/ToastConsumer/ToastConsumer";
 
 export const App = define("ky-app")(
@@ -22,6 +23,7 @@ export const App = define("ky-app")(
       return html`
         <pwa-sheet></pwa-sheet>
         <ky-header></ky-header>
+        <nav-rail></nav-rail>
         <main data-router-view></main>
         <toast-consumer></toast-consumer>
         <navigation-bar class="${this.styles.navigationBar}"></navigation-bar>

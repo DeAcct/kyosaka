@@ -9,7 +9,7 @@ export const Fallback = define("ky-fallback", { mapping, raw })(
   class extends Component {
     async onJSONButtonClick() {
       await useJSONUpload((data) => {
-        scheduleStore.commit("list", data);
+        scheduleStore.newPlan(data);
       });
     }
     template() {
@@ -20,7 +20,9 @@ export const Fallback = define("ky-fallback", { mapping, raw })(
             src="./fallback.svg"
             alt="파일을 등록해주세요"
           />
-          <p class="${this.styles.text}">등록된 여행 일정이 없습니다.</p>
+          <p class="${this.styles.text}">
+            <slot>데이터가 없습니다.</slot>
+          </p>
           <button
             @click="${(e) => {
               this.onJSONButtonClick();

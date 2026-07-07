@@ -1,7 +1,7 @@
 import { Component, define, html } from "@/lib/core";
 import { switcher } from "@/lib/switcher";
 import { scheduleStore } from "@/store/scheduleStore";
-import { useJSONUpload } from "@/hooks/file";
+// import { useJSONUpload } from "@/hooks/file";
 import { useSwipe } from "@/hooks/touch";
 
 import mapping from "./schedule.module.scss";
@@ -45,18 +45,30 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
         });
     }
 
-    async onJSONButtonClick() {
-      await useJSONUpload((data) => {
-        scheduleStore.commit("list", data);
-      });
-    }
+    // async onJSONButtonClick() {
+    //   await useJSONUpload((data) => {
+    //     // scheduleStore.commit("list", data);
+    //     scheduleStore.newPlan(data);
+    //   });
+    // }
 
     template() {
-      const list = scheduleStore.currentDayList;
+      const plans = scheduleStore.plans;
+      const list = scheduleStore.selectedDayList; // PlanDay 객체
 
-      if (!list) {
-        return html`<ky-fallback></ky-fallback>`;
+      // 🚨 1단계 폴백: 어떤 플랜도 만들지 않았을 때 (전체 플랜 배열이 비었을 때)
+      if (!plans || plans.length === 0) {
+        return html` <ky-fallback>등록된 여행 플랜이 없습니다.</ky-fallback> `;
       }
+
+      const hasSchedule = list && list.schedule && list.schedule.length > 0;
+
+      if (!hasSchedule) {
+        return html`
+          <ky-fallback>이날은 아직 등록된 일정이 없습니다.</ky-fallback>
+        `;
+      }
+
       return html`
         <slot name="selector"></slot>
         <div class="${this.styles.colBG}">
@@ -116,14 +128,6 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
             `,
           )}
         </swipe-wrap>
-        <button
-          type="button"
-          class="${this.styles.reload}"
-          @click="${this.onJSONButtonClick}"
-        >
-          <ky-icon name="upload" class="${this.styles.icon}"></ky-icon>
-          다른 스케줄 업로드
-        </button>
       `;
     }
     afterRender() {
@@ -135,3 +139,12 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
     }
   },
 );
+
+// <button
+//   type="button"
+//   class="${this.styles.reload}"
+//   @click="${this.onJSONButtonClick}"
+// >
+//   <ky-icon name="upload" class="${this.styles.icon}"></ky-icon>
+//   다른 스케줄 업로드
+// </button>
