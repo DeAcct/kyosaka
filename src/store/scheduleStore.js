@@ -4,7 +4,7 @@ class ScheduleStore extends Store {
     const newItem = {
       id: crypto.randomUUID(),
       edited: Temporal.Now.plainDateTimeISO(),
-      data,
+      ...data,
       selected: 0,
     };
 
@@ -36,6 +36,12 @@ class ScheduleStore extends Store {
         plan.id === currentPlanId ? { ...plan, selected: index } : plan,
       ),
     );
+  }
+  changePlan(id) {
+    if (this.state.selected === id) {
+      return;
+    }
+    this.commit("selected", () => id);
   }
 
   // get currentDayList() {

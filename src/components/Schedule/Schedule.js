@@ -45,13 +45,6 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
         });
     }
 
-    // async onJSONButtonClick() {
-    //   await useJSONUpload((data) => {
-    //     // scheduleStore.commit("list", data);
-    //     scheduleStore.newPlan(data);
-    //   });
-    // }
-
     template() {
       const plans = scheduleStore.plans;
       const list = scheduleStore.selectedDayList; // PlanDay 객체
@@ -139,12 +132,3 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
     }
   },
 );
-
-// <button
-//   type="button"
-//   class="${this.styles.reload}"
-//   @click="${this.onJSONButtonClick}"
-// >
-//   <ky-icon name="upload" class="${this.styles.icon}"></ky-icon>
-//   다른 스케줄 업로드
-// </button>
