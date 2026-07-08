@@ -116,14 +116,15 @@ export const NavRail = define("nav-rail", { mapping, raw })(
               `,
             )}
           </ul>
-          ${this.state.mode === "edit"
-            ? html` <plan-editbar
-                @delete="${this.onDelete}"
-                @exit="${this.editor.exitEdit}"
-                :counter="${this.state.deleteSelected.length}"
-              ></plan-editbar>`
-            : ""}
         </nav>
+        ${this.state.mode === "edit"
+          ? html` <plan-editbar
+              @delete="${this.onDelete}"
+              @exit="${this.editor.exitEdit}"
+              :counter="${this.state.deleteSelected.length}"
+              class="${this.styles.editbar}"
+            ></plan-editbar>`
+          : ""}
         <div class="${this.styles.backdrop}" @click="${this.closeNav}"></div>
       `;
     }
