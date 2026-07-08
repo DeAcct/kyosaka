@@ -68,17 +68,17 @@ export const NavRail = define("nav-rail", { mapping, raw })(
       const { isOpen } = navStore.state;
       return html`
         <nav class="${this.styles.navRail} ${isOpen ? this.styles.open : ""}">
-          <div class="${this.styles.sticky}">
-            <div class="${this.styles.controller}">
-              <button
-                class="${this.styles.close}"
-                type="button"
-                @click="${this.closeNav}"
-              >
-                <ky-icon name="hamburger" class="${this.styles.icon}"></ky-icon>
-              </button>
-              <strong class="${this.styles.logo}">kyosaka</strong>
-            </div>
+          <div class="${this.styles.controller}">
+            <button
+              class="${this.styles.close}"
+              type="button"
+              @click="${this.closeNav}"
+            >
+              <ky-icon name="hamburger" class="${this.styles.icon}"></ky-icon>
+            </button>
+            <strong class="${this.styles.logo}">kyosaka</strong>
+          </div>
+          <div class="${this.styles.actions}">
             ${this.actions.map(
               ({ icon, action, text }) => html`
                 <button

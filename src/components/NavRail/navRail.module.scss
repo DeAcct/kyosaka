@@ -12,7 +12,7 @@
   height: 100dvh;
   overflow-y: scroll;
   background-color: var(--bg-100);
-  padding: 0 2rem 2rem;
+  padding: 0 2rem 10.8rem;
   border-radius: 0 var(--card-radius-base) var(--card-radius-base) 0;
   transition: translate 150ms var(--ease-out-expo);
 
@@ -20,40 +20,38 @@
     translate: 0 0;
   }
 
-  .sticky {
+  .controller {
+    height: var(--header-height);
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    flex-shrink: 0;
+    width: 100%;
     position: sticky;
-    .controller {
-      height: var(--header-height);
+    z-index: 112;
+    top: 0;
+    background-color: var(--bg-100);
+    .close {
+      width: 3.6rem;
+      height: 3.6rem;
       display: flex;
       align-items: center;
-      flex-shrink: 0;
-      width: 100%;
-      .close {
-        width: 3.6rem;
-        height: 3.6rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 0.8rem;
-        transition: 150ms ease-out;
+      justify-content: center;
+      border-radius: 0.8rem;
+      transition: 150ms ease-out;
 
-        .icon {
-          font-size: 2.4rem;
-        }
-        &:active {
-          background: var(--bg-200);
-        }
-      }
-      .logo {
-        font-family: "Space Grotesk", sans-serif;
+      .icon {
         font-size: 2.4rem;
-        height: 6rem;
-        align-content: center;
-        margin-left: 0.8rem;
       }
+      &:active {
+        background: var(--bg-200);
+      }
+    }
+    .logo {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 2.4rem;
+      height: 6rem;
+      align-content: center;
+      margin-left: 0.8rem;
     }
   }
 
