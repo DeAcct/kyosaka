@@ -23,7 +23,7 @@ export const Header = define("ky-header", { mapping, raw })(
           </button>
           <h1 class="sr-only">쿄사카</h2>
           <h2 class="${this.styles.text}">
-            ${scheduleStore.selectedPlan.title}
+            ${scheduleStore.selectedPlan.title || "계획표"}
           </h2>
           <button type="button" class="${this.styles.button}">
             <ky-icon name="export" class="${this.styles.icon}"></ky-icon>

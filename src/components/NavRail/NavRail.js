@@ -71,7 +71,7 @@ export const NavRail = define("nav-rail", { mapping, raw })(
                   >
                     <strong class="${this.styles.planTitle}">${title}</strong>
                     <p class="${this.styles.edited}">
-                      ${useTimeFormat(edited)} 수정
+                      ${useTimeFormat(edited)} 전 수정
                     </p>
                   </button>
                 </li>
