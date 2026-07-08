@@ -77,7 +77,7 @@ export const NavRail = define("nav-rail", { mapping, raw })(
               <ky-icon name="hamburger" class="${this.styles.icon}"></ky-icon>
             </button>
             <strong class="${this.styles.logo}">kyosaka</strong>
-          </head>
+          </header>
           <div class="${this.styles.actions}">
             ${this.actions.map(
               ({ icon, action, text }) => html`
@@ -117,16 +117,14 @@ export const NavRail = define("nav-rail", { mapping, raw })(
             )}
           </ul>
         </nav>
-        ${
-          this.state.mode === "edit"
-            ? html` <plan-editbar
-                @delete="${this.onDelete}"
-                @exit="${this.editor.exitEdit}"
-                :counter="${this.state.deleteSelected.length}"
-                class="${this.styles.editbar}"
-              ></plan-editbar>`
-            : ""
-        }
+        ${this.state.mode === "edit"
+          ? html` <plan-editbar
+              @delete="${this.onDelete}"
+              @exit="${this.editor.exitEdit}"
+              :counter="${this.state.deleteSelected.length}"
+              class="${this.styles.editbar}"
+            ></plan-editbar>`
+          : ""}
         <div class="${this.styles.backdrop}" @click="${this.closeNav}"></div>
       `;
     }
