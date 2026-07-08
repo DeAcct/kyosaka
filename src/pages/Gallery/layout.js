@@ -81,7 +81,7 @@ export const GalleryLayout = define("layout-gallery", { mapping, raw })(
               }}"
             >
               <ky-icon
-                :name="${galleryStore.mode === "edit" ? "add" : "upload"}"
+                :name="${galleryStore.mode === "edit" ? "add" : "export"}"
                 class="${this.styles.icon}"
               ></ky-icon>
               <span

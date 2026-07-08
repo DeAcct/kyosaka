@@ -1,22 +1,32 @@
 @use "@/styles/layout/layout" as *;
 
+/* 📱 모바일 기본값: 껍데기를 깨고 자식들을 부모 레이아웃에 밀어 올림 */
+swipe-wrap {
+  display: contents;
+}
+
 .colBG {
   display: none;
 }
 .emptyHolder {
   display: none;
 }
+
 @media screen and (min-width: 690px) {
+  /* 💻 진짜 주인공인 :host(최상위 컨테이너)를 그리드로 선언 */
+  :host {
+    display: grid;
+    grid-template-columns: calc(50% + 1rem) calc(50% - 1rem);
+    grid-auto-rows: min-content;
+    height: 100%;
+  }
+
   .colBG {
     display: grid;
     place-content: center;
     position: fixed;
-
-    /* 기존 inset 값 유지 */
-    // inset: calc(var(--header-height) + 0.4rem)
-    //   max(var(--inner-padding), calc(50dvw - 54rem)) 10rem calc(50% + 1rem);
-    inset: 0 0 0 calc(50% + 1rem);
-    border-radius: 0.8rem;
+    inset: var(--header-height) 0 0 calc(50% + 1rem);
+    border-radius: 0.8rem 0 0 0.8rem;
     background-color: var(--bg-200);
 
     .emptyHolder {
@@ -61,6 +71,7 @@
       background-color 150ms var(--ease-out-expo);
     @media screen and (min-width: 690px) {
       border-radius: 0.8rem;
+      align-self: start;
       @starting-style {
         opacity: 0;
         scale: 0.9;
@@ -98,11 +109,14 @@
     transition: rotate 150ms var(--ease-out-expo);
     flex-shrink: 0;
     color: var(--bg-500);
+    @media screen and (min-width: 690px) {
+      rotate: 90deg;
+    }
   }
   &[open] .arrow {
     rotate: -180deg;
     @media screen and (min-width: 690px) {
-      rotate: unset;
+      rotate: -90deg;
     }
   }
 
@@ -139,7 +153,12 @@
 
     @media screen and (min-width: 690px) {
       padding: 0 0 0 2rem;
-      margin-top: calc(var(--header-height) * -1);
+
+      grid-row: 1 / -10;
+
+      align-self: start;
+      position: sticky;
+      top: 6rem;
     }
   }
   .contentTitle {

@@ -26,58 +26,6 @@ export default class Store {
     return this.state;
   }
 
-  // commit(path, value) {
-  //   const keys = path.split("/");
-
-  //   // 🔍 재귀적으로 중첩 객체를 업데이트하는 헬퍼 함수
-  //   const updateRecursive = (current, pathKeys, newValue) => {
-  //     const [first, ...rest] = pathKeys;
-  //     const isArray = Array.isArray(current);
-
-  //     // 마지막 키에 도달했을 때
-  //     if (rest.length === 0) {
-  //       // 💡 만약 newValue가 함수라면, 기존 값을 인자로 전달해 실행 결과(새 값)를 얻음
-  //       const finalValue =
-  //         typeof newValue === "function" ? newValue(current[first]) : newValue;
-
-  //       if (isArray) {
-  //         const nextArray = [...current];
-  //         nextArray[first] = finalValue;
-  //         return nextArray;
-  //       }
-  //       return { ...current, [first]: finalValue };
-  //     }
-
-  //     // 중간 경로를 내려갈 때 (배열과 객체 분기 처리)
-  //     if (isArray) {
-  //       const nextArray = [...current];
-  //       nextArray[first] = updateRecursive(
-  //         current[first] || {},
-  //         rest,
-  //         newValue,
-  //       );
-  //       return nextArray;
-  //     }
-
-  //     return {
-  //       ...current,
-  //       [first]: updateRecursive(current[first] || {}, rest, newValue),
-  //     };
-  //   };
-
-  //   // 전체 상태 업데이트
-  //   const nextState = updateRecursive(this.state, keys, value);
-
-  //   // 🔍 불변성 유지 및 lastUpdated 갱신
-  //   this.state = {
-  //     ...nextState,
-  //     lastUpdated: new Date().toISOString(),
-  //   };
-
-  //   this._save();
-  //   this.notify();
-  // }
-
   commit(path, value) {
     this.#stepInto(path, value, { isPatch: false });
   }

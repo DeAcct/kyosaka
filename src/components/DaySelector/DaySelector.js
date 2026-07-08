@@ -4,6 +4,8 @@ import { Component, define, html, kyFor } from "@/lib/core";
 import mapping from "./daySelector.module.scss";
 import raw from "./daySelector.module.scss?inline";
 
+import { Icon } from "@/components/Icon/Icon";
+
 export const DaySelector = define("day-selector", { mapping, raw })(
   class extends Component {
     setup() {
@@ -23,7 +25,9 @@ export const DaySelector = define("day-selector", { mapping, raw })(
       const { selected, data } = scheduleStore.selectedPlan;
 
       if (this.$refs.button) {
-        const $button = this.$refs.button[selected];
+        const $button = Array.isArray(this.$refs.button)
+          ? this.$refs.button[selected]
+          : this.$refs.button;
         $button.scrollIntoView({
           behavior: "smooth",
           inline: "center",
@@ -75,6 +79,9 @@ export const DaySelector = define("day-selector", { mapping, raw })(
                 `,
               )}
             </ul>
+            <button class="${this.styles.actionButton}">
+              <ky-icon name="add"></ky-icon>
+            </button>
           </div>
         </div>
       `;

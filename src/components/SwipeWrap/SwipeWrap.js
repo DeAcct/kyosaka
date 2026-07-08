@@ -19,7 +19,7 @@ export const SwipeWrap = define("swipe-wrap")(
           @pointermove="${this.swipe.move}"
           @pointerup="${this.swipe.end}"
           @pointercancel="${this.swipe.end}"
-          style="display: contents; touch-action: pan-y; user-select: none; -webkit-user-drag: none;"
+          style="touch-action: pan-y; user-select: none; -webkit-user-drag: none;"
         ></host>
         <slot></slot>
       `;

@@ -49,18 +49,17 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
       const plans = scheduleStore.plans;
       const list = scheduleStore.selectedDayList; // PlanDay 객체
 
-      // 🚨 1단계 폴백: 어떤 플랜도 만들지 않았을 때 (전체 플랜 배열이 비었을 때)
       if (!plans || plans.length === 0) {
         return html` <ky-fallback>등록된 여행 플랜이 없습니다.</ky-fallback> `;
       }
 
-      const hasSchedule = list && list.schedule && list.schedule.length > 0;
+      // const hasSchedule = list && list.schedule && list.schedule.length > 0;
 
-      if (!hasSchedule) {
-        return html`
-          <ky-fallback>이날은 아직 등록된 일정이 없습니다.</ky-fallback>
-        `;
-      }
+      // if (!hasSchedule) {
+      //   return html`
+      //     <ky-fallback>이날은 아직 등록된 일정이 없습니다.</ky-fallback>
+      //   `;
+      // }
 
       return html`
         <slot name="selector"></slot>

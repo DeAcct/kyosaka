@@ -1,14 +1,36 @@
 import Store from "@/lib/store";
+
+const DEFAULT_SCHEDULE = {
+  name: "공항버스",
+  type: "transport",
+  time: { from: "05:10", to: "07:10" },
+  description: ["버스 탑승하기"],
+};
+
 class ScheduleStore extends Store {
-  newPlan(data) {
+  importPlan(data = {}) {
     const newItem = {
       id: crypto.randomUUID(),
       edited: Temporal.Now.plainDateTimeISO(),
+      title: "제목 없는 여행",
+      data: [
+        {
+          name: "제목 없는 날",
+          day: "2000-01-01",
+          description: "즐거운 여행~",
+          schedule: [DEFAULT_SCHEDULE],
+        },
+      ],
       ...data,
       selected: 0,
     };
 
-    this.commit("plans", (currentPlans) => [...currentPlans, newItem]);
+    this.commit("plans", (currentPlans) => [newItem, ...currentPlans]);
+    this.changePlan(newItem.id);
+  }
+  newPlan() {
+    // 인자 없이 호출하면 빈 객체({})가 들어가면서 기본값들로 채워짐
+    this.importPlan();
   }
   editPlan(id, updatedData) {
     this.commit("plans", (currentPlans) =>
@@ -44,6 +66,23 @@ class ScheduleStore extends Store {
     this.commit("selected", () => id);
   }
 
+  removePlan(targetId) {
+    this.commit("plans", (current) =>
+      current.filter(({ id }) => {
+        if (Array.isArray(targetId)) {
+          return !targetId.includes(id);
+        }
+        return targetId !== id;
+      }),
+    );
+    if (this.validSelected) {
+      return;
+    }
+    this.commit("selected", () =>
+      this.plans.length > 0 ? this.plans[0].id : null,
+    );
+  }
+
   // get currentDayList() {
 
   //   return list.data[selectedDay];
@@ -51,6 +90,10 @@ class ScheduleStore extends Store {
 
   get plans() {
     return this.state.plans;
+  }
+
+  get validSelected() {
+    return this.plans.some(({ id }) => id === this.state.selected);
   }
 
   get selectedPlan() {

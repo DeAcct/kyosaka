@@ -1,7 +1,7 @@
 /* src/styles/_layout.scss */
 @mixin double-col-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   transition: opacity 0.5s var(--ease-in-out-back);
   gap: 0.4rem;
   @starting-style {
@@ -10,6 +10,7 @@
 
   /* 🔍 화면 너비가 넓어질 때 (Unfolded / Tablet) */
   @media (min-width: 690px) {
+    display: grid;
     gap: 1.2rem 2rem;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
@@ -126,5 +127,41 @@
   // transform: translateY(100%);
   translate: -50% 100%;
   transition: all 300ms var(--ease-out-expo);
-  will-change: transform; // 🔍 성능 최적화
+  will-change: transform;
+}
+
+@mixin bottom-sheet {
+  display: flex;
+  flex-direction: column;
+  padding: 0 2rem 2rem;
+  .title {
+    font-size: 1.8rem;
+    margin-bottom: 1.2rem;
+  }
+  .sub {
+    font-size: 1.6rem;
+    color: var(--gray-400);
+    margin-bottom: 2.4rem;
+  }
+  .actions {
+    display: flex;
+    gap: 0.4rem;
+    .button {
+      @include ky-button;
+      flex: 1 0 0;
+      background-color: var(--bg-200);
+      font-size: 1.6rem;
+      color: var(--gray-200);
+      border-radius: calc(var(--card-radius-base) * 1.5 - 2rem);
+      &.primary {
+        background-color: var(--brand-500);
+        color: var(--gray-900);
+
+        &:disabled {
+          background-color: var(--bg-300);
+          color: var(--gray-500);
+        }
+      }
+    }
+  }
 }

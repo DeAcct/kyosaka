@@ -9,7 +9,7 @@ export const Fallback = define("ky-fallback", { mapping, raw })(
   class extends Component {
     async onJSONButtonClick() {
       await useJSONUpload((data) => {
-        scheduleStore.newPlan(data);
+        scheduleStore.importPlan(data);
       });
     }
     template() {
@@ -30,7 +30,7 @@ export const Fallback = define("ky-fallback", { mapping, raw })(
             type="button"
             class="${this.styles.button}"
           >
-            불러오기
+            가져오기
           </button>
         </div>
       `;
