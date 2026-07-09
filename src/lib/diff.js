@@ -335,9 +335,7 @@ export function updateProps(blueprint, target, values, component) {
       // 이벤트는 camelName 대신 원본에서 수식어(modifiers)를 분리해야 함
       const [rawEventName, ...modifiers] = name.slice(1).split(".");
       // 이벤트명 자체도 케밥케이스일 수 있으므로 변환 (예: @custom-event -> customEvent)
-      const eventName = rawEventName.replace(/-([a-z])/g, (_, l) =>
-        l.toUpperCase(),
-      );
+      const eventName = rawEventName;
 
       const match = value.match(/__VAL_(\d+)__/);
       const realValue = match ? values[match[1]] : null;

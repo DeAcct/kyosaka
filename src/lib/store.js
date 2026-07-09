@@ -41,7 +41,7 @@ export default class Store {
 
     this.state = {
       ...nextState,
-      lastUpdated: new Date().toISOString(),
+      lastUpdated: Temporal.Now.plainDateISO(),
     };
 
     this._save();

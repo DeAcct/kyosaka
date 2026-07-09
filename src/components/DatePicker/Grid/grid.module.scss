@@ -1,0 +1,71 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  row-gap: 0.4rem;
+  --range-bg: oklch(from var(--brand-500) l c h / 0.1);
+  --range-text: var(--brand-500);
+  --point: var(--brand-500);
+
+  .item {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    align-content: center;
+  }
+
+  .weekday {
+    color: var(--text-500);
+  }
+
+  .day {
+    transition: background-color 0.2s ease;
+
+    &:hover:not(.empty) {
+      background: #f5f5f5;
+    }
+
+    &.empty {
+      cursor: default;
+    }
+
+    &.selected {
+      background: var(--point);
+      color: var(--bg-100);
+      font-weight: bold;
+      position: relative;
+      z-index: 2;
+
+      &:hover {
+        background: oklch(from var(--point) l c h / 0.8);
+      }
+
+      &.start::before,
+      &.end::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        width: 50%;
+        height: 100%;
+        background-color: var(--range-bg);
+        z-index: 1;
+      }
+
+      // 시작일은 오른쪽 절반만 채워서 뒤의 range와 연결
+      &.start::before {
+        right: 0;
+      }
+
+      // 종료일은 왼쪽 절반만 채워서 앞의 range와 연결
+      &.end::before {
+        left: 0;
+      }
+    }
+
+    &.inRange {
+      background: var(--range-bg);
+      color: var(--range-text);
+      border-radius: 0; /* 범위 내의 날짜는 연결된 느낌을 주도록 둥근 모서리 제거 */
+    }
+  }
+}

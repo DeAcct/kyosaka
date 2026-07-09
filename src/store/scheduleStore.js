@@ -6,6 +6,12 @@ const DEFAULT_SCHEDULE = {
   time: { from: "05:10", to: "07:10" },
   description: ["버스 탑승하기"],
 };
+const DEFAULT_DAY = {
+  name: "제목 없는 날",
+  day: "2000-01-01",
+  description: "즐거운 여행~",
+  schedule: [DEFAULT_SCHEDULE],
+};
 
 class ScheduleStore extends Store {
   importPlan(data = {}) {
@@ -13,14 +19,7 @@ class ScheduleStore extends Store {
       id: crypto.randomUUID(),
       edited: Temporal.Now.plainDateTimeISO(),
       title: "제목 없는 여행",
-      data: [
-        {
-          name: "제목 없는 날",
-          day: "2000-01-01",
-          description: "즐거운 여행~",
-          schedule: [DEFAULT_SCHEDULE],
-        },
-      ],
+      data: [DEFAULT_DAY],
       ...data,
       selected: 0,
     };
@@ -34,19 +33,32 @@ class ScheduleStore extends Store {
   }
   editPlan(id, updatedData) {
     this.commit("plans", (currentPlans) =>
-      currentPlans.map((plan) =>
-        plan.id === id
-          ? {
-              ...plan,
-              edited: Temporal.Now.plainDateTimeISO(),
-              data:
-                typeof plan.data === "object" && plan.data !== null
-                  ? { ...plan.data, ...updatedData }
-                  : updatedData,
-            }
-          : plan,
-      ),
+      currentPlans.map((plan) => {
+        if (plan.id !== id) {
+          return plan;
+        }
+
+        return {
+          ...plan,
+          edited: Temporal.Now.plainDateTimeISO(),
+          data: [...plan.data, ...updatedData], // 무조건 배열이므로 단순 병합
+        };
+      }),
     );
+  }
+  addDay(id = this.state.selected) {
+    const plan = this.plans.find((p) => p.id === id);
+    if (!plan) {
+      return -1;
+    }
+
+    // 🎯 추가되기 전의 배열 길이가 새로 추가될 요소의 인덱스가 됨
+    const newIndex = plan.data.length;
+
+    this.editPlan(id, [DEFAULT_DAY]);
+
+    // 🎯 생성된 요소의 인덱스 반환
+    return newIndex;
   }
 
   changeDay(index) {
@@ -108,6 +120,29 @@ class ScheduleStore extends Store {
     }
 
     return plans.find(({ id }) => id === selected);
+  }
+
+  get selectedPeriod() {
+    const planData = this.selectedPlan;
+
+    if (!planData || !planData.data || planData.data.length === 0) {
+      return { start: null, end: null, days: 0 };
+    }
+
+    const dayStrings = planData.data.map((planDay) => planDay.day);
+    dayStrings.sort();
+
+    const start = dayStrings[0];
+    const end = dayStrings[dayStrings.length - 1];
+    const startDateObj = Temporal.PlainDate.from(start);
+    const duration = startDateObj.until(end, { largestUnit: "day" });
+
+    // 3. 최종 정제 데이터 반환
+    return {
+      start,
+      end,
+      days: duration.days,
+    };
   }
 
   get selectedDayList() {

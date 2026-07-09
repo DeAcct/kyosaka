@@ -7,10 +7,11 @@ import { useSwipe } from "@/hooks/touch";
 import mapping from "./schedule.module.scss";
 import raw from "./schedule.module.scss?inline";
 
-import { PositionBox } from "@/components/PositionBox/PositionBox";
+// import { DatePicker } from "@/components/DatePicker/DatePicker";
 import { Description } from "@/components/Description/Description";
 import { Fallback } from "@/components/Fallback/Fallback";
 import { Icon } from "@/components/Icon/Icon";
+import { PositionBox } from "@/components/PositionBox/PositionBox";
 import { RouteCard } from "@/components/RouteCard/RouteCard";
 import { SwipeWrap } from "@/components/SwipeWrap/SwipeWrap";
 
@@ -47,19 +48,12 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
 
     template() {
       const plans = scheduleStore.plans;
-      const list = scheduleStore.selectedDayList; // PlanDay 객체
+      const list = scheduleStore.selectedDayList;
+      // const { start, end, days } = scheduleStore.selectedPeriod;
 
       if (!plans || plans.length === 0) {
         return html` <ky-fallback>등록된 여행 플랜이 없습니다.</ky-fallback> `;
       }
-
-      // const hasSchedule = list && list.schedule && list.schedule.length > 0;
-
-      // if (!hasSchedule) {
-      //   return html`
-      //     <ky-fallback>이날은 아직 등록된 일정이 없습니다.</ky-fallback>
-      //   `;
-      // }
 
       return html`
         <slot name="selector"></slot>
@@ -131,3 +125,4 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
     }
   },
 );
+// <date-picker :start-date="${start}" :end-date="${end}"></date-picker>

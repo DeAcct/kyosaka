@@ -1,0 +1,28 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 4.8rem;
+
+  .month {
+    font-weight: bold;
+  }
+
+  .button {
+    background: transparent;
+    font-size: 2.4rem;
+    width: 4.8rem;
+    height: 4.8rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .next {
+      rotate: 180deg;
+    }
+
+    &:hover {
+      background: var(--bg-200);
+    }
+  }
+}

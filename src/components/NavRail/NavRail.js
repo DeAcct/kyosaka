@@ -62,6 +62,7 @@ export const NavRail = define("nav-rail", { mapping, raw })(
 
     onDelete() {
       scheduleStore.removePlan(this.state.deleteSelected);
+      this.editor.exitEdit();
     }
 
     template() {
