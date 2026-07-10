@@ -13,6 +13,7 @@ import { Fallback } from "@/components/Fallback/Fallback";
 import { Icon } from "@/components/Icon/Icon";
 import { PositionBox } from "@/components/PositionBox/PositionBox";
 import { RouteCard } from "@/components/RouteCard/RouteCard";
+import { ScheduleIcon } from "@/components/ScheduleIcon/ScheduleIcon";
 import { SwipeWrap } from "@/components/SwipeWrap/SwipeWrap";
 
 export const Schedule = define("ky-schedule", { mapping, raw })(
@@ -75,7 +76,11 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
                 1}; --i:${index};"
               >
                 <summary class="${this.styles.shrink}">
-                  <i class="${this.styles.icon}">${this.getIcon(item)}</i>
+                  <schedule-icon
+                    class="${this.styles.icon}"
+                    name="${item.type}"
+                  ></schedule-icon>
+
                   <div class="${this.styles.text}">
                     <h2 class="${this.styles.name}">${item.name}</h2>
                     <p class="${this.styles.time}">
