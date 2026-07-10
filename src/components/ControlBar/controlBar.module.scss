@@ -1,4 +1,4 @@
-@use "@/styles/layout/layout" as *;
+@use "@/styles/layout/button" as button;
 
 .form {
   width: 100%;
@@ -70,7 +70,7 @@
 }
 
 .button {
-  @include ky-button;
+  @include button.ky-button;
   border-radius: 0.8rem;
   width: calc(var(--card-radius-base) * 2);
   height: calc(var(--card-radius-base) * 2);

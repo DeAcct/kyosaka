@@ -1,4 +1,4 @@
-@use "@/styles/layout/layout" as *;
+@use "@/styles/layout/layout" as layout;
 
 :host {
   position: fixed;
@@ -24,7 +24,7 @@
   width: calc(100% - var(--inner-padding) * 2);
   height: var(--inner-padding);
   background-color: var(--bg-100);
-  @include concave-edge(
+  @include layout.concave-edge(
     bottom,
     calc(var(--inner-padding)),
     var(--card-radius-base),

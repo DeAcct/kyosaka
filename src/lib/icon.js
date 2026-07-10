@@ -10,7 +10,6 @@ export const IconLoader = Object.entries(iconModules).reduce(
 
     acc[name] = async () => {
       if (cache) return cache;
-      console.log("new icon detected");
       const mod = await loader();
       // named export(const d)와 default export 모두 대응
       cache = mod.d || mod.default;

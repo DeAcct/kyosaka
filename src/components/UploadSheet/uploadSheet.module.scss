@@ -1,7 +1,8 @@
-@use "@/styles/layout/layout" as *;
+@use "@/styles/layout/button" as button;
+@use "@/styles/layout/bottom-sheet" as sheet;
 
 .uploadSheet {
-  @include bottom-sheet;
+  @include sheet.bottom-sheet;
 }
 
 .types {
@@ -9,7 +10,7 @@
 }
 
 .picker {
-  @include ky-button;
+  @include button.ky-button;
   font-size: 1.6rem;
   font-weight: 600;
   width: 100%;

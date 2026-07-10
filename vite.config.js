@@ -102,5 +102,8 @@ export default defineConfig({
       allow: ["/"],
     },
   },
+  esbuild: {
+    drop: ["console", "debugger"], // 빌드 시 console 및 debugger 제거
+  },
   cacheDir: ".vite",
 });

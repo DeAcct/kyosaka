@@ -1,0 +1,37 @@
+@mixin details-sliding-motion(
+  $arrow-selector: ".arrow",
+  $arrow-close-rotate: 0deg,
+  $arrow-open-rotate: -180deg,
+  $border-color: var(--bg-100)
+) {
+  // 1. 화살표 기본 상태 및 트랜지션 정보 주입
+  #{$arrow-selector} {
+    transition: rotate 150ms var(--ease-out-expo);
+    rotate: $arrow-close-rotate;
+  }
+
+  // 2. 열렸을 때 화살표 회전 처리
+  &[open] #{$arrow-selector} {
+    rotate: $arrow-open-rotate;
+  }
+
+  // 3. 최신 명세 기반의 details 콘텐츠 영역 감춤 처리 (allow-discrete 완벽 대응)
+  &::details-content {
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+    border-top: 4px dotted transparent;
+    overflow: hidden;
+    transition: all 300ms var(--ease-in-out-back);
+    transition-behavior: allow-discrete;
+    interpolate-size: allow-keywords;
+  }
+
+  // 4. 열렸을 때 가변 높이(calc-size) 확장 및 노출 처리
+  &[open]::details-content {
+    visibility: visible;
+    opacity: 1;
+    height: calc-size(auto, size);
+    border-top-color: $border-color;
+  }
+}

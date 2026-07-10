@@ -1,4 +1,4 @@
-@use "@/styles/layout/layout" as *;
+@use "@/styles/layout/layout" as layout;
 
 .grid {
   display: grid;
@@ -30,7 +30,7 @@
   aspect-ratio: 1;
   border-radius: 0.8rem;
   overflow: hidden;
-  @include loading-target;
+  @include layout.loading-target;
   transition:
     opacity 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
     scale 150ms var(--ease-in-out-back) calc(30ms * var(--i));

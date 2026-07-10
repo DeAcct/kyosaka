@@ -1,9 +1,10 @@
-@use "@/styles/layout/layout" as *;
+@use "@/styles/layout/layout" as layout;
+@use "@/styles/layout/button" as button;
 
 .gallery {
   display: flex;
   flex-direction: column;
-  @include safe-area;
+  @include layout.safe-area;
   margin: 0 auto;
 }
 
@@ -14,8 +15,7 @@
   top: var(--header-height);
   z-index: 101;
   background-color: var(--bg-100);
-  // @include round-mask(calc(var(--card-radius-base) * 2));
-  @include concave-edge(
+  @include layout.concave-edge(
     top,
     calc(var(--card-radius-base) * 2),
     var(--card-radius-base),
@@ -47,7 +47,7 @@
 }
 
 .upload {
-  @include ky-button;
+  @include button.ky-button;
   gap: 0.4rem;
   align-items: center;
   width: auto;

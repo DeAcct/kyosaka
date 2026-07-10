@@ -1,4 +1,6 @@
-@use "@/styles/layout/layout" as *;
+@use "@/styles/layout/layout" as layout;
+@use "@/styles/layout/accordion" as accordion;
+@use "@/styles/layout/button" as button;
 
 /* 📱 모바일 기본값: 껍데기를 깨고 자식들을 부모 레이아웃에 밀어 올림 */
 swipe-wrap {
@@ -54,7 +56,15 @@ swipe-wrap {
   position: relative;
   min-height: 0;
   background-color: var(--bg-200);
-  @include round-list("y");
+  @include layout.round-list("y");
+
+  // 🎯 [핵심 교정]: 가장 기본적인 열림-닫힘 모션을 믹스인으로 완벽히 전수
+  @include accordion.details-sliding-motion(
+    $arrow-selector: ".arrow",
+    $arrow-close-rotate: 0deg,
+    $arrow-open-rotate: -180deg,
+    $border-color: var(--bg-100)
+  );
 
   @media screen and (min-width: 690px) {
     display: contents;
@@ -69,6 +79,7 @@ swipe-wrap {
       opacity 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
       scale 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
       background-color 150ms var(--ease-out-expo);
+
     @media screen and (min-width: 690px) {
       border-radius: 0.8rem;
       align-self: start;
@@ -78,6 +89,7 @@ swipe-wrap {
       }
     }
   }
+
   &[open] .shrink {
     @media screen and (min-width: 690px) {
       background-color: var(--bg-200);
@@ -87,51 +99,50 @@ swipe-wrap {
       margin-top: -0.8rem;
     }
   }
+
   .icon {
     flex-shrink: 0;
     background-color: var(--bg-300);
     color: var(--bg-500);
     font-size: 2.4rem;
   }
+
   .text {
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
   }
+
   .name {
     font-size: 1.8rem;
     line-height: 1.2;
   }
+
   .time {
     font-size: 1.8rem;
     color: var(--text-500);
   }
+
   .arrow {
     font-size: 3.6rem;
     margin-left: auto;
-    transition: rotate 150ms var(--ease-out-expo);
     flex-shrink: 0;
     color: var(--bg-500);
+
+    // 🔍 미디어 쿼리별 특수 정렬 및 오버라이딩 정보만 본진에 잔류시킵니다.
     @media screen and (min-width: 690px) {
-      rotate: 90deg;
-    }
-  }
-  &[open] .arrow {
-    rotate: -180deg;
-    @media screen and (min-width: 690px) {
-      rotate: -90deg;
+      rotate: 90deg !important; // 기본 믹스인 각도 강제 제어 오버라이드
     }
   }
 
+  &[open] .arrow {
+    @media screen and (min-width: 690px) {
+      rotate: -90deg !important; // 기본 믹스인 각도 강제 제어 오버라이드
+    }
+  }
+
+  // 🔍 모션 이외의 레이아웃 배치 명세만 깔끔하게 남겨 가독성을 복원합니다.
   &::details-content {
-    visibility: hidden;
-    opacity: 0;
-    height: 0;
-    border-top: 4px dotted transparent;
-    overflow: hidden;
-    transition: all 300ms var(--ease-in-out-back);
-    transition-behavior: allow-discrete;
-    interpolate-size: allow-keywords;
     @media screen and (min-width: 690px) {
       grid-column: 2;
       grid-row: 1 / var(--schedule-rows);
@@ -142,12 +153,7 @@ swipe-wrap {
       border-top: unset;
     }
   }
-  &[open]::details-content {
-    visibility: visible;
-    opacity: 1;
-    height: calc-size(auto, size);
-    border-top-color: var(--bg-100);
-  }
+
   .content {
     display: flex;
     flex-direction: column;
@@ -156,14 +162,13 @@ swipe-wrap {
 
     @media screen and (min-width: 690px) {
       padding: 0 0 0 2rem;
-
       grid-row: 1 / -10;
-
       align-self: start;
       position: sticky;
       top: 6rem;
     }
   }
+
   .contentTitle {
     display: none;
     @media screen and (min-width: 690px) {
@@ -178,7 +183,7 @@ swipe-wrap {
 }
 
 .reload {
-  @include ky-button;
+  @include button.ky-button;
   gap: 0.4rem;
   position: fixed;
   left: 50%;

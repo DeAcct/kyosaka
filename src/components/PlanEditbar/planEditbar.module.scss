@@ -1,4 +1,4 @@
-@use "@/styles/layout/layout" as *;
+@use "@/styles/layout/bottom-sheet" as sheet;
 
 .planEditbar {
   display: flex;
@@ -26,5 +26,5 @@
 }
 
 .editSheet {
-  @include bottom-sheet;
+  @include sheet.bottom-sheet;
 }

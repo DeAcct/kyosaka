@@ -1,9 +1,10 @@
-@use "@/styles/layout/layout" as *;
+@use "@/styles/layout/layout" as layout;
+@use "@/styles/layout/button" as button;
 
 .doubleCol {
   margin: 0 auto;
-  @include safe-area;
-  @include double-col-layout;
+  @include layout.safe-area;
+  @include layout.double-col-layout;
   min-height: 100dvh;
   row-gap: 0.4rem;
   align-content: start;
@@ -41,7 +42,7 @@
   display: contents;
 }
 .item {
-  @include round-list("y");
+  @include layout.round-list("y");
   background-color: var(--bg-200);
   border: 1px solid transparent;
 
@@ -101,7 +102,7 @@
   }
 
   .button {
-    @include ky-button;
+    @include button.ky-button;
     border-radius: 0.8rem;
     width: calc(var(--card-radius-base) * 2);
     height: calc(var(--card-radius-base) * 2);

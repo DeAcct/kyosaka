@@ -121,13 +121,14 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
         </swipe-wrap>
       `;
     }
-    afterRender() {
-      const list = scheduleStore.currentDayList;
-      if (!list) {
-        return;
-      }
-      this.$refs.details[0]?.setAttribute("open", "");
-    }
+    // afterRender() {
+    //   const list = scheduleStore.currentDayList;
+    //   if (!list) {
+    //     return;
+    //   }
+    //   this.$refs.details[0]?.setAttribute("open", "");
+    // }
   },
 );
+
 // <date-picker :start-date="${start}" :end-date="${end}"></date-picker>

@@ -1,11 +1,14 @@
 // DatePicker.js
 import { Component, define, html } from "@/lib/core";
+import { switcher } from "@/lib/switcher";
+
 import mapping from "./datePicker.module.scss";
 import raw from "./datePicker.module.scss?inline";
 
 import { DatePickerHeader } from "./Header";
 import { DatePickerGrid } from "./Grid";
 import { DatePickerYear } from "./Year";
+import { SwipeWrap } from "@/components/SwipeWrap/SwipeWrap";
 
 export const DatePicker = define("date-picker", { mapping, raw })(
   class extends Component {
@@ -64,74 +67,123 @@ export const DatePicker = define("date-picker", { mapping, raw })(
       );
     }
 
-    handlePrevMonth() {
-      // 🎯 연도 피커 뷰 모드일 때는 대구간(12년 전) 이동 버스로 변모
+    // const METHOD_MAP = {
+    //   prev: "substract",
+    //   next: "add"
+    // }
+    // handlePrevMonth() {
+    //   // 🎯 연도 피커 뷰 모드일 때는 대구간(12년 전) 이동 버스로 변모
+    //   if (this.state.showYearPicker) {
+    //     this.setState("viewYear", this._viewYear - 12); //
+    //     return;
+    //   }
+
+    //   const currentView = Temporal.PlainDate.from({
+    //     year: this._viewYear,
+    //     month: this._viewMonth,
+    //     day: 1,
+    //   });
+    //   const prevMonthView = currentView.subtract({ months: 1 });
+
+    //   this.setState("viewYear", prevMonthView.year);
+    //   this.setState("viewMonth", prevMonthView.month);
+    // }
+
+    // handleNextMonth() {
+    //   // 🎯 연도 피커 뷰 모드일 때는 대구간(12년 후) 이동 버스로 변모
+    //   if (this.state.showYearPicker) {
+    //     this.setState("viewYear", this._viewYear + 12); //
+    //     return;
+    //   }
+
+    //   const currentView = Temporal.PlainDate.from({
+    //     year: this._viewYear,
+    //     month: this._viewMonth,
+    //     day: 1,
+    //   });
+    //   const nextMonthView = currentView.add({ months: 1 });
+
+    //   this.setState("viewYear", nextMonthView.year);
+    //   this.setState("viewMonth", nextMonthView.month);
+    // }
+    /**
+     * 보여주고 있는 연 또는 월을 다음 또는 이전으로 변경합니다.
+     * @param {"next"|"prev"} direction 변경할 방향입니다.
+     */
+    moveCalendar(direction) {
+      const _direction = direction === "prev" ? -1 : 1;
       if (this.state.showYearPicker) {
-        this.setState("viewYear", this._viewYear - 12); //
+        this.setState("viewYear", this._viewYear + 12 * _direction); //
         return;
       }
 
-      const currentView = Temporal.PlainDate.from({
+      const METHOD_MAP = {
+        prev: "subtract",
+        next: "add",
+      };
+
+      const oldView = Temporal.PlainDate.from({
         year: this._viewYear,
         month: this._viewMonth,
         day: 1,
       });
-      const prevMonthView = currentView.subtract({ months: 1 });
+      // const prevMonthView = oldView.subtract({ months: 1 });
+      const newView = oldView[METHOD_MAP[direction]]({ months: 1 });
 
-      this.setState("viewYear", prevMonthView.year);
-      this.setState("viewMonth", prevMonthView.month);
-    }
-
-    handleNextMonth() {
-      // 🎯 연도 피커 뷰 모드일 때는 대구간(12년 후) 이동 버스로 변모
-      if (this.state.showYearPicker) {
-        this.setState("viewYear", this._viewYear + 12); //
-        return;
-      }
-
-      const currentView = Temporal.PlainDate.from({
-        year: this._viewYear,
-        month: this._viewMonth,
-        day: 1,
-      });
-      const nextMonthView = currentView.add({ months: 1 });
-
-      this.setState("viewYear", nextMonthView.year);
-      this.setState("viewMonth", nextMonthView.month);
+      this.setState("viewYear", newView.year);
+      this.setState("viewMonth", newView.month);
     }
 
     handleDateSelect(e) {
-      const clickedTime = e.detail; // 'YYYY-MM-DD' 문자열 규격
+      const clickedTime = e.detail; // 'YYYY-MM-DD'
       const startDate = this._startDate;
       const endDate = this._endDate;
 
-      let nextStartDate = startDate;
-      let nextEndDate = endDate;
+      // 🎯 switcher 유틸리티를 활용해 연립부등식 조건 분기 뎁스를 1단계로 파괴
+      const { nextStartDate, nextEndDate } = switcher({
+        startDate,
+        endDate,
+        clickedTime,
+      })
+        // 조건 1: 이미 시작일과 종료일이 달라서 범위가 형성되어 있는 경우 -> 시작점으로 지정
+        .case(
+          ({ startDate, endDate }) => startDate !== endDate,
+          () => ({ nextStartDate: clickedTime, nextEndDate: clickedTime }),
+        )
+        // 조건 2: 날짜 하나만 찍혀서 대기 중인데, 현재 선택된 날짜보다 과거를 클릭한 경우 -> 1년 가드 검사 후 시작점으로 리셋
+        .case(
+          ({ startDate, clickedTime }) => clickedTime < startDate,
+          () => ({ nextStartDate: clickedTime, nextEndDate: clickedTime }),
+        )
+        // 조건 3: 날짜 하나만 찍혀서 대기 중인데, 1년 이상 미래를 클릭 -> 리셋
+        .case(
+          ({ startDate, clickedTime }) =>
+            Temporal.PlainDate.from(startDate).until(clickedTime, {
+              largestUnit: "year",
+            }).years >= 1,
+          () => {
+            return { nextStartDate: clickedTime, nextEndDate: clickedTime };
+          },
+        )
+        // 기본값 (조건 4): 정상적인 1년 미만의 미래 날짜를 찍은 경우 -> 그대로 반영
+        .default(() => ({
+          nextStartDate: startDate,
+          nextEndDate: clickedTime,
+        }));
 
-      // ISO 문자열('YYYY-MM-DD') 간의 부등호 비교는 자바스크립트 엔진에서 완벽하게 정렬 연산됩니다.
-      if (startDate === endDate) {
-        if (clickedTime < startDate) {
-          nextStartDate = clickedTime;
-          nextEndDate = clickedTime;
-        } else {
-          nextEndDate = clickedTime;
-        }
-      } else {
-        nextStartDate = clickedTime;
-        nextEndDate = clickedTime;
-      }
-
+      // 1. 내부 상태 동기 동기화
       this.setState("startDate", nextStartDate);
       this.setState("endDate", nextEndDate);
 
       console.log(nextStartDate, nextEndDate);
 
+      // 2. 부모 컴포넌트에 정제 데이터 실시간 즉시 송출
       this.emit("change", {
         detail: {
           startDate: nextStartDate,
           endDate: nextEndDate,
         },
-      }); //
+      });
     }
 
     handleToggleYear() {
@@ -145,6 +197,10 @@ export const DatePicker = define("date-picker", { mapping, raw })(
     }
 
     template() {
+      const swipeAction = {
+        left: () => this.moveCalendar("next"),
+        right: () => this.moveCalendar("prev"),
+      };
       const showYearPicker = this.state.showYearPicker;
       return html`
         <div class="${this.styles.container}">
@@ -152,30 +208,32 @@ export const DatePicker = define("date-picker", { mapping, raw })(
             :view-year="${this._viewYear}"
             :view-month="${this._viewMonth}"
             @prev="${() => {
-              this.handlePrevMonth();
+              this.moveCalendar("prev");
             }}"
             @next="${() => {
-              this.handleNextMonth();
+              this.moveCalendar("next");
             }}"
             @toggle-year="${() => this.handleToggleYear()}"
           ></date-picker-header>
 
-          ${showYearPicker
-            ? html`
-                <date-picker-year
-                  :current-year="${this._viewYear}"
-                  @select="${(e) => this.handleYearSelect(e)}"
-                ></date-picker-year>
-              `
-            : html`
-                <date-picker-grid
-                  :view-year="${this._viewYear}"
-                  :view-month="${this._viewMonth}"
-                  :start-date="${this._startDate}"
-                  :end-date="${this._endDate}"
-                  @select="${(e) => this.handleDateSelect(e)}"
-                ></date-picker-grid>
-              `}
+          <swipe-wrap @swipe="${(e) => swipeAction[e.detail.direction]?.()}">
+            ${showYearPicker
+              ? html`
+                  <date-picker-year
+                    :current-year="${this._viewYear}"
+                    @select="${(e) => this.handleYearSelect(e)}"
+                  ></date-picker-year>
+                `
+              : html`
+                  <date-picker-grid
+                    :view-year="${this._viewYear}"
+                    :view-month="${this._viewMonth}"
+                    :start-date="${this._startDate}"
+                    :end-date="${this._endDate}"
+                    @select="${(e) => this.handleDateSelect(e)}"
+                  ></date-picker-grid>
+                `}
+          </swipe-wrap>
         </div>
       `;
     }

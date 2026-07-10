@@ -6,6 +6,8 @@
   --range-bg: oklch(from var(--brand-500) l c h / 0.1);
   --range-text: var(--brand-500);
   --point: var(--brand-500);
+  border-radius: calc(100% / 14);
+  overflow: hidden;
 
   .item {
     width: 100%;
@@ -22,7 +24,7 @@
     transition: background-color 0.2s ease;
 
     &:hover:not(.empty) {
-      background: #f5f5f5;
+      background: var(--bg-200);
     }
 
     &.empty {
@@ -65,7 +67,7 @@
     &.inRange {
       background: var(--range-bg);
       color: var(--range-text);
-      border-radius: 0; /* 범위 내의 날짜는 연결된 느낌을 주도록 둥근 모서리 제거 */
+      border-radius: 0;
     }
   }
 }
