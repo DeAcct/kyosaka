@@ -55,6 +55,7 @@ export const NavigationBar = define("navigation-bar", { mapping, raw })(
       const navbarClass = `${this.styles.navigationBar} ${isHidden ? this.styles.hidden : ""}`;
 
       return html` <global @scroll="${this.handleScroll}"></global>
+        <div class="${this.styles.mask}"></div>
         <nav class="${navbarClass}">
           ${this.menu.map(
             ({ to, icon, text }) => html`

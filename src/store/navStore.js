@@ -3,7 +3,6 @@ import Store from "@/lib/store";
 
 class NavStore extends Store {
   toggle() {
-    console.log(this);
     this.commit("isOpen", (now) => !now);
   }
   open() {
@@ -21,3 +20,8 @@ export const navStore = new NavStore(
   },
   { exclude: ["isOpen"] },
 );
+
+navStore.subscribe((state) => {
+  // classList.toggle의 두 번째 인자로 boolean을 주면 조건에 따라 넣고 빼줍니다.
+  document.documentElement.classList.toggle("is-locked", state.isOpen);
+});

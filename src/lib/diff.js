@@ -5,9 +5,10 @@
  */
 
 // 배열 앵커 생성
-function createArrayAnchor(markerId) {
-  const comment = document.createComment(`array-${markerId}`);
+function createArrayAnchor(markerId, type = "start") {
+  const comment = document.createComment(`array-${type}-${markerId}`);
   comment._arrayMarker = markerId;
+  comment._arrayAnchorType = type; // 'start' 또는 'end'
   return comment;
 }
 
@@ -50,11 +51,11 @@ function renderValue(value, component) {
 function resolveMarkers(node, values, component) {
   if (node.nodeType === Node.TEXT_NODE) {
     const text = node.textContent;
-    const markerRegex = /(__VAL_\d+__)/g; // 🔍 마커를 캡처 그룹으로 분리
+    const markerRegex = /(__VAL_\d+__)/g;
 
     if (markerRegex.test(text)) {
       const parent = node.parentNode;
-      const parts = text.split(markerRegex); // 🎯 마커와 일반 텍스트를 배열로 쪼갬
+      const parts = text.split(markerRegex);
 
       parts.forEach((part) => {
         if (!part) return;
@@ -63,31 +64,29 @@ function resolveMarkers(node, values, component) {
         if (match) {
           const markerId = match[1];
           const realValue = values[markerId];
-
-          // 🎯 여기서 renderValue를 실행하여 배열이나 템플릿을 실제 노드로 변환
           const rendered = renderValue(realValue, component);
 
           if (Array.isArray(realValue)) {
-            // 배열이면 앵커(Comment)를 만들고 그 뒤에 렌더링 결과 삽입
-            const anchor = createArrayAnchor(markerId);
-            parent.insertBefore(anchor, node);
+            // 🎯 시작 앵커와 끝 앵커 쌍을 배치하여 경계선 확립
+            const startAnchor = createArrayAnchor(markerId, "start");
+            const endAnchor = createArrayAnchor(markerId, "end");
+            parent.insertBefore(startAnchor, node);
             parent.insertBefore(rendered, node);
+            parent.insertBefore(endAnchor, node);
           } else {
             parent.insertBefore(rendered, node);
           }
         } else {
-          // 마커가 아닌 순수 텍스트 조각
           parent.insertBefore(document.createTextNode(part), node);
         }
       });
 
-      node.remove(); // 🎯 모든 조각을 삽입했으므로 원본 마커 텍스트 노드 제거
+      node.remove();
       return;
     }
   } else if (node.nodeType === Node.ELEMENT_NODE) {
     updateAttrs(node, node, values);
     updateProps(node, node, values, component);
-    // 🔍 자식 순회 시 Array.from으로 스냅샷을 찍어야 노드 삭제/추가 시 인덱스가 안 꼬임
     Array.from(node.childNodes).forEach((child) =>
       resolveMarkers(child, values, component),
     );
@@ -100,12 +99,16 @@ function resolveMarkers(node, values, component) {
 function patchArrayContent(parent, anchorNode, arrayData, values, component) {
   const markerId = anchorNode._arrayMarker;
 
-  // 1. 기존 배열 노드들 수집 및 제거
   const nodesToRemove = [];
   let current = anchorNode.nextSibling;
 
+  // 🎯 자신의 고유 end 앵커를 만날 때까지만 수집 (다른 형제 노드 침범 방지)
   while (current) {
-    if (current.nodeType === Node.COMMENT_NODE) {
+    if (
+      current.nodeType === Node.COMMENT_NODE &&
+      current._arrayMarker === markerId &&
+      current._arrayAnchorType === "end"
+    ) {
       break;
     }
     nodesToRemove.push(current);
@@ -117,8 +120,8 @@ function patchArrayContent(parent, anchorNode, arrayData, values, component) {
     node.remove();
   });
 
-  // 2. 새 배열 아이템들 렌더링 및 삽입
-  const refNode = anchorNode.nextSibling;
+  // 이제 current는 안전하게 end 앵커를 가리키고 있음
+  const refNode = current;
 
   arrayData.forEach((item) => {
     const rendered = renderValue(item, component);
@@ -127,10 +130,11 @@ function patchArrayContent(parent, anchorNode, arrayData, values, component) {
 }
 
 export function patch(parent, newNode, oldNode, index, values, component) {
-  // 🎯 배열 앵커 처리
+  // 🎯 오직 start 앵커일 때만 배열 패치 진입
   if (
     oldNode?.nodeType === Node.COMMENT_NODE &&
-    oldNode._arrayMarker !== undefined
+    oldNode._arrayMarker !== undefined &&
+    oldNode._arrayAnchorType === "start"
   ) {
     const markerId = oldNode._arrayMarker;
     const realValue = values[markerId];
@@ -141,13 +145,12 @@ export function patch(parent, newNode, oldNode, index, values, component) {
     }
   }
 
-  // 1. 삭제
   if (!newNode && oldNode) {
     if (
       oldNode.nodeType === Node.COMMENT_NODE &&
       oldNode._arrayMarker !== undefined
     ) {
-      return; // 앵커는 유지
+      return; // 앵커 유지
     }
     cleanupEventListeners(oldNode);
     return oldNode.remove();
@@ -155,7 +158,6 @@ export function patch(parent, newNode, oldNode, index, values, component) {
 
   let targetNode = oldNode;
 
-  // 2. 생성/교체
   if (
     !oldNode ||
     newNode.nodeType !== oldNode.nodeType ||
@@ -168,7 +170,6 @@ export function patch(parent, newNode, oldNode, index, values, component) {
     else parent.replaceChild(targetNode, oldNode);
   }
 
-  // 3. 텍스트 노드
   if (newNode.nodeType === Node.TEXT_NODE) {
     const text = newNode.textContent;
     const match = text.match(/__VAL_(\d+)__/);
@@ -177,23 +178,22 @@ export function patch(parent, newNode, oldNode, index, values, component) {
       const markerId = match[1];
       const realValue = values[markerId];
 
-      // 배열: 앵커로 변환
       if (Array.isArray(realValue)) {
-        const anchor = createArrayAnchor(markerId);
-        parent.replaceChild(anchor, targetNode);
+        // 처음으로 배열로 변환되는 경우 앵커 쌍 생성
+        const startAnchor = createArrayAnchor(markerId, "start");
+        const endAnchor = createArrayAnchor(markerId, "end");
+        parent.replaceChild(startAnchor, targetNode);
+        parent.insertBefore(endAnchor, startAnchor.nextSibling);
 
-        // 즉시 배열 내용 렌더링
-        patchArrayContent(parent, anchor, realValue, values, component);
+        patchArrayContent(parent, startAnchor, realValue, values, component);
         return;
       }
 
-      // 중첩 템플릿
       if (realValue && typeof realValue === "object" && realValue.strings) {
         parent.replaceChild(renderValue(realValue, component), targetNode);
         return;
       }
 
-      // 일반 문자열
       const finalValue = text.replace(/__VAL_(\d+)__/g, (_, i) => values[i]);
       if (targetNode.textContent !== finalValue) {
         targetNode.textContent = finalValue;
@@ -202,7 +202,6 @@ export function patch(parent, newNode, oldNode, index, values, component) {
     return;
   }
 
-  // 4. 엘리먼트 노드
   if (newNode.nodeType === Node.ELEMENT_NODE) {
     updateAttrs(newNode, targetNode, values);
     updateProps(newNode, targetNode, values, component);
@@ -214,13 +213,46 @@ export function patch(parent, newNode, oldNode, index, values, component) {
       targetNode.render();
     }
 
-    // 자식 패치
+    // 🎯 자식 패치 로직을 인덱스 대조에서 포인터 순회로 변경
     const newChildren = Array.from(newNode.childNodes);
-    const oldChildren = Array.from(targetNode.childNodes);
-    const max = Math.max(newChildren.length, oldChildren.length);
+    let currentOldChild = targetNode.firstChild;
 
-    for (let i = 0; i < max; i++) {
-      patch(targetNode, newChildren[i], oldChildren[i], i, values, component);
+    newChildren.forEach((newChild) => {
+      const oldChild = currentOldChild;
+
+      // 🎯 만약 이번에 매칭할 oldChild가 배열 시작 앵커라면,
+      // 다음 루프에서 마주칠 '진짜 형제'는 end 앵커의 다음 녀석이어야 함.
+      if (
+        oldChild &&
+        oldChild.nodeType === Node.COMMENT_NODE &&
+        oldChild._arrayMarker !== undefined &&
+        oldChild._arrayAnchorType === "start"
+      ) {
+        let current = oldChild.nextSibling;
+        while (current) {
+          if (
+            current.nodeType === Node.COMMENT_NODE &&
+            current._arrayMarker === oldChild._arrayMarker &&
+            current._arrayAnchorType === "end"
+          ) {
+            current = current.nextSibling; // end 앵커 다음 노드로 점프!
+            break;
+          }
+          current = current.nextSibling;
+        }
+        currentOldChild = current;
+      } else {
+        currentOldChild = oldChild ? oldChild.nextSibling : null;
+      }
+
+      patch(targetNode, newChild, oldChild, 0, values, component);
+    });
+
+    // 가상돔 순회가 끝났는데 실돔에 남은 찌꺼기 구조적 자식들 제거
+    while (currentOldChild) {
+      const next = currentOldChild.nextSibling;
+      patch(targetNode, null, currentOldChild, 0, values, component);
+      currentOldChild = next;
     }
   }
 }

@@ -62,7 +62,6 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
               ${allChecked.length} / ${items.length}
             </strong>
           </ky-progress>
-          <h2 class="${this.styles.title}">전체 체크리스트</h2>
           <section class="${this.styles.list}">
             ${items.map(
               (item, index) => html`

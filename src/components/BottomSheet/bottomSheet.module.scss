@@ -38,7 +38,7 @@
 
   .content {
     position: absolute;
-    bottom: calc(2.4rem + env(safe-area-inset-bottom));
+    bottom: calc(var(--inner-padding) + env(safe-area-inset-bottom));
     width: min(47.5rem, calc(100% - calc(var(--inner-padding) * 2)));
     left: 50%;
     background: var(--bg-100);

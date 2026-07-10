@@ -253,10 +253,42 @@ export const updateDOM = (parent, templateResult, component) => {
   // 기존 텍스트 마커/앵커 처리 로직... (생략)
 
   const newNodes = Array.from(temp.content.childNodes);
-  const oldNodes = Array.from(parent.childNodes);
-  const max = Math.max(newNodes.length, oldNodes.length);
+  let currentOldNode = parent.firstChild;
 
-  for (let i = 0; i < max; i++) {
-    patch(parent, newNodes[i], oldNodes[i], i, values, component);
+  newNodes.forEach((newNode) => {
+    const oldNode = currentOldNode;
+
+    // 🎯 동일하게 루트 레벨의 배열 블록 건너뛰기 처리
+    if (
+      oldNode &&
+      oldNode.nodeType === Node.COMMENT_NODE &&
+      oldNode._arrayMarker !== undefined &&
+      oldNode._arrayAnchorType === "start"
+    ) {
+      let current = oldNode.nextSibling;
+      while (current) {
+        if (
+          current.nodeType === Node.COMMENT_NODE &&
+          current._arrayMarker === oldNode._arrayMarker &&
+          current._arrayAnchorType === "end"
+        ) {
+          current = current.nextSibling;
+          break;
+        }
+        current = current.nextSibling;
+      }
+      currentOldNode = current;
+    } else {
+      currentOldNode = oldNode ? oldNode.nextSibling : null;
+    }
+
+    patch(parent, newNode, oldNode, 0, values, component);
+  });
+
+  // 불필요해진 남은 노드들 청소
+  while (currentOldNode) {
+    const next = currentOldNode.nextSibling;
+    patch(parent, null, currentOldNode, 0, values, component);
+    currentOldNode = next;
   }
 };

@@ -18,6 +18,9 @@
 :host {
   display: block;
 }
+:root.is-locked {
+  overflow: hidden;
+}
 
 *,
 *::before,

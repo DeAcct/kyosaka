@@ -56,9 +56,9 @@
 
 .control {
   position: fixed;
-  width: anchor-size(width);
+  width: calc(100% - var(--inner-padding) * 2);
   z-index: 110;
-  bottom: calc(var(--navigation-height) + 1.2rem);
+  bottom: calc(var(--navigation-height) + var(--inner-padding));
   left: 50%;
   translate: -50% 0;
   position-anchor: --right-col;

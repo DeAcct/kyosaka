@@ -10,7 +10,14 @@
     position: sticky;
     top: 0;
     z-index: 101;
-    @include round-mask(6.4rem);
+    // @include round-mask(6.4rem);
+    @include concave-edge(
+      top,
+      calc(var(--header-height) + 0.4rem),
+      var(--card-radius-base),
+      var(--card-radius-base),
+      var(--bg-100)
+    );
     background-color: var(--bg-100);
     margin-bottom: -0.4rem;
     padding: 0.8rem 0;

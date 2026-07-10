@@ -1,4 +1,6 @@
-/* src/styles/_layout.scss */
+@use "sass:list";
+@use "sass:map";
+
 @mixin double-col-layout {
   display: flex;
   flex-direction: column;
@@ -90,35 +92,94 @@
   background-repeat: repeat-x;
 }
 
-@mixin round-mask($top) {
+@mixin concave-edge($position, $offset, $radius-1, $radius-2, $bg-color) {
+  $config-map: (
+    "top": (
+      top,
+      left,
+      top,
+      right,
+      -1,
+      -1,
+    ),
+    "bottom": (
+      bottom,
+      left,
+      bottom,
+      right,
+      1,
+      -1,
+    ),
+    "left": (
+      top,
+      left,
+      bottom,
+      left,
+      -1,
+      -1,
+    ),
+    "right": (
+      top,
+      right,
+      bottom,
+      right,
+      -1,
+      1,
+    ),
+  );
+
+  $config: map.get($config-map, $position);
+
+  $y1: list.nth($config, 1);
+  $x1: list.nth($config, 2);
+  $y2: list.nth($config, 3);
+  $x2: list.nth($config, 4);
+  $s-y: list.nth($config, 5);
+  $s-x: list.nth($config, 6);
+
   &::before,
   &::after {
     content: "";
     position: absolute;
-    top: $top;
     display: block;
-    width: calc(var(--card-radius-base) * 2);
-    height: calc(var(--card-radius-base) * 2);
     background-color: transparent;
     border-radius: 50%;
+    z-index: -1;
   }
+
   &::before {
-    left: 0;
-    z-index: -1;
-    box-shadow: calc(var(--card-radius-base) * -1)
-      calc(var(--card-radius-base) * -1) 0 var(--bg-100);
+    #{$y1}: $offset;
+    #{$x1}: 0;
+    width: calc(#{$radius-1} * 2);
+    height: calc(#{$radius-1} * 2);
+    box-shadow: calc(#{$radius-1} * #{$s-x}) calc(#{$radius-1} * #{$s-y}) 0 0
+      $bg-color;
   }
+
+  $after-x: 0;
+  $after-y: 0;
+
+  @if $position == "left" or $position == "right" {
+    $after-x: $s-x;
+    $after-y: $s-y * -1;
+  } @else {
+    $after-x: $s-x * -1;
+    $after-y: $s-y;
+  }
+
   &::after {
-    right: 0;
-    z-index: -1;
-    box-shadow: var(--card-radius-base) calc(var(--card-radius-base) * -1) 0
-      var(--bg-100);
+    #{$y2}: $offset;
+    #{$x2}: 0;
+    width: calc(#{$radius-2} * 2);
+    height: calc(#{$radius-2} * 2);
+    box-shadow: calc(#{$radius-2} * #{$after-x})
+      calc(#{$radius-2} * #{$after-y}) 0 0 $bg-color;
   }
 }
 
 @mixin bottom-sheet-content {
   position: absolute;
-  bottom: calc(2.4rem + env(safe-area-inset-bottom));
+  bottom: calc(var(--inner-padding) + env(safe-area-inset-bottom));
   width: min(47.5rem, calc(100% - calc(var(--inner-padding) * 2)));
   left: 50%;
   background: var(--bg-100);

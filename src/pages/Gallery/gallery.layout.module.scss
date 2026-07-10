@@ -1,4 +1,5 @@
 @use "@/styles/layout/layout" as *;
+
 .gallery {
   display: flex;
   flex-direction: column;
@@ -13,7 +14,14 @@
   top: var(--header-height);
   z-index: 101;
   background-color: var(--bg-100);
-  @include round-mask(calc(var(--card-radius-base) * 2));
+  // @include round-mask(calc(var(--card-radius-base) * 2));
+  @include concave-edge(
+    top,
+    calc(var(--card-radius-base) * 2),
+    var(--card-radius-base),
+    var(--card-radius-base),
+    transparent
+  );
   anchor-name: --gallery-grid;
 }
 
@@ -29,7 +37,7 @@
   position-anchor: --gallery-grid;
   width: min(calc(100% - calc(var(--inner-padding) * 2)), 47.5rem);
   z-index: 110;
-  bottom: calc(var(--navigation-height) + 1.2rem);
+  bottom: calc(var(--navigation-height) + var(--inner-padding));
   left: 50%;
   translate: -50% 0;
 
