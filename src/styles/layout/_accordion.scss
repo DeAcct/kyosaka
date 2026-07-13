@@ -8,6 +8,8 @@
   #{$arrow-selector} {
     transition: rotate 150ms var(--ease-out-expo);
     rotate: $arrow-close-rotate;
+
+    font-size: 3.6rem;
   }
 
   // 2. 열렸을 때 화살표 회전 처리
@@ -15,7 +17,7 @@
     rotate: $arrow-open-rotate;
   }
 
-  // 3. 최신 명세 기반의 details 콘텐츠 영역 감춤 처리 (allow-discrete 완벽 대응)
+  // 3. 최신 명세 기반의 details 콘텐츠 영역 감춤 처리
   &::details-content {
     visibility: hidden;
     opacity: 0;

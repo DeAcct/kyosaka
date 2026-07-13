@@ -129,8 +129,6 @@ function patchArrayContent(parent, anchorNode, arrayData, values, component) {
   });
 }
 
-// lib/diff.js
-
 export function patch(parent, newNode, oldNode, index, values, component) {
   // 🎯 오직 start 앵커일 때만 배열 패치 진입
   if (
@@ -160,9 +158,6 @@ export function patch(parent, newNode, oldNode, index, values, component) {
 
   let targetNode = oldNode;
 
-  // ----------------------------------------------------------------
-  // 🎯 [교정 구간]: 노드 신규 생성 및 교체 아키텍처 순서 재정렬
-  // ----------------------------------------------------------------
   if (
     !oldNode ||
     newNode.nodeType !== oldNode.nodeType ||
@@ -171,15 +166,6 @@ export function patch(parent, newNode, oldNode, index, values, component) {
     if (oldNode) cleanupEventListeners(oldNode);
     targetNode = newNode.cloneNode(true);
 
-    // 🔥 [핵심]: appendChild / replaceChild로 실DOM에 꽂기 "전에"
-    // 속성과 프로퍼티(:type 등)를 컴포넌트 인스턴스에 동기식으로 먼저 주입합니다.
-    if (newNode.nodeType === Node.ELEMENT_NODE) {
-      updateAttrs(newNode, targetNode, values);
-      updateProps(newNode, targetNode, values, component);
-    }
-
-    // 데이터가 이미 완벽하게 안착된 상태에서 DOM에 바인딩되므로,
-    // 이 직후 터지는 connectedCallback() -> template() 내부에서 this.type을 정상 인식합니다.
     if (!oldNode) parent.appendChild(targetNode);
     else parent.replaceChild(targetNode, oldNode);
   }
@@ -193,6 +179,7 @@ export function patch(parent, newNode, oldNode, index, values, component) {
       const realValue = values[markerId];
 
       if (Array.isArray(realValue)) {
+        // 처음으로 배열로 변환되는 경우 앵커 쌍 생성
         const startAnchor = createArrayAnchor(markerId, "start");
         const endAnchor = createArrayAnchor(markerId, "end");
         parent.replaceChild(startAnchor, targetNode);
@@ -216,8 +203,6 @@ export function patch(parent, newNode, oldNode, index, values, component) {
   }
 
   if (newNode.nodeType === Node.ELEMENT_NODE) {
-    // 💡 아래 기존 패치 로직들은 '업데이트(기존 노드 변경)' 파이프라인을 위해 그대로 유지합니다.
-    // (새로 생성된 노드의 경우 위에서 이미 값이 주입되었으므로 내부 중복 방어 조건에 의해 자연스럽게 1회만 평가됩니다.)
     updateAttrs(newNode, targetNode, values);
     updateProps(newNode, targetNode, values, component);
 
@@ -228,12 +213,15 @@ export function patch(parent, newNode, oldNode, index, values, component) {
       targetNode.render();
     }
 
+    // 🎯 자식 패치 로직을 인덱스 대조에서 포인터 순회로 변경
     const newChildren = Array.from(newNode.childNodes);
     let currentOldChild = targetNode.firstChild;
 
     newChildren.forEach((newChild) => {
       const oldChild = currentOldChild;
 
+      // 🎯 만약 이번에 매칭할 oldChild가 배열 시작 앵커라면,
+      // 다음 루프에서 마주칠 '진짜 형제'는 end 앵커의 다음 녀석이어야 함.
       if (
         oldChild &&
         oldChild.nodeType === Node.COMMENT_NODE &&
@@ -247,7 +235,7 @@ export function patch(parent, newNode, oldNode, index, values, component) {
             current._arrayMarker === oldChild._arrayMarker &&
             current._arrayAnchorType === "end"
           ) {
-            current = current.nextSibling;
+            current = current.nextSibling; // end 앵커 다음 노드로 점프!
             break;
           }
           current = current.nextSibling;
@@ -260,6 +248,7 @@ export function patch(parent, newNode, oldNode, index, values, component) {
       patch(targetNode, newChild, oldChild, 0, values, component);
     });
 
+    // 가상돔 순회가 끝났는데 실돔에 남은 찌꺼기 구조적 자식들 제거
     while (currentOldChild) {
       const next = currentOldChild.nextSibling;
       patch(targetNode, null, currentOldChild, 0, values, component);

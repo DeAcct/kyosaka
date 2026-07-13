@@ -72,6 +72,14 @@ export const withComponent = (Base = HTMLElement) =>
       this.queueRender();
     }
 
+    onPropsPatchComplete() {
+      // 횡적으로 여러 프로퍼티(type, activeDate 등)가 동시에 들어와도
+      // 루프가 다 끝난 시점이라 "단 한 번만" 정갈하게 동기식 리렌더링이 일어납니다.
+      if (this.isConnected) {
+        this.render();
+      }
+    }
+
     disconnectedCallback() {
       this._unsubscribers.forEach((unsub) => unsub());
 

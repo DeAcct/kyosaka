@@ -1,7 +1,7 @@
 import { Component, define, html } from "@/lib/core";
 import { switcher } from "@/lib/switcher";
 import { scheduleStore } from "@/store/scheduleStore";
-// import { useJSONUpload } from "@/hooks/file";
+import { useJSONUpload } from "@/hooks/file";
 import { useSwipe } from "@/hooks/touch";
 
 import mapping from "./schedule.module.scss";
@@ -131,4 +131,8 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
   },
 );
 
-// <date-picker :start-date="${start}" :end-date="${end}"></date-picker>
+// <date-picker
+//   :start-date="${start}"
+//   :end-date="${end}"
+//   type="day"
+// ></date-picker>

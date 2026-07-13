@@ -10,10 +10,9 @@
     position: sticky;
     top: 0;
     z-index: 101;
-    // @include round-mask(6.4rem);
     @include layout.concave-edge(
       top,
-      calc(var(--header-height) + 0.4rem),
+      100%,
       var(--card-radius-base),
       var(--card-radius-base),
       var(--bg-100)
@@ -24,6 +23,7 @@
     margin: -0.8rem 0 -0.4rem;
     @media screen and (min-width: 690px) {
       margin-bottom: 0;
+      top: var(--header-height);
       &::after,
       &::before {
         content: none;

@@ -8,6 +8,7 @@
   min-height: 100dvh;
   row-gap: 0.4rem;
   align-content: start;
+  anchor-name: --center-position;
 }
 .sticky {
   position: sticky;
@@ -31,7 +32,6 @@
 }
 .title {
   font-size: 1.6rem;
-  anchor-name: --right-col;
 }
 .progress {
   margin-left: auto;
@@ -62,9 +62,10 @@
   bottom: calc(var(--navigation-height) + var(--inner-padding));
   left: 50%;
   translate: -50% 0;
-  position-anchor: --right-col;
+  position-anchor: --center-position;
 
   @media screen and (min-width: 690px) {
+    width: 50%;
     left: anchor(center);
   }
 

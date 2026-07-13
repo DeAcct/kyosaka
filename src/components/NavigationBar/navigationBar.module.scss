@@ -16,6 +16,9 @@
   &:has(.hidden) {
     // bottom: calc(-100% + var(--inner-padding));
     translate: 0 calc(100% - var(--inner-padding));
+    @media screen and (min-width: 690px) {
+      translate: 0 100%;
+    }
   }
 }
 
@@ -31,6 +34,9 @@
     var(--card-radius-base),
     var(--bg-100)
   );
+  @media screen and (min-width: 690px) {
+    display: none;
+  }
 }
 
 .navigationBar {

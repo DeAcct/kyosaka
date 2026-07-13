@@ -1,121 +1,116 @@
+// components/DaySelector.js
 import { scheduleStore } from "@/store/scheduleStore";
-import { Component, define, html, kyFor } from "@/lib/core";
+import { Component, define, html } from "@/lib/core";
 
 import mapping from "./daySelector.module.scss";
 import raw from "./daySelector.module.scss?inline";
 
 import { Icon } from "@/components/Icon/Icon";
+import { DatePicker } from "@/components/DatePicker/DatePicker";
 
 export const DaySelector = define("day-selector", { mapping, raw })(
   class extends Component {
     setup() {
       this.subscribe(scheduleStore);
+      // 🎯 아코디언의 강제 개폐 통제 및 DatePicker 동기화를 위한 로컬 상태 주입
+      this.state = { isOpen: false };
     }
-    onDayClick(e, index) {
-      const currentPlan = scheduleStore.selectedPlan;
 
-      if (currentPlan && currentPlan.selected !== index) {
-        scheduleStore.changeDay(index);
-      }
+    // 🔍 스토어에서 선택된 플랜 안전하게 픽업
+    get selectedPlan() {
+      return scheduleStore.selectedPlan || { selected: 0, data: [] };
     }
-    afterRender() {
-      this.centerActiveButton();
-    }
-    centerActiveButton() {
-      const { selected } = scheduleStore.selectedPlan;
 
-      if (!this.$refs.button) {
-        return;
-      }
-
-      let $button = this.$refs.button;
-      if (Array.isArray(this.$refs.button)) {
-        $button = this.$refs.button[selected];
-      }
-
-      if (!$button) {
-        return;
-      }
-
-      $button.scrollIntoView({
-        behavior: "smooth",
-        inline: "center",
-        block: "nearest",
-      });
-    }
     get days() {
-      // 🔍 selectedPlan이나 내부 data 배열이 없는 순간에는 안전하게 빈 배열([])을 반환
+      return this.selectedPlan.data || [];
+    }
+
+    // 🔍 현재 활성화된 일차의 상세 데이터를 추출하는 게터
+    get currentDayInfo() {
+      const { selected } = this.selectedPlan;
       return (
-        scheduleStore.selectedPlan?.data?.map(({ name, day, description }) => ({
-          name,
-          day,
-          description,
-        })) || []
+        this.days[selected] || {
+          name: "지정된 일정 없음",
+          day: "",
+          description: "",
+        }
       );
     }
+
+    // 🔍 현재 플랜의 첫날과 마지막날 구간을 연산하여 달력의 이탈 가드로 전달
+    get tripBounds() {
+      if (this.days.length === 0) return { start: null, end: null };
+      const sorted = [...this.days].sort((a, b) => a.day.localeCompare(b.day));
+      return {
+        start: sorted[0].day,
+        end: sorted[sorted.length - 1].day,
+      };
+    }
+
     formatter(day) {
-      // YYYY-MM-DD 문자열을 안전한 PlainDate 인스턴스로 변환 후 즉시 포맷팅
+      if (!day) return "";
       return Temporal.PlainDate.from(day).toLocaleString("ko-KR", {
         month: "long",
         day: "numeric",
       });
     }
-    // AS-IS)
-    // 수정할 부분을 서로 다른 컴포넌트에 흩뿌려놓기
 
-    // TO-BE)
-    // - 상단 헤더에 "편집"버튼을 통해 이름/기간/설명 편집 가능
-    // - 세부 일정의 수정은 아코디언 내부 수정버튼에 맡기기
-    // 공통적으로 모든 수정 작업은 라우트 전환이 없는 별도 전체화면 뷰를 통해 진행된다.
+    handleDayChange(e) {
+      const targetDayStr = e.detail;
+      const targetIndex = this.days.findIndex(
+        (item) => item.day === targetDayStr,
+      );
 
-    // addNewDay() {
-    //   const newDayIndex = scheduleStore.addDay();
-    //   scheduleStore.changeDay(newDayIndex);
-    //   this.centerActiveButton();
-    // }
-    // editDays() {}
+      if (targetIndex !== -1) {
+        scheduleStore.changeDay(targetIndex);
+      }
+
+      this.setState("isOpen", false);
+    }
 
     template() {
-      const { selected, data } = scheduleStore.selectedPlan;
+      const { selected } = this.selectedPlan;
+      const current = this.currentDayInfo;
+      const bounds = this.tripBounds;
+      const isOpen = this.state.isOpen;
+
       return html`
-        <global
-          @resize="${() => {
-            this.centerActiveButton();
-          }}"
-        ></global>
-        <div class="${this.styles.daySelector}">
-          <div class="${this.styles.scrollClip}">
-            <ul class="${this.styles.scrollBody}">
-              ${this.days.map(
-                ({ name, day, description }, index) => html`
-                  <li
-                    class="${this.styles.item}"
-                    data-key="${this.formatter(day)}, ${name}"
-                  >
-                    <button
-                      class="${this.styles.button} ${selected === index
-                        ? this.styles.selected
-                        : ""}"
-                      @click="${(e) => this.onDayClick(e, index)}"
-                      $button
-                    >
-                      <span>${name}</span>
-                      <strong> ${this.formatter(day)} </strong>
-                    </button>
-                  </li>
-                `,
-              )}
-            </ul>
+        <details class="${this.styles.schedule}" ?open="${isOpen}">
+          <summary
+            class="${this.styles.shrink}"
+            @click="${(e) => {
+              e.preventDefault(); // 브라우저 고유 무반응 개폐를 막고 바인딩 상태 루프로 통제합니다.
+              this.setState("isOpen", !isOpen);
+            }}"
+          >
+            <div class="${this.styles.text}">
+              <div class="${this.styles.titleRow}">
+                <strong class="${this.styles.time}"
+                  >${this.formatter(current.day)}</strong
+                >
+                <span class="${this.styles.name}">${current.name}</span>
+              </div>
+              ${current.description
+                ? html`<p class="${this.styles.description}">
+                    ${current.description}
+                  </p>`
+                : html``}
+            </div>
+
+            <ky-icon class="${this.styles.arrow}" name="chevron"></ky-icon>
+          </summary>
+
+          <div class="${this.styles.content}">
+            <date-picker
+              type="day"
+              :start-date="${bounds.start}"
+              :end-date="${bounds.end}"
+              :active-date="${current.day}"
+              @day-change="${(e) => this.handleDayChange(e)}"
+            ></date-picker>
           </div>
-        </div>
+        </details>
       `;
     }
   },
 );
-
-// <button
-//   class="${this.styles.actionButton}"
-//   @click="${this.addNewDay}"
-// >
-//   <ky-icon name="editDays">날짜 변경</ky-icon>
-// </button>

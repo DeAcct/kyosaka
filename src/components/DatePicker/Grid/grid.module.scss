@@ -1,9 +1,11 @@
+/* components/grid.module.scss */
+
 .grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
   row-gap: 0.4rem;
-  --range-bg: oklch(from var(--brand-500) l c h / 0.1);
+  --range-bg: var(--bg-200);
   --range-text: var(--brand-500);
   --point: var(--brand-500);
   border-radius: calc(100% / 14);
@@ -12,7 +14,7 @@
   .item {
     width: 100%;
     aspect-ratio: 1 / 1;
-    border-radius: 50%;
+    border-radius: 1.2rem;
     align-content: center;
   }
 
@@ -20,54 +22,83 @@
     color: var(--text-500);
   }
 
+  // 🔗 [공통 베이스] 일반 날짜 및 기간 음영 트랙 명세
   .day {
-    transition: background-color 0.2s ease;
+    position: relative;
+    cursor: pointer;
 
-    &:hover:not(.empty) {
-      background: var(--bg-200);
+    .dayText {
+      position: relative;
+      z-index: 1;
     }
 
     &.empty {
       cursor: default;
+      pointer-events: none;
     }
-
-    &.selected {
-      background: var(--point);
-      color: var(--bg-100);
-      font-weight: bold;
-      position: relative;
-      z-index: 2;
-
-      &:hover {
-        background: oklch(from var(--point) l c h / 0.8);
-      }
-
-      &.start::before,
-      &.end::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        width: 50%;
-        height: 100%;
-        background-color: var(--range-bg);
-        z-index: 1;
-      }
-
-      // 시작일은 오른쪽 절반만 채워서 뒤의 range와 연결
-      &.start::before {
-        right: 0;
-      }
-
-      // 종료일은 왼쪽 절반만 채워서 앞의 range와 연결
-      &.end::before {
-        left: 0;
-      }
+    &:hover:not(.empty) {
+      background: var(--bg-300);
     }
 
     &.inRange {
       background: var(--range-bg);
-      color: var(--range-text);
       border-radius: 0;
+      &.start {
+        border-radius: 1.2rem 0 0 1.2rem;
+      }
+      &.end {
+        border-radius: 0 1.2rem 1.2rem 0;
+      }
+      &.start.end {
+        border-radius: 1.2rem;
+      }
+    }
+  }
+
+  // ----------------------------------------------------------------
+  // 🎯 명세 1. type=range : start, end에 흰색 insetbox 생성
+  // ----------------------------------------------------------------
+  &.rangeMode {
+    .day {
+      &.start,
+      &.end {
+        z-index: 2;
+        font-weight: 700;
+
+        &::before {
+          content: "";
+          position: absolute;
+          inset: 0.6rem;
+          background-color: var(--gray-1000);
+          border-radius: 0.6rem;
+          z-index: 0;
+          box-shadow: 0 0 0.8rem var(--bg-300);
+        }
+      }
+    }
+  }
+
+  // ----------------------------------------------------------------
+  // 🎯 명세 2. type=day : 전체 음영 유지 + active에만 ::after 점 표시
+  // ----------------------------------------------------------------
+  &.dayMode {
+    .day {
+      &.activeDay {
+        color: var(--brand-500) !important;
+        font-weight: 850;
+
+        .dayText::after {
+          content: "";
+          position: absolute;
+          bottom: -4px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background-color: var(--brand-500);
+        }
+      }
     }
   }
 }
