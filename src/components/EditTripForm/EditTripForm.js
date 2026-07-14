@@ -155,9 +155,12 @@ export const EditTripForm = define("edit-trip-form", { mapping, raw })(
                   <div class="${this.styles.scrollContent}">
                     <h3 class="${this.styles.title}">여정 편집</h3>
                     <section class="${this.styles.section}">
-                      <label class="${this.styles.label}">여행 이름</label>
+                      <label class="${this.styles.label}" for="tripName"
+                        >여행 이름</label
+                      >
                       <input
                         type="text"
+                        id="tripName"
                         class="${this.styles.input}"
                         value="${tripName}"
                         @change="${(e) => this.handleTripNameChange(e)}"
@@ -166,7 +169,7 @@ export const EditTripForm = define("edit-trip-form", { mapping, raw })(
                     </section>
 
                     <section class="${this.styles.section}">
-                      <label class="${this.styles.label}">여행 기간 선택</label>
+                      <i class="${this.styles.label}">여행 기간 선택</i>
                       <div class="${this.styles.calendarWrapper}">
                         <date-picker
                           type="range"
@@ -178,8 +181,8 @@ export const EditTripForm = define("edit-trip-form", { mapping, raw })(
                     </section>
 
                     <section class="${this.styles.section}">
-                      <label class="${this.styles.label}"
-                        >일차별 상세 명칭</label
+                      <i class="${this.styles.label}" for="dayNames"
+                        >일차별 상세 명칭</i
                       >
                       <div class="${this.styles.dayList}">
                         ${dates.map((dateStr, index) => {
@@ -194,7 +197,7 @@ export const EditTripForm = define("edit-trip-form", { mapping, raw })(
                           });
 
                           return html`
-                            <div class="${this.styles.dayItem}">
+                            <label class="${this.styles.dayItem}">
                               <div class="${this.styles.dayMeta}">
                                 <span class="${this.styles.dayNumber}"
                                   >${index + 1}일차</span
@@ -214,7 +217,7 @@ export const EditTripForm = define("edit-trip-form", { mapping, raw })(
                                     e.target.value,
                                   )}"
                               />
-                            </div>
+                            </label>
                           `;
                         })}
                       </div>
