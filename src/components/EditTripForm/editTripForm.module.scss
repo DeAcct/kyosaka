@@ -22,10 +22,11 @@ bottom-sheet::part(content) {
 .formContainer {
   @include bs.bottom-sheet;
 
-  height: 100%;
   flex-grow: 1;
+  min-height: 0;
   width: 100%;
-  padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+
+  padding-bottom: 0;
 
   --sheet-content-radius: calc(
     var(--card-radius-base) * 1.5 - var(--inner-padding)
@@ -52,9 +53,10 @@ bottom-sheet::part(content) {
     height: 4.8rem;
     align-content: center;
     text-align: center;
+    margin-bottom: -2.4rem;
     @include layout.concave-edge(
       top,
-      4.8rem,
+      100%,
       var(--sheet-content-radius),
       var(--sheet-content-radius),
       var(--bg-100)
@@ -156,11 +158,11 @@ bottom-sheet::part(content) {
   }
   .actions {
     flex-shrink: 0;
-    padding: 1.6rem 0 2.4rem;
+    padding: 2rem 0;
     position: relative;
     @include layout.concave-edge(
       bottom,
-      8.4rem,
+      100%,
       var(--sheet-content-radius),
       var(--sheet-content-radius),
       var(--bg-100)
