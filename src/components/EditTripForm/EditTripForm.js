@@ -152,9 +152,8 @@ export const EditTripForm = define("edit-trip-form", { mapping, raw })(
           ${isEditOpen
             ? html`
                 <div class="${this.styles.formContainer}">
-                  <h3 class="${this.styles.title}">여정 편집</h3>
-
                   <div class="${this.styles.scrollContent}">
+                    <h3 class="${this.styles.title}">여정 편집</h3>
                     <section class="${this.styles.section}">
                       <label class="${this.styles.label}">여행 이름</label>
                       <input
@@ -221,6 +220,8 @@ export const EditTripForm = define("edit-trip-form", { mapping, raw })(
                       </div>
                     </section>
                   </div>
+
+                  <div class="${this.styles.mask}"></div>
 
                   <div class="${this.styles.actions}">
                     <button

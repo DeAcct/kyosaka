@@ -2,19 +2,28 @@
 
 // 🎯 공용 바텀시트 믹스인 및 레이아웃 파일 수혈
 @use "@/styles/layout/bottom-sheet" as bs;
+@use "@/styles/layout/layout" as layout;
 
 bottom-sheet::part(content) {
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  width: min(47.5rem, 100%);
   bottom: 0;
   --radius: calc(var(--card-radius-base) * 1.5);
   border-radius: var(--radius) var(--radius) 0 0;
   height: calc(100dvh - var(--header-height));
+  @media screen and (min-width: 690px) {
+    height: 50dvh;
+    border-radius: var(--radius);
+    bottom: 50%;
+    transform: translateY(50%);
+  }
 }
 .formContainer {
-  // 🔥 [핵심] 제공해주신 믹스인 한 줄로 .title, .actions, .button 및 .primary 스타일 일괄 정복!
   @include bs.bottom-sheet;
 
   height: 100%;
+  flex-grow: 1;
   width: 100%;
   padding-bottom: calc(2rem + env(safe-area-inset-bottom));
 
@@ -24,9 +33,9 @@ bottom-sheet::part(content) {
 
   // 스크롤 본체 영역
   .scrollContent {
+    min-height: 0;
     flex-grow: 1;
     overflow-y: auto;
-    padding-right: 0.4rem;
     -webkit-overflow-scrolling: touch;
 
     display: flex;
@@ -35,10 +44,21 @@ bottom-sheet::part(content) {
   }
 
   .title {
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    background-color: var(--bg-100);
     flex-shrink: 0;
     height: 4.8rem;
     align-content: center;
     text-align: center;
+    @include layout.concave-edge(
+      top,
+      4.8rem,
+      var(--sheet-content-radius),
+      var(--sheet-content-radius),
+      var(--bg-100)
+    );
   }
 
   .section {
@@ -103,7 +123,7 @@ bottom-sheet::part(content) {
       font-size: 1.4rem;
 
       .dayNumber {
-        font-weight: 850;
+        font-weight: 600;
         color: var(--brand-500);
         font-variant-numeric: tabular-nums;
       }
@@ -136,6 +156,18 @@ bottom-sheet::part(content) {
   }
   .actions {
     flex-shrink: 0;
-    padding: 1.6rem 0;
+    padding: 1.6rem 0 2.4rem;
+    position: relative;
+    @include layout.concave-edge(
+      bottom,
+      8.4rem,
+      var(--sheet-content-radius),
+      var(--sheet-content-radius),
+      var(--bg-100)
+    );
+    &::before,
+    &::after {
+      z-index: 2;
+    }
   }
 }
