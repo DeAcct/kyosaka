@@ -41,6 +41,19 @@
 //   }
 // }
 
+@font-face {
+  font-family: "Space Grotesk";
+  /* HTML의 href 경로와 정확히 일치해야 합니다 */
+  src: url("/fonts/SpaceGroteskVariable.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Pretendard Variable";
+  /* HTML의 href 경로와 정확히 일치해야 합니다 */
+  src: url("/fonts/PretendardVariable.woff2") format("woff2");
+  font-display: swap;
+}
+
 html {
   font-size: 0.625em;
 }
