@@ -40,7 +40,7 @@ json 기반 여행 계획표 앱
   - [x] 기본계획표 자동생성(하루의 여행기간, 하나의 계획)
 - [ ] 수정
   - [x] date-picker
-  - [ ] 여행기간+여행이름+날짜별이름을 수정하는 bottom-sheet
+  - [x] 여행기간+여행이름+날짜별이름을 수정하는 bottom-sheet
   - [ ] 각 일정별 수정버튼 추가
   - [ ] 각 일정별 수정 bottom-sheet
   - [ ] 새 일정을 추가하는 우측하단 floating-button -> bottom-sheet연결
