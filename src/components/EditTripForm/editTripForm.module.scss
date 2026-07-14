@@ -1,0 +1,141 @@
+/* components/EditTripForm/editTripForm.module.scss */
+
+// 🎯 공용 바텀시트 믹스인 및 레이아웃 파일 수혈
+@use "@/styles/layout/bottom-sheet" as bs;
+
+bottom-sheet::part(content) {
+  width: 100%;
+  bottom: 0;
+  --radius: calc(var(--card-radius-base) * 1.5);
+  border-radius: var(--radius) var(--radius) 0 0;
+  height: calc(100dvh - var(--header-height));
+}
+.formContainer {
+  // 🔥 [핵심] 제공해주신 믹스인 한 줄로 .title, .actions, .button 및 .primary 스타일 일괄 정복!
+  @include bs.bottom-sheet;
+
+  height: 100%;
+  width: 100%;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+
+  --sheet-content-radius: calc(
+    var(--card-radius-base) * 1.5 - var(--inner-padding)
+  );
+
+  // 스크롤 본체 영역
+  .scrollContent {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 0.4rem;
+    -webkit-overflow-scrolling: touch;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2.4rem;
+  }
+
+  .title {
+    flex-shrink: 0;
+    height: 4.8rem;
+    align-content: center;
+    text-align: center;
+  }
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+
+    .label {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  .input {
+    width: 100%;
+    padding: 1.4rem 1.6rem;
+    background-color: var(--bg-200);
+    border: 1px solid transparent;
+    border-radius: var(--sheet-content-radius);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-900);
+    outline: none;
+    transition:
+      border-color 150ms ease-out,
+      background-color 150ms ease-out;
+
+    &:focus {
+      border-color: var(--brand-500);
+    }
+  }
+
+  .calendarWrapper {
+    border: 1px solid var(--bg-200);
+    border-radius: var(--sheet-content-radius);
+    padding: 1.2rem;
+    background-color: var(--bg-100);
+  }
+
+  .dayList {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .dayItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    background-color: var(--bg-200);
+    padding: 1.2rem 1.6rem;
+    border-radius: var(--sheet-content-radius);
+    border: 1px solid transparent;
+
+    .dayMeta {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 1.4rem;
+
+      .dayNumber {
+        font-weight: 850;
+        color: var(--brand-500);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .dayDate {
+        color: var(--text-500);
+        font-weight: 600;
+      }
+    }
+
+    &:focus-within {
+      border-color: var(--brand-500);
+    }
+    .dayInput {
+      width: 100%;
+      background: none;
+      border: none;
+      border-bottom: 1px solid transparent;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-900);
+      padding: 0.4rem 0;
+      outline: none;
+      transition: border-color 0.2s;
+
+      &::placeholder {
+        color: var(--text-300);
+      }
+    }
+  }
+  .actions {
+    flex-shrink: 0;
+    padding: 1.6rem 0;
+  }
+}

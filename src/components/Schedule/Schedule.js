@@ -16,6 +16,9 @@ import { RouteCard } from "@/components/RouteCard/RouteCard";
 import { ScheduleIcon } from "@/components/ScheduleIcon/ScheduleIcon";
 import { SwipeWrap } from "@/components/SwipeWrap/SwipeWrap";
 
+import { EditTripForm } from "@/components/EditTripForm/EditTripForm";
+import { BottomSheet } from "@/components/BottomSheet/BottomSheet";
+
 export const Schedule = define("ky-schedule", { mapping, raw })(
   class extends Component {
     setup() {
@@ -50,6 +53,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
     template() {
       const plans = scheduleStore.plans;
       const list = scheduleStore.selectedDayList;
+      const isEditOpen = scheduleStore.isOpenEditTrip;
       // const { start, end, days } = scheduleStore.selectedPeriod;
 
       if (!plans || plans.length === 0) {
@@ -119,6 +123,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
             `,
           )}
         </swipe-wrap>
+        <edit-trip-form></edit-trip-form>
       `;
     }
     // afterRender() {

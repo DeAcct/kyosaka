@@ -37,6 +37,7 @@
   }
 
   .content {
+    overflow: hidden;
     position: absolute;
     bottom: calc(var(--inner-padding) + env(safe-area-inset-bottom));
     width: min(47.5rem, calc(100% - calc(var(--inner-padding) * 2)));

@@ -11,7 +11,6 @@ export const PWASheet = define("pwa-sheet", { mapping, raw })(
     deferredPrompt = null;
 
     onInstallable(e) {
-      e.preventDefault();
       this.deferredPrompt = e;
       this.$refs.sheet.open();
     }

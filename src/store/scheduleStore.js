@@ -95,11 +95,6 @@ class ScheduleStore extends Store {
     );
   }
 
-  // get currentDayList() {
-
-  //   return list.data[selectedDay];
-  // }
-
   get plans() {
     return this.state.plans;
   }
@@ -173,10 +168,45 @@ class ScheduleStore extends Store {
   prevDay(mode) {
     this.#move(-1, mode);
   }
+
+  toggleEditTrip(changeTo) {
+    this.commit("ui/editTrip", (current) =>
+      typeof changeTo === "boolean" ? changeTo : !current,
+    );
+  }
+  get isOpenEditTrip() {
+    return this.state.ui.editTrip;
+  }
+  updatePlanMetadata({ name, data }) {
+    const currentPlanId = this.state.selected;
+    if (!currentPlanId) return;
+
+    this.commit("plans", (currentPlans) =>
+      currentPlans.map((plan) => {
+        if (plan.id !== currentPlanId) {
+          return plan;
+        }
+
+        // 혹시 여행 기간 단축으로 인해 현재 선택된 인덱스 범위를 초과하면 0으로 안전 방어
+        const nextSelected = plan.selected >= data.length ? 0 : plan.selected;
+
+        return {
+          ...plan,
+          title: name, // 폼에서 넘어온 여행 명칭을 스토어의 title 키에 매핑
+          data: data,
+          selected: nextSelected,
+          edited: Temporal.Now.plainDateTimeISO(),
+        };
+      }),
+    );
+  }
 }
 export const scheduleStore = new ScheduleStore("scheduleStore", {
   plans: [],
   selected: null,
+  ui: {
+    editTrip: false,
+  },
 });
 
 /*

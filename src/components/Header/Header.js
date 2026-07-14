@@ -15,10 +15,21 @@ export const Header = define("ky-header", { mapping, raw })(
       this.subscribe(scheduleStore);
     }
     get actions() {
-      return [{ icon: "export", action: this.exportJSON }];
+      const plans = scheduleStore.plans || [];
+      const hasPlan = plans.length > 0;
+
+      return [
+        // 🔥 플랜이 정말 존재할 때만 수정 버튼 액션을 배열에 추가합니다.
+        ...(hasPlan ? [{ icon: "edit", action: this.editTrip }] : []),
+        { icon: "export", action: this.exportJSON },
+      ];
     }
 
     exportJSON() {}
+    editTrip() {
+      scheduleStore.toggleEditTrip(true);
+      console.log(scheduleStore.isOpenEditTrip);
+    }
     template() {
       return html`
         <header class="${this.styles.header}">
