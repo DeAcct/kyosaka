@@ -198,14 +198,14 @@ export const EditTripForm = define("edit-trip-form", { mapping, raw })(
 
                           return html`
                             <label class="${this.styles.dayItem}">
-                              <div class="${this.styles.dayMeta}">
+                              <span class="${this.styles.dayMeta}">
                                 <span class="${this.styles.dayNumber}"
                                   >${index + 1}일차</span
                                 >
                                 <span class="${this.styles.dayDate}"
                                   >${formattedDate}</span
                                 >
-                              </div>
+                              </span>
                               <input
                                 type="text"
                                 class="${this.styles.dayInput}"
