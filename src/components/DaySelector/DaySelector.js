@@ -74,6 +74,8 @@ export const DaySelector = define("day-selector", { mapping, raw })(
       const bounds = this.tripBounds;
       const isOpen = this.state.isOpen;
 
+      console.log(bounds, selected);
+
       return html`
         <details class="${this.styles.schedule}" ?open="${isOpen}">
           <summary
@@ -83,13 +85,16 @@ export const DaySelector = define("day-selector", { mapping, raw })(
               this.setState("isOpen", !isOpen);
             }}"
           >
+            <div class="${this.styles.dayBadge}">${selected + 1}일차</div>
+
             <div class="${this.styles.text}">
               <div class="${this.styles.titleRow}">
-                <strong class="${this.styles.time}"
-                  >${this.formatter(current.day)}</strong
-                >
                 <span class="${this.styles.name}">${current.name}</span>
+                <span class="${this.styles.time}"
+                  >${this.formatter(current.day)}</span
+                >
               </div>
+
               ${current.description
                 ? html`<p class="${this.styles.description}">
                     ${current.description}

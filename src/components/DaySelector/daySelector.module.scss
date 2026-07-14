@@ -18,19 +18,42 @@
     color: var(--bg-500);
   }
 
+  &[open] {
+    .description {
+      display: block;
+      white-space: normal; // 줄바꿈 제한을 풀어서 풀내용이 노출되도록 합니다.
+      word-break: keep-all; // 한글 단어 단위로 예쁘게 떨어지도록 조절
+      word-wrap: break-word; // 긴 영문/숫자 방어선
+      overflow: visible;
+    }
+  }
   .shrink {
     display: flex;
-    align-items: center;
-    gap: 1.6rem;
+    align-items: flex-start;
+    gap: 1.6rem; // 배지와 텍스트 간격
     padding: 1.6rem;
     user-select: none;
+  }
+  .dayBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1.2rem;
+    background-color: oklch(from var(--brand-500) l c h / 0.1);
+    color: var(--brand-500);
+    font-size: 1.3rem;
+    font-weight: 850;
+    border-radius: 0.8rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
   }
 
   .text {
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    gap: 0.4rem;
     flex-grow: 1;
+    min-width: 0;
   }
 
   .titleRow {
@@ -39,21 +62,27 @@
     gap: 0.8rem;
   }
 
-  .time {
-    font-size: 1.8rem;
-    font-weight: 800;
-  }
+  // 🎯 가장 확실하게 눈에 띄어야 할 일상 메인 타이틀
   .name {
     font-size: 1.8rem;
-    font-weight: 600;
+    font-weight: 800;
     color: var(--text-100);
+    line-height: 1.5;
   }
 
-  .description {
+  .time {
     font-size: 1.6rem;
     color: var(--text-500);
-    margin: 0;
-    line-height: 150%;
+  }
+  .description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5;
+    font-size: 1.4rem;
+    color: var(--text-500);
   }
 
   .content {
