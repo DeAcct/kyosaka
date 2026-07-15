@@ -107,4 +107,21 @@ bottom-sheet::part(content) {
       }
     }
   }
+  .actions {
+    flex-shrink: 0;
+    margin-top: auto;
+    padding: 2rem 0 0;
+    position: relative;
+    @include layout.concave-edge(
+      bottom,
+      100%,
+      var(--sheet-content-radius),
+      var(--sheet-content-radius),
+      var(--bg-100)
+    );
+    &::before,
+    &::after {
+      z-index: 2;
+    }
+  }
 }
