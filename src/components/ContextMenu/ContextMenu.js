@@ -1,5 +1,5 @@
 import { Component, define, html } from "@/lib/core";
-import { BottomSheet } from "@/components/BottomSheet/BottomSheet";
+import "@/components/BottomSheet/BottomSheet";
 
 import mapping from "./contextMenu.module.scss";
 import raw from "./contextMenu.module.scss?inline";

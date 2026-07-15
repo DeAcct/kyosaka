@@ -20,3 +20,4 @@ export const RootPage = define("page-root", { mapping, raw })(
     }
   },
 );
+

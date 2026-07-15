@@ -4,7 +4,7 @@ import { toastStore } from "@/store/toastStore";
 import mapping from "./pwaSheet.module.scss";
 import raw from "./pwaSheet.module.scss?inline";
 
-import { BottomSheet } from "@/components/BottomSheet/BottomSheet";
+import "@/components/BottomSheet/BottomSheet";
 
 export const PWASheet = define("pwa-sheet", { mapping, raw })(
   class extends Component {

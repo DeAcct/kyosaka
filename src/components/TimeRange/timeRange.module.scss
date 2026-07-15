@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.icon {
+  font-size: 2.4rem;
+  rotate: -90deg;
+}
+
+.input {
+  flex-grow: 1;
+}

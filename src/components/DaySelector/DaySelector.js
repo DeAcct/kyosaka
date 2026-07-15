@@ -5,8 +5,8 @@ import { Component, define, html } from "@/lib/core";
 import mapping from "./daySelector.module.scss";
 import raw from "./daySelector.module.scss?inline";
 
-import { Icon } from "@/components/Icon/Icon";
-import { DatePicker } from "@/components/DatePicker/DatePicker";
+import "@/components/Icon/Icon";
+import "@/components/DatePicker/DatePicker";
 
 export const DaySelector = define("day-selector", { mapping, raw })(
   class extends Component {

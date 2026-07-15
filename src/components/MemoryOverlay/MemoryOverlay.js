@@ -2,7 +2,7 @@ import { Component, define, html, flushSync } from "@/lib/core";
 import { galleryStore } from "@/store/galleryStore";
 import { useOverlayTransition, stackOut } from "@/hooks/overlayMotion";
 
-import { Icon } from "@/components/Icon/Icon";
+import "@/components/Icon/Icon";
 
 import mapping from "./memoryOverlay.module.scss";
 import raw from "./memoryOverlay.module.scss?inline";

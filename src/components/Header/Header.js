@@ -1,6 +1,6 @@
 import { Component, define, html } from "@/lib/core";
 
-import { Icon } from "@/components/Icon/Icon";
+import "@/components/Icon/Icon";
 
 import mapping from "./header.module.scss";
 import raw from "./header.module.scss?inline";

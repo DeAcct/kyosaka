@@ -2,7 +2,7 @@
 import { Component, define, html } from "@/lib/core";
 import mapping from "./header.module.scss";
 import raw from "./header.module.scss?inline";
-import { Icon } from "@/components/Icon/Icon";
+import "@/components/Icon/Icon";
 
 export const DatePickerHeader = define("date-picker-header", { mapping, raw })(
   class extends Component {

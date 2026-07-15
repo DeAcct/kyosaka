@@ -8,7 +8,7 @@ import raw from "./datePicker.module.scss?inline";
 import { DatePickerHeader } from "./Header";
 import { DatePickerGrid } from "./Grid";
 import { DatePickerYear } from "./Year";
-import { SwipeWrap } from "@/components/SwipeWrap/SwipeWrap";
+import "@/components/SwipeWrap/SwipeWrap";
 
 export const DatePicker = define("date-picker", { mapping, raw })(
   class extends Component {

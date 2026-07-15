@@ -1,22 +1,22 @@
 import { Component, define, html } from "@/lib/core";
 import { switcher } from "@/lib/switcher";
 import { scheduleStore } from "@/store/scheduleStore";
+import { toastStore } from "@/store/toastStore";
 
 import mapping from "./schedule.module.scss";
 import raw from "./schedule.module.scss?inline";
 
-import { Fallback } from "@/components/Fallback/Fallback";
-import { SwipeWrap } from "@/components/SwipeWrap/SwipeWrap";
-import { EditTripForm } from "@/components/EditTripForm/EditTripForm";
-import { ContextMenu } from "@/components/ContextMenu/ContextMenu";
-import { toastStore } from "@/store/toastStore";
+import "@/components/Fallback/Fallback";
+import "@/components/SwipeWrap/SwipeWrap";
+import "@/components/EditTripForm/EditTripForm";
+import "@/components/EditScheduleForm/EditScheduleForm";
+import "@/components/ContextMenu/ContextMenu";
 
-// 아이템 내부 렌더링에 필요한 자식 컴포넌트들만 로드
-import { ScheduleIcon } from "@/components/ScheduleIcon/ScheduleIcon";
-import { RouteCard } from "@/components/RouteCard/RouteCard";
-import { PositionBox } from "@/components/PositionBox/PositionBox";
-import { Description } from "@/components/Description/Description";
-import { Icon } from "@/components/Icon/Icon";
+import "@/components/ScheduleIcon/ScheduleIcon";
+import "@/components/RouteCard/RouteCard";
+import "@/components/PositionBox/PositionBox";
+import "@/components/Description/Description";
+import "@/components/Icon/Icon";
 
 export const Schedule = define("ky-schedule", { mapping, raw })(
   class extends Component {
@@ -44,18 +44,16 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
         });
     }
 
-    // 🎯 롱프레스 시작 시점 기록 및 타이머 가동
     handlePointerDown(e, item, index) {
       this.#startPos = { x: e.clientX, y: e.clientY };
       if (this.#longPressTimer) clearTimeout(this.#longPressTimer);
 
       this.#longPressTimer = setTimeout(() => {
-        if (navigator.vibrate) navigator.vibrate(50); // 기분 좋은 진동 피드백
+        if (navigator.vibrate) navigator.vibrate(50);
         this.triggerLongPress(item, index);
-      }, 450); // 450ms 동안 머물면 편집창 가동
+      }, 450);
     }
 
-    // 🎯 포인터가 움직일 때 (부모 수준에서 단 한 번만 감시하여 위임 처리)
     handlePointerMove(e) {
       if (!this.#longPressTimer) return;
 
@@ -63,7 +61,6 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
         Math.pow(e.clientX - this.#startPos.x, 2) +
           Math.pow(e.clientY - this.#startPos.y, 2),
       );
-      // 미세 떨림(8px)을 넘어서 드래그/스크롤을 하려고 하면 즉시 롱프레스 취소
       if (dist > 8) this.cancelLongPress();
     }
 
@@ -92,7 +89,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
             text: "일정 수정",
             icon: "edit",
             action: () => {
-              toastStore.add("일정 수정 기능은 준비 중입니다.", "info", 2000);
+              scheduleStore.toggleEditSchedule(true, index);
             },
           },
           {
@@ -112,7 +109,8 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
             icon: "delete",
             danger: true,
             action: () => {
-              toastStore.add("일정 삭제 기능은 준비 중입니다.", "info", 2000);
+              scheduleStore.removeScheduleItem(index);
+              toastStore.add("일정을 삭제했어요!", "info", 2000);
             },
           },
         ],
@@ -124,7 +122,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
       const list = scheduleStore.selectedDayList;
 
       if (!plans || plans.length === 0) {
-        return html` <ky-fallback>등록된 여행 플랜이 없습니다.</ky-fallback> `;
+        return html`<ky-fallback>등록된 여행 플랜이 없습니다.</ky-fallback>`;
       }
 
       return html`
@@ -152,7 +150,8 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
                   class="${this.styles.shrink}"
                   @pointerdown="${(e) =>
                     this.handlePointerDown(e, item, index)}"
-                  @contextmenu.prevent="${(e) => this.handleContextMenu(e, item, index)}"
+                  @contextmenu.prevent="${(e) =>
+                    this.handleContextMenu(e, item, index)}"
                   style="user-select: none; -webkit-user-select: none;"
                 >
                   <schedule-icon
@@ -200,6 +199,9 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
           )}
         </swipe-wrap>
         <edit-trip-form></edit-trip-form>
+        <edit-schedule-form
+          :schedule-data="${scheduleStore.editingScheduleItem}"
+        ></edit-schedule-form>
         <context-menu $context-menu></context-menu>
       `;
     }

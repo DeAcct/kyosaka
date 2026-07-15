@@ -1,0 +1,110 @@
+/* components/EditScheduleForm/editScheduleForm.module.scss */
+
+@use "@/styles/layout/bottom-sheet" as bs;
+@use "@/styles/layout/layout" as layout;
+
+bottom-sheet::part(content) {
+  display: flex;
+  flex-direction: column;
+  width: min(47.5rem, 100%);
+  bottom: 0;
+  --radius: calc(var(--card-radius-base) * 1.5);
+  border-radius: var(--radius) var(--radius) 0 0;
+  height: calc(100dvh - var(--header-height));
+  @media screen and (min-width: 690px) {
+    height: 65dvh;
+    border-radius: var(--radius);
+    bottom: 50%;
+    transform: translateY(50%);
+  }
+}
+
+.formContainer {
+  @include bs.bottom-sheet;
+
+  flex-grow: 1;
+  min-height: 0;
+  width: 100%;
+
+  --sheet-content-radius: calc(
+    var(--card-radius-base) * 1.5 - var(--inner-padding)
+  );
+
+  .scrollContent {
+    min-height: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .typeSelector {
+    color: var(--text-500);
+  }
+
+  .title {
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    background-color: var(--bg-100);
+    flex-shrink: 0;
+    height: 4.8rem;
+    align-content: center;
+    text-align: center;
+    margin-bottom: -1rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-900);
+    @include layout.concave-edge(
+      top,
+      100%,
+      var(--sheet-content-radius),
+      var(--sheet-content-radius),
+      var(--bg-100)
+    );
+  }
+
+  .formRow {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    .label {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-500);
+      letter-spacing: 0.05em;
+      padding: 0 1.6rem;
+    }
+  }
+
+  .routeRow {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+
+    .icon {
+      font-size: 2.4rem;
+      rotate: -90deg;
+    }
+
+    .arrowWrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.4rem;
+      height: 2.4rem;
+      color: var(--text-400);
+      flex-shrink: 0;
+
+      .routeArrow {
+        width: 1.6rem;
+        height: 1.6rem;
+        transform: rotate(-90deg);
+      }
+    }
+  }
+}

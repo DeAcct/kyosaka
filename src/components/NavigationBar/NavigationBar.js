@@ -3,8 +3,8 @@ import { Component, define, html } from "@/lib/core";
 import mapping from "./navigationBar.module.scss";
 import raw from "./navigationBar.module.scss?inline";
 
-import { RouterLink } from "@/components/RouterLink/RouterLink";
-import { Icon } from "@/components/Icon/Icon";
+import "@/components/RouterLink/RouterLink";
+import "@/components/Icon/Icon";
 
 export const NavigationBar = define("navigation-bar", { mapping, raw })(
   class extends Component {

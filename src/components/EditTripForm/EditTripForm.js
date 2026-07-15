@@ -5,8 +5,8 @@ import { Component, define, html } from "@/lib/core";
 import mapping from "./editTripForm.module.scss";
 import raw from "./editTripForm.module.scss?inline";
 
-import { DatePicker } from "@/components/DatePicker/DatePicker";
-import { BottomSheet } from "@/components/BottomSheet/BottomSheet";
+import "@/components/DatePicker/DatePicker";
+import "@/components/BottomSheet/BottomSheet";
 
 export const EditTripForm = define("edit-trip-form", { mapping, raw })(
   class extends Component {

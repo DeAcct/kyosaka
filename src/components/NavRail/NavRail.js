@@ -1,19 +1,18 @@
 import { Component, define, html } from "@/lib/core";
 
-import { Icon } from "@/components/Icon/Icon";
-
 import mapping from "./navRail.module.scss";
 import raw from "./navRail.module.scss?inline";
 
 import { navStore } from "@/store/navStore";
 import { scheduleStore } from "@/store/scheduleStore";
-import { useTimeFormat } from "@/hooks/time";
+import { toastStore } from "@/store/toastStore";
 import { useJSONUpload } from "@/hooks/file";
 import { useEdit } from "@/hooks/edit";
 
-import { PlanItem } from "@/components/PlanItem/PlanItem";
-import { BottomSheet } from "@/components/BottomSheet/BottomSheet";
-import { PlanEditbar } from "@/components/PlanEditbar/PlanEditbar";
+import "@/components/Icon/Icon";
+import "@/components/PlanItem/PlanItem";
+import "@/components/BottomSheet/BottomSheet";
+import "@/components/PlanEditbar/PlanEditbar";
 
 export const NavRail = define("nav-rail", { mapping, raw })(
   class extends Component {
@@ -63,6 +62,7 @@ export const NavRail = define("nav-rail", { mapping, raw })(
     onDelete() {
       scheduleStore.removePlan(this.state.deleteSelected);
       this.editor.exitEdit();
+      toastStore.add("플랜을 삭제했어요!", "info", 2000);
     }
 
     template() {
@@ -75,7 +75,10 @@ export const NavRail = define("nav-rail", { mapping, raw })(
               type="button"
               @click="${this.closeNav}"
             >
-              <ky-icon name="hamburger" class="${this.styles.icon}"></ky-icon>
+              <ky-icon
+                name="hamburger"
+                class="${this.styles.icon}"
+              ></ky-icon>
             </button>
             <strong class="${this.styles.logo}">kyosaka</strong>
           </header>
@@ -89,7 +92,10 @@ export const NavRail = define("nav-rail", { mapping, raw })(
                     if (this.state.mode !== "edit") action();
                   }}"
                 >
-                  <ky-icon class="${this.styles.icon}" name="${icon}"></ky-icon>
+                  <ky-icon
+                    class="${this.styles.icon}"
+                    name="${icon}"
+                  ></ky-icon>
                   ${text}
                 </button>
               `,
@@ -126,7 +132,10 @@ export const NavRail = define("nav-rail", { mapping, raw })(
               class="${this.styles.editbar}"
             ></plan-editbar>`
           : ""}
-        <div class="${this.styles.backdrop}" @click="${this.closeNav}"></div>
+        <div
+          class="${this.styles.backdrop}"
+          @click="${this.closeNav}"
+        ></div>
       `;
     }
   },

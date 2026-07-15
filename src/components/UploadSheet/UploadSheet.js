@@ -4,8 +4,8 @@ import { galleryStore } from "@/store/galleryStore";
 import mapping from "./uploadSheet.module.scss";
 import raw from "./uploadSheet.module.scss?inline";
 
-import { BottomSheet } from "@/components/BottomSheet/BottomSheet";
-import { RadioGroup } from "@/components/RadioGroup/RadioGroup";
+import "@/components/BottomSheet/BottomSheet";
+import "@/components/RadioGroup/RadioGroup";
 
 export const UploadSheet = define("upload-sheet", { mapping, raw })(
   class extends Component {

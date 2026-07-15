@@ -3,7 +3,7 @@ import { Component, define, html } from "@/lib/core";
 import mapping from "./scheduleIcon.module.scss";
 import raw from "./scheduleIcon.module.scss?inline";
 
-import { Icon } from "@/components/Icon/Icon";
+import "@/components/Icon/Icon";
 
 export const ScheduleIcon = define("schedule-icon", { mapping, raw })(
   class extends Component {

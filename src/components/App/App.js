@@ -1,11 +1,11 @@
 import { Component, define, html } from "@/lib/core";
 import { Router } from "@/lib/router";
 
-import { Header } from "@/components/Header/Header";
-import { NavigationBar } from "@/components/NavigationBar/NavigationBar";
-import { NavRail } from "@/components/NavRail/NavRail";
-import { PWASheet } from "@/components/PWASheet/PWASheet";
-import { ToastConsumer } from "@/components/ToastConsumer/ToastConsumer";
+import "@/components/Header/Header";
+import "@/components/NavigationBar/NavigationBar";
+import "@/components/NavRail/NavRail";
+import "@/components/PWASheet/PWASheet";
+import "@/components/ToastConsumer/ToastConsumer";
 
 export const App = define("ky-app")(
   class extends Component {

@@ -4,7 +4,7 @@ import { toastStore } from "@/store/toastStore";
 import mapping from "./positionBox.module.scss";
 import raw from "./positionBox.module.scss?inline";
 
-import { Icon } from "@/components/Icon/Icon";
+import "@/components/Icon/Icon";
 
 export const PositionBox = define("position-box", { mapping, raw })(
   class extends Component {

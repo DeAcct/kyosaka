@@ -5,7 +5,7 @@ import { useLongPress } from "@/hooks/touch";
 import mapping from "./checklistItem.module.scss";
 import raw from "./checklistItem.module.scss?inline";
 
-import { Checkbox } from "@/components/Checkbox/Checkbox";
+import "@/components/Checkbox/Checkbox";
 
 export const ChecklistItem = define("checklist-item", { mapping, raw })(
   class extends Component {

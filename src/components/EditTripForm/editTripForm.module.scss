@@ -21,11 +21,9 @@ bottom-sheet::part(content) {
 }
 .formContainer {
   @include bs.bottom-sheet;
-
   flex-grow: 1;
   min-height: 0;
   width: 100%;
-
   padding-bottom: 0;
 
   --sheet-content-radius: calc(

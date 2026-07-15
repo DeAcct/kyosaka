@@ -95,6 +95,37 @@ class ScheduleStore extends Store {
     );
   }
 
+  removeScheduleItem(scheduleIndex) {
+    const currentPlanId = this.state.selected;
+    if (!currentPlanId) return;
+
+    this.commit("plans", (currentPlans) =>
+      currentPlans.map((plan) => {
+        if (plan.id !== currentPlanId) {
+          return plan;
+        }
+
+        const dayIndex = plan.selected;
+        const targetDay = plan.data[dayIndex];
+        if (!targetDay) return plan;
+
+        const updatedSchedule = targetDay.schedule.filter(
+          (_, index) => index !== scheduleIndex,
+        );
+
+        const updatedData = plan.data.map((day, index) =>
+          index === dayIndex ? { ...day, schedule: updatedSchedule } : day,
+        );
+
+        return {
+          ...plan,
+          data: updatedData,
+          edited: Temporal.Now.plainDateTimeISO(),
+        };
+      }),
+    );
+  }
+
   get plans() {
     return this.state.plans;
   }
@@ -200,14 +231,73 @@ class ScheduleStore extends Store {
       }),
     );
   }
+
+  toggleEditSchedule(changeTo, index = -1) {
+    this.commit("ui", (current) => ({
+      ...current,
+      editSchedule: typeof changeTo === "boolean" ? changeTo : !current.editSchedule,
+      editingScheduleIndex: changeTo ? index : -1,
+    }));
+  }
+
+  get isOpenEditSchedule() {
+    return this.state.ui.editSchedule;
+  }
+
+  get editingScheduleIndex() {
+    return this.state.ui.editingScheduleIndex;
+  }
+
+  get editingScheduleItem() {
+    const index = this.editingScheduleIndex;
+    if (index === -1) return null;
+    return this.selectedDayList?.schedule?.[index] || null;
+  }
+
+  updateScheduleItem(scheduleIndex, updatedItem) {
+    const currentPlanId = this.state.selected;
+    if (!currentPlanId) return;
+
+    this.commit("plans", (currentPlans) =>
+      currentPlans.map((plan) => {
+        if (plan.id !== currentPlanId) {
+          return plan;
+        }
+
+        const dayIndex = plan.selected;
+        const targetDay = plan.data[dayIndex];
+        if (!targetDay) return plan;
+
+        const updatedSchedule = targetDay.schedule.map((item, index) =>
+          index === scheduleIndex ? { ...item, ...updatedItem } : item,
+        );
+
+        const updatedData = plan.data.map((day, index) =>
+          index === dayIndex ? { ...day, schedule: updatedSchedule } : day,
+        );
+
+        return {
+          ...plan,
+          data: updatedData,
+          edited: Temporal.Now.plainDateTimeISO(),
+        };
+      }),
+    );
+  }
 }
 export const scheduleStore = new ScheduleStore("scheduleStore", {
   plans: [],
   selected: null,
   ui: {
     editTrip: false,
+    editSchedule: false,
+    editingScheduleIndex: -1,
   },
 });
+
+if (typeof window !== "undefined") {
+  window.scheduleStore = scheduleStore;
+}
 
 /*
 현재 만들고 있는 것은 여러 플랜을 저장할 수 있는 앱임.
