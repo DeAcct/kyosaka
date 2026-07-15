@@ -1,0 +1,66 @@
+@use "@/styles/layout/bottom-sheet" as sheet;
+
+.contextMenu {
+  @include sheet.bottom-sheet;
+  padding: 0 1.6rem calc(1.6rem + env(safe-area-inset-bottom));
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-100);
+  margin-bottom: 1.6rem;
+  padding: 0 0.8rem;
+  text-align: left;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.item {
+  width: 100%;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  width: 100%;
+  padding: 1.4rem 1.6rem;
+  font-size: 1.6rem;
+  font-weight: 550;
+  color: var(--text-200);
+  background: var(--bg-200);
+  border: none;
+  border-radius: 1.2rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 200ms ease, transform 100ms ease;
+
+  &:active {
+    background-color: var(--bg-300);
+    transform: scale(0.98);
+  }
+
+  .icon {
+    font-size: 2.0rem;
+    width: 2.0rem;
+    height: 2.0rem;
+    flex-shrink: 0;
+    color: var(--text-300);
+  }
+
+  &.danger {
+    color: var(--red-500);
+    
+    .icon {
+      color: var(--red-500);
+    }
+  }
+}

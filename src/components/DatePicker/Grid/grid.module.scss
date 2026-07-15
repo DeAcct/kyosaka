@@ -36,6 +36,7 @@
       cursor: default;
       pointer-events: none;
     }
+
     &:hover:not(.empty) {
       background: var(--bg-300);
     }
@@ -43,12 +44,15 @@
     &.inRange {
       background: var(--range-bg);
       border-radius: 0;
+
       &.start {
         border-radius: 1.2rem 0 0 1.2rem;
       }
+
       &.end {
         border-radius: 0 1.2rem 1.2rem 0;
       }
+
       &.start.end {
         border-radius: 1.2rem;
       }
@@ -60,6 +64,7 @@
   // ----------------------------------------------------------------
   &.rangeMode {
     .day {
+
       &.start,
       &.end {
         z-index: 2;
@@ -83,6 +88,10 @@
   // ----------------------------------------------------------------
   &.dayMode {
     .day {
+      &:not(.inRange):not(.empty) {
+        color: var(--bg-500);
+      }
+
       &.activeDay {
         color: var(--brand-500) !important;
         font-weight: 850;
