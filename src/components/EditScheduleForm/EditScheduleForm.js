@@ -7,10 +7,10 @@ import mapping from "./editScheduleForm.module.scss";
 import raw from "./editScheduleForm.module.scss?inline";
 
 import "@/components/BottomSheet/BottomSheet";
-import "@/components/TimeRange/TimeRange";
 import "@/components/Icon/Icon";
 import "@/components/Input/Input";
 import "@/components/TypeSelector/TypeSelector";
+import "@/components/TimeRange/TimeRange";
 
 const SCHEDULE_TYPES = [
   { value: "transport", label: "이동", icon: "transport" },
