@@ -41,6 +41,7 @@ export const NavRail = define("nav-rail", { mapping, raw })(
         // scheduleStore.commit("list", data);
         scheduleStore.importPlan(data);
       });
+      this.closeNav();
     }
 
     newPlan() {
@@ -49,8 +50,20 @@ export const NavRail = define("nav-rail", { mapping, raw })(
 
     get actions() {
       return [
-        { icon: "import", action: this.importJSON, text: "가져오기" },
-        { icon: "add", action: this.newPlan, text: "새로 만들기" },
+        {
+          icon: "import",
+          action: () => {
+            this.importJSON();
+          },
+          text: "가져오기",
+        },
+        {
+          icon: "add",
+          action: () => {
+            this.newPlan();
+          },
+          text: "새로 만들기",
+        },
       ];
     }
 

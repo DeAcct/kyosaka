@@ -16,7 +16,7 @@ export const BottomSheet = define("bottom-sheet", { mapping, raw })(
       this.$refs.dialog.showModal();
       this.$refs.content.style.translate = `-50% 0`;
       this.$refs.content.style.opacity = 1;
-      document.documentElement.style.overflow = "hidden";
+      document.documentElement.classList.toggle("is-locked");
     }
 
     close() {
@@ -24,7 +24,7 @@ export const BottomSheet = define("bottom-sheet", { mapping, raw })(
       this.$refs.content.style.opacity = 0;
       this.emit("close");
       this.$refs.dialog.close();
-      document.documentElement.style.overflow = "initial";
+      document.documentElement.classList.toggle("is-locked");
     }
 
     // 🔍 딤 영역 클릭 시 닫기
