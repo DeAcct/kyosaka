@@ -33,7 +33,9 @@ src/
 │   │   └── detail/
 │   │       ├── [id].js  # 동적 파라미터 매핑 "/detail/123"
 │   │       └── page.js
-└── store/               # 전역 상태 관리 저장소
+├── store/               # 전역 상태 관리 저장소
+└── intelligence/        # prompt api 연동코드
+
 
 ```
 

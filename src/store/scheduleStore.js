@@ -268,13 +268,50 @@ class ScheduleStore extends Store {
         const targetDay = plan.data[dayIndex];
         if (!targetDay) return plan;
 
-        const updatedSchedule = targetDay.schedule.map((item, index) =>
-          index === scheduleIndex ? { ...item, ...updatedItem } : item,
-        );
+        let updatedSchedule;
+        if (scheduleIndex === -1) {
+          updatedSchedule = [...targetDay.schedule, updatedItem];
+        } else {
+          updatedSchedule = targetDay.schedule.map((item, index) =>
+            index === scheduleIndex ? { ...item, ...updatedItem } : item,
+          );
+        }
 
         const updatedData = plan.data.map((day, index) =>
           index === dayIndex ? { ...day, schedule: updatedSchedule } : day,
         );
+
+        return {
+          ...plan,
+          data: updatedData,
+          edited: Temporal.Now.plainDateTimeISO(),
+        };
+      }),
+    );
+  }
+
+  setDaySchedule(scheduleList, dayName, dayDescription) {
+    const currentPlanId = this.state.selected;
+    if (!currentPlanId) return;
+
+    this.commit("plans", (currentPlans) =>
+      currentPlans.map((plan) => {
+        if (plan.id !== currentPlanId) {
+          return plan;
+        }
+
+        const dayIndex = plan.selected;
+        const targetDay = plan.data[dayIndex];
+        if (!targetDay) return plan;
+
+        const updatedData = plan.data.map((day, index) => {
+          if (index !== dayIndex) return day;
+
+          const updatedDay = { ...day, schedule: scheduleList };
+          if (dayName) updatedDay.name = dayName;
+          if (dayDescription) updatedDay.description = dayDescription;
+          return updatedDay;
+        });
 
         return {
           ...plan,

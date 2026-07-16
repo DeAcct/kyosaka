@@ -7,7 +7,7 @@ import raw from "./icon.module.scss?inline";
 export const Icon = define("ky-icon", { mapping, raw })(
   class extends Component {
     _lastLoadedName = null;
-    state = { d: "", loaded: false };
+    state = { d: "", viewBox: "0 -960 960 960", loaded: false };
 
     afterRender() {
       const currentName = this.name || this.getAttribute("name");
@@ -23,8 +23,11 @@ export const Icon = define("ky-icon", { mapping, raw })(
       if (!name || !IconLoader[name]) return;
 
       try {
-        const d = await IconLoader[name]();
+        // 이제 IconLoader는 무조건 { d, viewBox } 객체를 반환합니다.
+        const { d, viewBox } = await IconLoader[name]();
+
         this.setState("d", d);
+        this.setState("viewBox", viewBox);
         this.setState("loaded", true);
       } catch (err) {
         console.error(`Failed to load icon: ${name}`, err);
@@ -35,7 +38,7 @@ export const Icon = define("ky-icon", { mapping, raw })(
       return html`
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 -960 960 960"
+          viewBox="${this.state.viewBox}"
           class="${this.styles.icon} ${this.state.loaded
             ? this.styles.loaded
             : ""}"

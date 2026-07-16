@@ -11,6 +11,7 @@ import "@/components/Icon/Icon";
 import "@/components/Input/Input";
 import "@/components/TypeSelector/TypeSelector";
 import "@/components/TimeRange/TimeRange";
+import { generateScheduleFromPrompt } from "@/intelligence/api/schedule";
 
 const SCHEDULE_TYPES = [
   { value: "transport", label: "이동", icon: "transport" },
@@ -21,31 +22,49 @@ const SCHEDULE_TYPES = [
   { value: "onsen", label: "온천", icon: "onsen" },
   { value: "shopping", label: "쇼핑", icon: "shopping" },
   { value: "photo_camera", label: "사진", icon: "photo_camera" },
-  { value: "temple_buddhist", label: "사찰", icon: "temple_buddhist" },
+  { value: "temple_buddhist", label: "전통", icon: "temple_buddhist" },
 ];
+
+const SUPPORTS_PROMPT_API =
+  typeof window !== "undefined" &&
+  ("LanguageModel" in window ||
+    ("ai" in window && "languageModel" in window.ai));
 
 export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
   class extends Component {
     setup() {
       this.subscribe(scheduleStore);
-      this.state = this.parseScheduleToState();
+      this.state = {
+        ...this.parseScheduleToState(),
+        isAiLoading: false,
+      };
     }
 
-    parseScheduleToState(item = {}) {
+    setState(key, newState) {
+      if (key === "now") {
+        this.state = { ...this.state, ...newState };
+        this.queueRender();
+      } else {
+        super.setState(key, newState);
+      }
+    }
+
+    parseScheduleToState(item) {
+      const target = item || {};
       return {
-        name: item.name || "",
-        type: item.type || "transport",
-        timeFrom: item.time?.from || "09:00",
-        timeTo: item.time?.to || "10:00",
-        budget: item.budget || 0,
-        routeFrom: item.route?.from || "",
-        routeTo: item.route?.to || "",
-        posName: item.position?.[0]?.name || "",
-        posAddress: item.position?.[0]?.address || "",
-        posMap: item.position?.[0]?.map || "",
-        descriptionText: Array.isArray(item.description)
-          ? item.description.join("\n")
-          : item.description || "",
+        name: target.name || "",
+        type: target.type || "transport",
+        timeFrom: target.time?.from || "09:00",
+        timeTo: target.time?.to || "10:00",
+        budget: target.budget || 0,
+        routeFrom: target.route?.from || "",
+        routeTo: target.route?.to || "",
+        posName: target.position?.[0]?.name || "",
+        posAddress: target.position?.[0]?.address || "",
+        posMap: target.position?.[0]?.map || "",
+        descriptionText: Array.isArray(target.description)
+          ? target.description.join("\n")
+          : target.description || "",
       };
     }
 
@@ -109,7 +128,7 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
     }
 
     handleNameChange(e) {
-      this.setState("name", e.target.value);
+      this.setState("name", e.detail.value);
     }
 
     handleCancel() {
@@ -127,7 +146,6 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
         }
 
         this.state = this.parseScheduleToState(item);
-        this.queueRender();
 
         toastStore.add("일정 정보를 붙여넣었어요!", "success", 2000);
       } catch (err) {
@@ -136,6 +154,49 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
           "error",
           2000,
         );
+      }
+    }
+
+    async handleAi() {
+      const { name, type } = this.state;
+      let promptText = name.trim();
+
+      if (!promptText) {
+        const defaultPrompts = {
+          transport: "이동 경로 또는 교통편 추천",
+          hotel: "가까운 숙소 또는 인기 호텔 추천",
+          food: "주변 맛집 또는 식사할 곳 추천",
+          attractions: "근처 대표적인 관광 명소 추천",
+          landscape: "풍경이 멋진 뷰포인트나 산책로 추천",
+          onsen: "근처 온천 또는 센토 추천",
+          shopping: "근처 기념품점 또는 대형 쇼핑몰 추천",
+          photo_camera: "사진 찍기 좋은 핫플레이스나 명소 추천",
+          temple_buddhist: "근처 유명한 절, 신사 또는 전통 문화재 추천",
+        };
+        promptText = defaultPrompts[type] || "여행 일정 추천";
+      }
+
+      this.setState("isAiLoading", true);
+      toastStore.add("AI가 일정을 분석하고 있어요...", "info", 3000);
+
+      try {
+        const currentSchedules = scheduleStore.selectedDayList?.schedule || [];
+        const editingIndex = scheduleStore.editingScheduleIndex;
+        const filteredSchedules = currentSchedules.filter(
+          (_, idx) => idx < editingIndex,
+        );
+
+        const result = await generateScheduleFromPrompt(
+          promptText,
+          filteredSchedules,
+        );
+
+        this.setState("now", this.parseScheduleToState(result));
+        toastStore.add("일정 정보를 채워넣었어요!", "success", 2000);
+      } catch (err) {
+        toastStore.add(err.message || "AI 분석에 실패했습니다.", "error", 2000);
+      } finally {
+        this.setState("isAiLoading", false);
       }
     }
 
@@ -155,7 +216,15 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
       );
 
       scheduleStore.toggleEditSchedule(false);
-      toastStore.add("일정을 수정했어요!", "success", 2000);
+      toastStore.add(
+        this.isNew ? "새 일정을 추가했어요!" : "일정을 수정했어요!",
+        "success",
+        2000,
+      );
+    }
+
+    get isNew() {
+      return scheduleStore.editingScheduleIndex === -1;
     }
 
     onPropsPatchComplete() {
@@ -200,6 +269,7 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
         posAddress,
         posMap,
         descriptionText,
+        isAiLoading,
       } = this.state;
 
       const fields = [
@@ -223,6 +293,19 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
         },
       ];
 
+      const tooltips = [
+        { icon: "paste", title: "일정 붙여넣기", onClick: this.handlePaste },
+        ...(SUPPORTS_PROMPT_API
+          ? [
+              {
+                icon: "ai",
+                title: "일정 ai추천",
+                onClick: () => this.handleAi(),
+              },
+            ]
+          : []),
+      ];
+
       return html`
         <bottom-sheet
           $sheet
@@ -233,37 +316,55 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
                 <div class="${this.styles.formContainer}">
                   <div class="${this.styles.scrollContent}">
                     <header class="${this.styles.titleRow}">
-                      <h3 class="${this.styles.titleText}">일정 편집</h3>
-                      <button
-                        type="button"
-                        class="${this.styles.pasteButton}"
-                        @click="${this.handlePaste}"
-                        title="일정 붙여넣기"
-                      >
-                        <ky-icon
-                          name="paste"
-                          class="${this.styles.pasteIcon}"
-                        ></ky-icon>
-                      </button>
+                      <h3 class="${this.styles.titleText}">
+                        ${this.isNew ? "일정 추가" : "일정 편집"}
+                      </h3>
+                      <div class="${this.styles.tooltips}">
+                        ${tooltips.map(
+                          (tip) => html`
+                            <button
+                              type="button"
+                              class="${this.styles.pasteButton}"
+                              ?disabled="${tip.icon === "ai" && isAiLoading}"
+                              @click="${tip.onClick}"
+                              title="${tip.title}"
+                            >
+                              <ky-icon
+                                name="${tip.icon}"
+                                class="${this.styles.pasteIcon} ${tip.icon ===
+                                  "ai" && isAiLoading
+                                  ? this.styles.spin
+                                  : ""}"
+                              ></ky-icon>
+                            </button>
+                          `,
+                        )}
+                      </div>
                     </header>
 
                     <!-- 1. 일정 이름 & 타입 선택 -->
                     <section class="${this.styles.formRow}">
-                      <i class="${this.styles.label}">일정 이름</i>
-                      <ky-input
-                        class="${this.styles.nameInput}"
-                        value="${name}"
-                        placeholder="일정 이름을 입력해주세요"
-                        @change="${this.handleNameChange}"
+                      <i class="${this.styles.label}">일정 및 AI 프롬프트</i>
+                      <div
+                        class="${this.styles.inputWrapper} ${isAiLoading
+                          ? this.styles.aiLoading
+                          : ""}"
                       >
-                        <type-selector
-                          :items="${SCHEDULE_TYPES}"
-                          value="${type}"
-                          @change="${(e) =>
-                            this.handleTypeChange(e.detail.value)}"
-                          class="${this.styles.typeSelector}"
-                        ></type-selector>
-                      </ky-input>
+                        <ky-input
+                          class="${this.styles.nameInput}"
+                          value="${name}"
+                          placeholder="원하는 일정이나 궁금한 장소 입력"
+                          @change="${this.handleNameChange}"
+                        >
+                          <type-selector
+                            :items="${SCHEDULE_TYPES}"
+                            value="${type}"
+                            @change="${(e) =>
+                              this.handleTypeChange(e.detail.value)}"
+                            class="${this.styles.typeSelector}"
+                          ></type-selector>
+                        </ky-input>
+                      </div>
                     </section>
 
                     <!-- 2. 시간 범위 -->

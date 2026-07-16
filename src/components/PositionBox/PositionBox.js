@@ -8,6 +8,20 @@ import "@/components/Icon/Icon";
 
 export const PositionBox = define("position-box", { mapping, raw })(
   class extends Component {
+    get mapUrl() {
+      if (
+        this.data.map &&
+        this.data.map.trim() &&
+        this.data.map.startsWith("http")
+      ) {
+        return this.data.map;
+      }
+      const query = this.data.address
+        ? `${this.data.name} ${this.data.address}`
+        : this.data.name;
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query.trim())}`;
+    }
+
     async handleCopy() {
       try {
         await navigator.clipboard.writeText(this.data.address);
@@ -34,17 +48,23 @@ export const PositionBox = define("position-box", { mapping, raw })(
           <div class="${this.styles.actions}">
             <button
               class="${this.styles.actionItem}"
-              @click="${this.handleCopy}"
+              @click="${() => this.handleCopy()}"
             >
-              <ky-icon name="copy" class="${this.styles.icon}"></ky-icon>
+              <ky-icon
+                name="copy"
+                class="${this.styles.icon}"
+              ></ky-icon>
               <span>주소 복사</span>
             </button>
             <a
               class="${this.styles.actionItem}"
-              href="${this.data.map}"
+              href="${this.mapUrl}"
               target="_blank"
             >
-              <ky-icon name="map" class="${this.styles.icon}"></ky-icon>
+              <ky-icon
+                name="map"
+                class="${this.styles.icon}"
+              ></ky-icon>
               <span>지도 보기</span>
             </a>
           </div>

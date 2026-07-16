@@ -1,0 +1,41 @@
+@use "@/styles/layout/button" as button;
+@use "@/styles/layout/bottom-sheet" as sheet;
+
+.container {
+  @include sheet.bottom-sheet;
+
+  .title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-100);
+    margin-bottom: 1.2rem;
+  }
+
+  .sub {
+    line-height: 1.5;
+  }
+
+  .strong {
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  .warning {
+    font-size: 1.3rem;
+    color: var(--red-500);
+    font-weight: 600;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 0.8rem;
+    .button {
+      flex: none;
+      width: 100%;
+      &.primary {
+        background-color: var(--red-500);
+        color: var(--bg-100);
+      }
+    }
+  }
+}

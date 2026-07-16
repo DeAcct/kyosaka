@@ -2,6 +2,7 @@ import { Component, define, html } from "@/lib/core";
 import { switcher } from "@/lib/switcher";
 import { scheduleStore } from "@/store/scheduleStore";
 import { toastStore } from "@/store/toastStore";
+import { generateDayScheduleFromPrompt } from "@/intelligence/api/yolo";
 
 import mapping from "./schedule.module.scss";
 import raw from "./schedule.module.scss?inline";
@@ -11,6 +12,8 @@ import "@/components/SwipeWrap/SwipeWrap";
 import "@/components/EditTripForm/EditTripForm";
 import "@/components/EditScheduleForm/EditScheduleForm";
 import "@/components/ContextMenu/ContextMenu";
+import "@/components/YoloConfirmSheet/YoloConfirmSheet";
+import "@/components/YoloBox/YoloBox";
 
 import "@/components/ScheduleIcon/ScheduleIcon";
 import "@/components/RouteCard/RouteCard";
@@ -22,6 +25,10 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
   class extends Component {
     #longPressTimer = null;
     #startPos = { x: 0, y: 0 };
+
+    state = {
+      isYoloLoading: false,
+    };
 
     setup() {
       this.subscribe(scheduleStore);
@@ -117,6 +124,56 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
       });
     }
 
+    handleYolo(e) {
+      const promptText = e.detail.prompt.trim();
+      if (!promptText) {
+        toastStore.add(
+          "AI에게 부탁할 하루 일정을 입력해 주세요.",
+          "error",
+          2000,
+        );
+        return;
+      }
+
+      const confirmSheet = this.$refs.yoloConfirmSheet;
+      if (confirmSheet) {
+        confirmSheet.open(promptText);
+      }
+    }
+
+    async executeYolo(promptText) {
+      this.setState("isYoloLoading", true);
+      toastStore.add("AI가 하루 일정을 설계하고 있어요...", "info", 3000);
+
+      try {
+        const plan = scheduleStore.plans.find((p) => p.id === scheduleStore.state.selected);
+        const dayIndex = plan ? plan.selected : -1;
+        const totalDays = plan ? plan.data.length : 0;
+
+        const isFirstDay = dayIndex === 0;
+        const isLastDay = dayIndex === totalDays - 1;
+
+        const result = await generateDayScheduleFromPrompt(promptText, {
+          isFirstDay,
+          isLastDay,
+        });
+
+        scheduleStore.setDaySchedule(result.schedules, result.dayName, result.dayDescription);
+        if (this.$refs.yoloBox) {
+          this.$refs.yoloBox.clear();
+        }
+        toastStore.add("하루 일정을 성공적으로 채워넣었어요!", "success", 2000);
+      } catch (err) {
+        toastStore.add(
+          err.message || "AI 일정 생성에 실패했습니다.",
+          "error",
+          2000,
+        );
+      } finally {
+        this.setState("isYoloLoading", false);
+      }
+    }
+
     template() {
       const plans = scheduleStore.plans;
       const list = scheduleStore.selectedDayList;
@@ -137,6 +194,11 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
           @pointerup="${this.cancelLongPress}"
           @pointerleave="${this.cancelLongPress}"
         >
+          <yolo-box
+            $yolo-box
+            loading="${this.state.isYoloLoading}"
+            @yolo="${(e) => this.handleYolo(e)}"
+          ></yolo-box>
           ${list.schedule.map(
             (item, index) => html`
               <details
@@ -197,12 +259,27 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
               </details>
             `,
           )}
+          <button
+            type="button"
+            class="${this.styles.schedule}"
+            @click="${() => scheduleStore.toggleEditSchedule(true, -1)}"
+          >
+            <ky-icon
+              name="add"
+              class="${this.styles.addIcon}"
+            ></ky-icon>
+            일정 추가
+          </button>
         </swipe-wrap>
         <edit-trip-form></edit-trip-form>
         <edit-schedule-form
           :schedule-data="${scheduleStore.editingScheduleItem}"
         ></edit-schedule-form>
         <context-menu $context-menu></context-menu>
+        <yolo-confirm-sheet
+          $yolo-confirm-sheet
+          @confirm="${(e) => this.executeYolo(e.detail.prompt)}"
+        ></yolo-confirm-sheet>
       `;
     }
   },

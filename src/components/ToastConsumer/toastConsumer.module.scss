@@ -1,14 +1,25 @@
 .container {
   position: fixed;
-  bottom: calc(var(--navigation-height) + 1.2rem);
-  left: 50%;
-  transform: translateX(-50%);
   z-index: 9999;
   display: flex;
   flex-direction: column;
   gap: 8px;
   pointer-events: none; // 클릭 방해 금지
   width: min(calc(100% - calc(var(--inner-padding) * 2)), 47.5rem);
+
+  // 팝오버 브라우저 기본 스타일 초기화
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0 auto;
+  overflow: visible;
+
+  // 팝오버 위치를 하단 내비바 위로 안전하게 중앙 정렬
+  inset: auto 0 calc(var(--navigation-height) + 1.2rem) 0;
+
+  &:popover-open {
+    display: flex;
+  }
 }
 
 .toast {

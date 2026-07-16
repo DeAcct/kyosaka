@@ -4,9 +4,9 @@
   display: flex;
   gap: 0.8rem;
   overflow-x: auto;
-  padding: 0.8rem 0 1.2rem;
   -webkit-overflow-scrolling: touch;
   width: 100%;
+  border-radius: 9999px;
 
   &::-webkit-scrollbar {
     display: none;
@@ -16,6 +16,7 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 0.8rem;
+    border-radius: 0;
   }
 }
 
@@ -28,7 +29,7 @@
   padding: 0.8rem 1.2rem;
   background-color: var(--bg-300);
   border: 1px solid transparent;
-  border-radius: 2rem;
+  border-radius: 9999px;
   font-size: 1.6rem;
   font-weight: 500;
   color: var(--text-500);
@@ -40,8 +41,8 @@
 
   &:hover,
   &.active {
-    background-color: var(--bg-500);
-    color: var(--bg-100);
+    background-color: var(--blue-tint);
+    color: var(--text-100);
   }
 
   .icon {

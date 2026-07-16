@@ -196,3 +196,57 @@ swipe-wrap {
     font-size: 2.4rem;
   }
 }
+
+button.schedule {
+  width: 100%;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.6rem;
+  color: var(--text-500);
+  font-size: 1.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: var(--bg-200);
+  transition: all 150ms ease-out;
+
+  &:hover {
+    background-color: var(--bg-300);
+    color: var(--brand-500);
+  }
+
+  .addIcon {
+    font-size: 2.4rem;
+    color: var(--brand-500);
+  }
+
+  @media screen and (min-width: 690px) {
+    display: flex !important; /* Override display: contents of details.schedule */
+    grid-column: 1;
+    border-radius: 0.8rem;
+    align-self: start;
+    width: 100%;
+    margin: 0;
+  }
+}
+
+yolo-box[loading="true"] ~ .schedule,
+yolo-box[loading="true"] ~ button.schedule {
+  animation: yolo-generating-pulse 1.5s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes yolo-generating-pulse {
+  0% {
+    opacity: 0.7;
+    filter: blur(0.5px);
+    transform: scale(0.99);
+  }
+  100% {
+    opacity: 0.3;
+    filter: blur(1.5px);
+    transform: scale(0.97);
+  }
+}
+

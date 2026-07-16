@@ -38,7 +38,7 @@ json 기반 여행 계획표 앱
 - [x] 계획표 업로드
 - [x] 계획표 신규
   - [x] 기본계획표 자동생성(하루의 여행기간, 하나의 계획)
-- [ ] 수정
+- [x] 수정
   - [x] date-picker
   - [x] 여행기간+여행이름+날짜별이름을 수정하는 bottom-sheet
   - [x] 각 일정별 롱프레스로 context-menu 호출
@@ -48,12 +48,13 @@ json 기반 여행 계획표 앱
   - [x] 스케줄 수정 bottom-sheet
     - [x] 스케줄 단순수정
     - [x] 클립보드 접근, 클립보드에서 붙여넣기 버튼(trustedEvent 없이 자동으로 붙여넣는 것은 브라우저 사양상 불가)
-  - [ ] 스케줄 신규 bottom-sheet
-    - [ ] 각 날짜별 맨 끝 추가버튼에서 접근
-    - [ ] prompt api(gemini nano, 크롬내장 온디바이스ai) 활용 다음일정 추천
+  - [x] 스케줄 신규 bottom-sheet
+    - [x] 각 날짜별 맨 끝 추가버튼에서 접근
+    - [x] prompt api(gemini nano, 크롬내장 온디바이스ai) 활용 다음일정 추천
 - [x] 삭제
   - [x] 플랜 자체를 삭제
   - [x] 일정 개별 삭제 (\*연결)
+- [ ] SUPER YOLO mode: ai한테 하루를 짜달라 하기
 
 ```
 // 시간표 json 명세
