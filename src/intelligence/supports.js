@@ -23,13 +23,13 @@ export function getUnsupportedReason() {
   const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.maxTouchPoints > 1 && /Macintosh/i.test(ua));
 
   if (isAndroid || isIOS) {
-    return "모바일용 Chrome(Android, iOS)은 AI 파운데이션 모델 API를 지원하지 않습니다.";
+    return "모바일용 Chrome은 아직 온디바이스 AI를 지원하지 않습니다. 모바일로 서비스가 확대될 수 있도록 구글과 협의 중입니다.";
   }
 
   const isCrOS = /CrOS/i.test(ua);
   if (isCrOS) {
-    return "일반 ChromeOS 기기(non-Chromebook Plus)는 AI 파운데이션 모델 API를 지원하지 않습니다. Chromebook Plus 기기를 사용해 주세요.";
+    return "일반 Chromebook은 아직 온디바이스 AI를 지원하지 않습니다. Chromebook Plus 기기에서 사용하시거나, 서비스가 확대될 수 있도록 구글과 소통 중입니다.";
   }
 
-  return "AI 기능은 Windows 10/11, macOS 13+, Linux, ChromeOS(Chromebook Plus)의 Google Chrome 브라우저에서 제공됩니다. Chrome 버전(126 이상) 및 chrome://flags 설정을 확인해 주세요.";
+  return "온디바이스 AI 기능을 사용하기 위해 브라우저 설정이 필요합니다. Windows 10/11, macOS 13+, Linux, ChromeOS(Chromebook Plus)의 Google Chrome 최신 버전(126 이상)에서 AI 설정을 켜주세요.";
 }

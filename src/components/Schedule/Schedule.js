@@ -152,7 +152,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
 
       if (availability === "after-download") {
         toastStore.add(
-          "AI 모델을 다운로드하는 중입니다. 다운로드가 완료될 때까지 잠시 후 다시 시도해 주세요.",
+          "AI 연산에 필요한 로컬 인공지능 모델을 다운로드하고 있습니다. 다운로드가 끝날 때까지 잠시만 기다리신 후 다시 시도해 주세요.",
           "error",
           3000,
         );

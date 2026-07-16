@@ -4,17 +4,13 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  pointer-events: none; // 클릭 방해 금지
+  pointer-events: none;
   width: min(calc(100% - calc(var(--inner-padding) * 2)), 47.5rem);
-
-  // 팝오버 브라우저 기본 스타일 초기화
   border: none;
   background: transparent;
   padding: 0;
   margin: 0 auto;
   overflow: visible;
-
-  // 팝오버 위치를 하단 내비바 위로 안전하게 중앙 정렬
   inset: auto 0 calc(var(--navigation-height) + 1.2rem) 0;
 
   &:popover-open {
@@ -25,22 +21,32 @@
 .toast {
   pointer-events: auto;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.8rem;
-  padding: 0 1.6rem;
-  height: calc(var(--card-radius-base) * 2);
+  padding: 0.8rem 1.6rem;
+  min-height: calc(var(--card-radius-base) * 2);
   border-radius: 0.8rem;
   background: oklch(from var(--gray-050) l c h / 0.8);
   backdrop-filter: blur(10px);
   color: var(--gray-900);
   font-size: 1.6rem;
   font-weight: 500;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 
   animation: slideUp 0.4s var(--ease-out-expo);
 }
+
+.message {
+  flex: 1;
+  line-height: 1.4;
+}
+
 .icon {
   font-size: 2.4rem;
   border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: -0.1rem;
   &.success {
     color: var(--bg-100);
     background-color: var(--green-500);
