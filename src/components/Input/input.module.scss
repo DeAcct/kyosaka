@@ -45,6 +45,7 @@ textarea {
 .input,
 .textarea {
   width: 100%;
+  min-width: 0;
   height: 4.8rem;
   background: transparent;
   border: none;
