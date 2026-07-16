@@ -42,7 +42,7 @@ export const YoloBox = define("yolo-box", { mapping, raw })(
           <ky-input
             class="${this.styles.yoloInput}"
             value="${this.state.prompt}"
-            placeholder="AI에게 하루 일정 부탁하기 (예: 오사카 힐링 온천 하루 일정)"
+            placeholder="AI에게 부탁할 하루 일정 입력..."
             @change="${(e) => {
               this.handleInputChange(e);
             }}"
