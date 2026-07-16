@@ -12,6 +12,7 @@ import "@/components/Input/Input";
 import "@/components/TypeSelector/TypeSelector";
 import "@/components/TimeRange/TimeRange";
 import { generateScheduleFromPrompt } from "@/intelligence/api/schedule";
+import { checkPromptAPIAvailability, getUnsupportedReason } from "@/intelligence/supports";
 
 const SCHEDULE_TYPES = [
   { value: "transport", label: "이동", icon: "transport" },
@@ -174,6 +175,22 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
           temple_buddhist: "근처 유명한 절, 신사 또는 전통 문화재 추천",
         };
         promptText = defaultPrompts[type] || "여행 일정 추천";
+      }
+
+      const availability = await checkPromptAPIAvailability();
+
+      if (availability === "no") {
+        toastStore.add(getUnsupportedReason(), "error", 3000);
+        return;
+      }
+
+      if (availability === "after-download") {
+        toastStore.add(
+          "AI 모델을 다운로드하는 중입니다. 다운로드가 완료될 때까지 잠시 후 다시 시도해 주세요.",
+          "error",
+          3000,
+        );
+        return;
       }
 
       this.setState("isAiLoading", true);

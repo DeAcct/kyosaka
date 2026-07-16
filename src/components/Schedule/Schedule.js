@@ -3,6 +3,7 @@ import { switcher } from "@/lib/switcher";
 import { scheduleStore } from "@/store/scheduleStore";
 import { toastStore } from "@/store/toastStore";
 import { generateDayScheduleFromPrompt } from "@/intelligence/api/yolo";
+import { checkPromptAPIAvailability, getUnsupportedReason } from "@/intelligence/supports";
 
 import mapping from "./schedule.module.scss";
 import raw from "./schedule.module.scss?inline";
@@ -142,6 +143,22 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
     }
 
     async executeYolo(promptText) {
+      const availability = await checkPromptAPIAvailability();
+
+      if (availability === "no") {
+        toastStore.add(getUnsupportedReason(), "error", 3000);
+        return;
+      }
+
+      if (availability === "after-download") {
+        toastStore.add(
+          "AI 모델을 다운로드하는 중입니다. 다운로드가 완료될 때까지 잠시 후 다시 시도해 주세요.",
+          "error",
+          3000,
+        );
+        return;
+      }
+
       this.setState("isYoloLoading", true);
       toastStore.add("AI가 하루 일정을 설계하고 있어요...", "info", 3000);
 
