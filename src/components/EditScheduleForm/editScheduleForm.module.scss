@@ -188,8 +188,9 @@ bottom-sheet::part(content) {
   .actions {
     flex-shrink: 0;
     margin-top: auto;
-    padding: 2rem 2rem 0; // 부모 패딩 제거에 맞추어 좌우 패딩 2rem 추가
-    width: 100%;
+    padding: 2rem 0 0;
+    width: calc(100% - 4rem);
+    margin: 0 auto;
 
     &::before,
     &::after {
@@ -252,7 +253,7 @@ bottom-sheet::part(content) {
   border-radius: var(--card-radius-base);
   color: var(--brand-500);
   font-size: 1.6rem;
-  font-weight: 600;
+  font-weight: 550;
   cursor: pointer;
   transition: all 0.2s ease;
 

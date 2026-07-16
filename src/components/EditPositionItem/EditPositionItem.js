@@ -79,7 +79,7 @@ export const EditPositionItem = define("edit-position-item", { mapping, raw })(
                 name="delete"
                 class="${this.styles.icon}"
               ></ky-icon>
-              장소 삭제
+              <span> 장소 삭제 </span>
             </button>
           </div>
         </details>
