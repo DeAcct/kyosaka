@@ -1,4 +1,5 @@
 @use "@/styles/layout/button" as button;
+@use "@/styles/layout/layout" as layout;
 
 @mixin bottom-sheet {
   display: flex;
@@ -13,9 +14,25 @@
     color: var(--gray-400);
     margin-bottom: 2.4rem;
   }
+  .label {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-500);
+    letter-spacing: 0.05em;
+    padding: 0 1.6rem;
+  }
   .actions {
     display: flex;
     gap: 0.4rem;
+
+    position: relative;
+    @include layout.concave-edge(
+      bottom,
+      100%,
+      var(--sheet-content-radius),
+      var(--sheet-content-radius),
+      var(--bg-100)
+    );
     .button {
       @include button.ky-button;
       flex: 1 0 0;

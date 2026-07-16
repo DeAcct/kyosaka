@@ -40,6 +40,7 @@ export const Input = define("ky-input", { mapping, raw })(
                   placeholder="${placeholder}"
                   rows="4"
                   @change="${this.handleChange}"
+                  part="input"
                 >
 ${value}</textarea
                 >`
@@ -50,6 +51,7 @@ ${value}</textarea
                     value="${value}"
                     placeholder="${placeholder}"
                     @change="${this.handleChange}"
+                    part="input"
                   />
                 `}
             <slot></slot>

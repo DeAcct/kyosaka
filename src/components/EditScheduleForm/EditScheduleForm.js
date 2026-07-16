@@ -48,10 +48,10 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
       this.setState("type", typeValue);
     }
 
-    handleTimeChange(e) {
-      const { startTime, endTime } = e.detail;
-      this.setState("timeFrom", startTime);
-      this.setState("timeTo", endTime);
+    handleTimeChange({ detail }) {
+      const { start, end } = detail;
+      this.setState("timeFrom", start);
+      this.setState("timeTo", end);
     }
 
     handleNameChange(e) {

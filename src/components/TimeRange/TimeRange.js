@@ -17,8 +17,8 @@ export const TimeRange = define("time-range", { mapping, raw })(
     }
 
     state = {
-      startTime: "09:00",
-      endTime: "18:00",
+      start: "09:00",
+      end: "18:00",
     };
 
     setup() {
@@ -33,29 +33,21 @@ export const TimeRange = define("time-range", { mapping, raw })(
 
     initRange() {
       const startProp =
-        this.startTime || this.getAttribute("start-time") || "09:00";
-      const endProp = this.endTime || this.getAttribute("end-time") || "18:00";
+        this.start || this.getAttribute("start-time") || "09:00";
+      const endProp = this.end || this.getAttribute("end-time") || "18:00";
 
       if (/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(startProp)) {
-        this.state.startTime = startProp;
+        this.state.start = startProp;
       }
       if (/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(endProp)) {
-        this.state.endTime = endProp;
+        this.state.end = endProp;
       }
     }
 
-    handleStartChange(e) {
-      const nextStart = e.target.value;
-      if (this.state.startTime !== nextStart) {
-        this.setState("startTime", nextStart);
-        this.emitChange();
-      }
-    }
-
-    handleEndChange(e) {
-      const nextEnd = e.target.value;
-      if (this.state.endTime !== nextEnd) {
-        this.setState("endTime", nextEnd);
+    handleChange(target, { detail }) {
+      const next = detail.value;
+      if (this.state[target] !== next) {
+        this.setState(target, next);
         this.emitChange();
       }
     }
@@ -63,8 +55,8 @@ export const TimeRange = define("time-range", { mapping, raw })(
     emitChange() {
       this.emit("change", {
         detail: {
-          startTime: this.state.startTime,
-          endTime: this.state.endTime,
+          start: this.state.start,
+          end: this.state.end,
         },
       });
     }
@@ -75,8 +67,8 @@ export const TimeRange = define("time-range", { mapping, raw })(
           <ky-input
             type="time"
             placeholder="시작"
-            value="${this.state.startTime}"
-            @change="${this.handleStartChange}"
+            value="${this.state.start}"
+            @change="${(e) => this.handleChange("start", e)}"
             part="start"
             class="${this.styles.input}"
           ></ky-input>
@@ -87,8 +79,8 @@ export const TimeRange = define("time-range", { mapping, raw })(
           <ky-input
             type="time"
             placeholder="종료"
-            value="${this.state.endTime}"
-            @change="${this.handleEndChange}"
+            value="${this.state.end}"
+            @change="${(e) => this.handleChange("end", e)}"
             part="end"
             class="${this.styles.input}"
           ></ky-input>
