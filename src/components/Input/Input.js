@@ -20,7 +20,10 @@ export const Input = define("ky-input", { mapping, raw })(
       const type = this.getAttribute("type") || "text";
 
       return html`
-        <div class="${this.styles.kyinput}">
+        <div
+          class="${this.styles.kyinput}"
+          part="box"
+        >
           ${icon
             ? html`
                 <ky-icon

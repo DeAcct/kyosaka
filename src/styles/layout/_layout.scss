@@ -24,7 +24,7 @@
   padding: var(--header-height) 0 var(--inner-padding);
 }
 
-@mixin round-list($direction: "y") {
+@mixin round-list($direction: "y", $custom-radius: var(--card-radius-base)) {
   // 기본값은 'y' (세로)
   border-radius: 0.8rem;
   transition:
@@ -33,23 +33,23 @@
 
   &:first-of-type {
     @if $direction == "y" {
-      border-top-left-radius: var(--card-radius-base);
-      border-top-right-radius: var(--card-radius-base);
+      border-top-left-radius: $custom-radius;
+      border-top-right-radius: $custom-radius;
     } @else {
       // 'x' 방향 (왼쪽 모서리)
-      border-top-left-radius: var(--card-radius-base);
-      border-bottom-left-radius: var(--card-radius-base);
+      border-top-left-radius: $custom-radius;
+      border-bottom-left-radius: $custom-radius;
     }
   }
 
   &:last-of-type {
     @if $direction == "y" {
-      border-bottom-left-radius: var(--card-radius-base);
-      border-bottom-right-radius: var(--card-radius-base);
+      border-bottom-left-radius: $custom-radius;
+      border-bottom-right-radius: $custom-radius;
     } @else {
       // 'x' 방향 (오른쪽 모서리)
-      border-top-right-radius: var(--card-radius-base);
-      border-bottom-right-radius: var(--card-radius-base);
+      border-top-right-radius: $custom-radius;
+      border-bottom-right-radius: $custom-radius;
     }
   }
 

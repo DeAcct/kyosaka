@@ -11,8 +11,12 @@ import "@/components/Icon/Icon";
 import "@/components/Input/Input";
 import "@/components/TypeSelector/TypeSelector";
 import "@/components/TimeRange/TimeRange";
+import "@/components/EditPositionItem/EditPositionItem";
 import { generateScheduleFromPrompt } from "@/intelligence/api/schedule";
-import { checkPromptAPIAvailability, getUnsupportedReason } from "@/intelligence/supports";
+import {
+  checkPromptAPIAvailability,
+  getUnsupportedReason,
+} from "@/intelligence/supports";
 
 const SCHEDULE_TYPES = [
   { value: "transport", label: "이동", icon: "transport" },
@@ -52,6 +56,15 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
 
     parseScheduleToState(item) {
       const target = item || {};
+      const positions =
+        Array.isArray(target.position) && target.position.length > 0
+          ? target.position.map((p) => ({
+              name: p.name || "",
+              address: p.address || "",
+              map: p.map || "",
+            }))
+          : [{ name: "", address: "", map: "" }];
+
       return {
         name: target.name || "",
         type: target.type || "transport",
@@ -60,9 +73,7 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
         budget: target.budget || 0,
         routeFrom: target.route?.from || "",
         routeTo: target.route?.to || "",
-        posName: target.position?.[0]?.name || "",
-        posAddress: target.position?.[0]?.address || "",
-        posMap: target.position?.[0]?.map || "",
+        positions,
         descriptionText: Array.isArray(target.description)
           ? target.description.join("\n")
           : target.description || "",
@@ -78,9 +89,7 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
         budget,
         routeFrom,
         routeTo,
-        posName,
-        posAddress,
-        posMap,
+        positions,
         descriptionText,
       } = state;
 
@@ -101,21 +110,39 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
         };
         updatedItem.position = null;
       } else {
-        if (posName.trim() || posAddress.trim() || posMap.trim()) {
-          updatedItem.position = [
-            {
-              name: posName,
-              address: posAddress,
-              map: posMap,
-            },
-          ];
-        } else {
-          updatedItem.position = [];
-        }
+        const validPositions = (positions || []).filter(
+          (pos) => pos.name.trim() || pos.address.trim() || pos.map.trim(),
+        );
+        updatedItem.position = validPositions;
         updatedItem.route = null;
       }
 
       return updatedItem;
+    }
+
+    addPosition() {
+      const positions = [
+        ...this.state.positions,
+        { name: "", address: "", map: "" },
+      ];
+      this.setState("positions", positions);
+    }
+
+    removePosition(index) {
+      const positions = this.state.positions.filter((_, idx) => idx !== index);
+      const updatedPositions =
+        positions.length > 0 ? positions : [{ name: "", address: "", map: "" }];
+      this.setState("positions", updatedPositions);
+    }
+
+    updatePositionField(index, field, value) {
+      const positions = this.state.positions.map((pos, idx) => {
+        if (idx === index) {
+          return { ...pos, [field]: value };
+        }
+        return pos;
+      });
+      this.setState("positions", positions);
     }
 
     handleTypeChange(typeValue) {
@@ -226,6 +253,7 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
       }
 
       const updatedItem = this.parseStateToSchedule(this.state);
+      const isNew = this.isNew;
 
       scheduleStore.updateScheduleItem(
         scheduleStore.editingScheduleIndex,
@@ -234,7 +262,7 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
 
       scheduleStore.toggleEditSchedule(false);
       toastStore.add(
-        this.isNew ? "새 일정을 추가했어요!" : "일정을 수정했어요!",
+        isNew ? "새 일정을 추가했어요!" : "일정을 수정했어요!",
         "success",
         2000,
       );
@@ -282,33 +310,10 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
         budget,
         routeFrom,
         routeTo,
-        posName,
-        posAddress,
-        posMap,
+        positions,
         descriptionText,
         isAiLoading,
       } = this.state;
-
-      const fields = [
-        {
-          key: "posName",
-          icon: "locationPin",
-          placeholder: "예)도쿄 도청 전망대",
-          label: "장소명",
-        },
-        {
-          key: "posAddress",
-          icon: "map",
-          placeholder: "예) 일본 〒163-8001 Tokyo, Shinjuku City",
-          label: "주소",
-        },
-        {
-          key: "posMap",
-          icon: "info",
-          placeholder: "구글맵 공유 링크",
-          label: "링크",
-        },
-      ];
 
       const tooltips = [
         { icon: "paste", title: "일정 붙여넣기", onClick: this.handlePaste },
@@ -421,20 +426,38 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
                             </div>
                           </section>
                         `
-                      : fields.map(
-                          (f) => html`
-                            <section class="${this.styles.formRow}">
-                              <i class="${this.styles.label}">${f.label}</i>
-                              <ky-input
-                                icon="${f.icon}"
-                                placeholder="${f.placeholder}"
-                                value="${this.state[f.key]}"
-                                @change="${(e) =>
-                                  this.setState(f.key, e.detail.value)}"
-                              ></ky-input>
-                            </section>
-                          `,
-                        )}
+                      : html`
+                          <div class="${this.styles.positionList}">
+                            ${(positions || []).map(
+                              (pos, index) => html`
+                                <edit-position-item
+                                  index="${index}"
+                                  ?show-delete="${(positions || []).length > 1}"
+                                  :data="${pos}"
+                                  class="${this.styles.positionItem}"
+                                  @remove="${() => this.removePosition(index)}"
+                                  @change-field="${(e) =>
+                                    this.updatePositionField(
+                                      index,
+                                      e.detail.field,
+                                      e.detail.value,
+                                    )}"
+                                ></edit-position-item>
+                              `,
+                            )}
+                            <button
+                              type="button"
+                              class="${this.styles.addPositionBtn}"
+                              @click="${this.addPosition}"
+                            >
+                              <ky-icon
+                                name="add"
+                                class="${this.styles.addIcon}"
+                              ></ky-icon>
+                              장소 추가
+                            </button>
+                          </div>
+                        `}
 
                     <section class="${this.styles.formRow}">
                       <i class="${this.styles.label}">예산</i>

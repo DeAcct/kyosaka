@@ -21,7 +21,7 @@
 .toast {
   pointer-events: auto;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.8rem;
   padding: 0.8rem 1.6rem;
   min-height: calc(var(--card-radius-base) * 2);
