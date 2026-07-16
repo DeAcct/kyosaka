@@ -120,6 +120,7 @@ export class Router {
         detail: { path: window.location.pathname },
       }),
     );
+    router.notify();
     this.queueRender();
   }
 
@@ -170,6 +171,8 @@ export class Router {
   }
 }
 
+const subscribers = new Set();
+
 export const router = {
   get current() {
     return instance;
@@ -178,5 +181,25 @@ export const router = {
   get params() {
     return instance?.params || {};
   },
+  get path() {
+    const current = window.location.pathname.toLowerCase();
+    const rootPath = `/${Router.rootPath.toLowerCase()}`;
+    return current === rootPath || current === rootPath + "/" ? "/" : current;
+  },
+  isActive(target) {
+    if (!target) return false;
+    const currentPath = this.path;
+    const normalizedTarget = target.toLowerCase();
+    return normalizedTarget === "/"
+      ? currentPath === "/"
+      : currentPath.startsWith(normalizedTarget);
+  },
   navigate: (path, replace) => instance?.navigate(path, replace),
+  subscribe(callback) {
+    subscribers.add(callback);
+    return () => subscribers.delete(callback);
+  },
+  notify() {
+    subscribers.forEach((callback) => callback(this));
+  },
 };

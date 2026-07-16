@@ -5,28 +5,33 @@ import raw from "./typeSelector.module.scss?inline";
 
 import "@/components/Icon/Icon";
 
-export const TypeSelector = define("ky-type-selector", { mapping, raw })(
+export const TypeSelector = define("type-selector", { mapping, raw })(
   class extends Component {
-    handleSelect(value, e) {
+    handleSelect(value) {
       this.emit("change", { detail: { value } });
-      this.centerChip(e.currentTarget, true);
     }
 
-    centerChip(chipEl, smooth = true) {
-      if (!chipEl) return;
-
-      chipEl.scrollIntoView({
-        behavior: smooth ? "smooth" : "auto",
-        inline: "center",
-        block: "nearest",
-      });
+    centerActiveButton() {
+      console.log(this.$refs.button);
+      if (this.$refs.button) {
+        const buttons = Array.isArray(this.$refs.button)
+          ? this.$refs.button
+          : [this.$refs.button];
+        const activeBtn = buttons.find((btn) =>
+          btn.classList.contains(this.styles.active),
+        );
+        if (activeBtn) {
+          activeBtn.scrollIntoView({
+            behavior: "smooth",
+            inline: "center",
+            block: "nearest",
+          });
+        }
+      }
     }
 
     afterRender() {
-      const activeChip = this.querySelector(`.${this.styles.active}`);
-      if (activeChip) {
-        this.centerChip(activeChip);
-      }
+      this.centerActiveButton();
     }
 
     template() {
@@ -43,6 +48,7 @@ export const TypeSelector = define("ky-type-selector", { mapping, raw })(
                   ? this.styles.active
                   : ""}"
                 @click="${(e) => this.handleSelect(t.value, e)}"
+                $button
               >
                 <ky-icon
                   class="${this.styles.icon}"

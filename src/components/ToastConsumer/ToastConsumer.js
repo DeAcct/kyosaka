@@ -15,19 +15,22 @@ export const ToastConsumer = define("toast-consumer", { mapping, raw })(
       const { toasts } = toastStore.state;
 
       return html`
-        <div class="${this.styles.container}">
+        <ul class="${this.styles.container}">
           ${toasts.map(
             (toast) => html`
-              <div class="${this.styles.toast}" key="${toast.id}">
+              <li
+                class="${this.styles.toast}"
+                key="${toast.id}"
+              >
                 <ky-icon
                   name="${this.getIconName(toast.type)}"
                   class="${this.styles.icon} ${this.styles[toast.type]}"
                 ></ky-icon>
                 <span class="${this.styles.message}">${toast.message}</span>
-              </div>
+              </li>
             `,
           )}
-        </div>
+        </ul>
       `;
     }
 

@@ -28,41 +28,28 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
   class extends Component {
     setup() {
       this.subscribe(scheduleStore);
+      this.state = this.parseScheduleToState();
+    }
 
-      this.state = {
-        name: "",
-        type: "transport",
-        timeFrom: "09:00",
-        timeTo: "10:00",
-        budget: 0,
-        routeFrom: "",
-        routeTo: "",
-        posName: "",
-        posAddress: "",
-        posMap: "",
-        descriptionText: "",
+    parseScheduleToState(item = {}) {
+      return {
+        name: item.name || "",
+        type: item.type || "transport",
+        timeFrom: item.time?.from || "09:00",
+        timeTo: item.time?.to || "10:00",
+        budget: item.budget || 0,
+        routeFrom: item.route?.from || "",
+        routeTo: item.route?.to || "",
+        posName: item.position?.[0]?.name || "",
+        posAddress: item.position?.[0]?.address || "",
+        posMap: item.position?.[0]?.map || "",
+        descriptionText: Array.isArray(item.description)
+          ? item.description.join("\n")
+          : (item.description || ""),
       };
     }
 
-    handleTypeChange(typeValue) {
-      this.setState("type", typeValue);
-    }
-
-    handleTimeChange({ detail }) {
-      const { start, end } = detail;
-      this.setState("timeFrom", start);
-      this.setState("timeTo", end);
-    }
-
-    handleNameChange(e) {
-      this.setState("name", e.target.value);
-    }
-
-    handleCancel() {
-      scheduleStore.toggleEditSchedule(false);
-    }
-
-    handleSave() {
+    parseStateToSchedule(state) {
       const {
         name,
         type,
@@ -75,12 +62,7 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
         posAddress,
         posMap,
         descriptionText,
-      } = this.state;
-
-      if (!name.trim()) {
-        toastStore.add("일정 이름을 입력해 주세요.", "error", 2000);
-        return;
-      }
+      } = state;
 
       const updatedItem = {
         name,
@@ -113,6 +95,60 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
         updatedItem.route = null;
       }
 
+      return updatedItem;
+    }
+
+    handleTypeChange(typeValue) {
+      this.setState("type", typeValue);
+    }
+
+    handleTimeChange({ detail }) {
+      const { start, end } = detail;
+      this.setState("timeFrom", start);
+      this.setState("timeTo", end);
+    }
+
+    handleNameChange(e) {
+      this.setState("name", e.target.value);
+    }
+
+    handleCancel() {
+      scheduleStore.toggleEditSchedule(false);
+    }
+
+    async handlePaste() {
+      try {
+        const text = await navigator.clipboard.readText();
+        const item = JSON.parse(text);
+
+        if (!item || typeof item !== "object" || !item.name) {
+          toastStore.add("올바른 일정 복사 데이터가 아닙니다.", "error", 2000);
+          return;
+        }
+
+        this.state = this.parseScheduleToState(item);
+        this.queueRender();
+
+        toastStore.add("일정 정보를 붙여넣었어요!", "success", 2000);
+      } catch (err) {
+        toastStore.add(
+          "클립보드 읽기에 실패했거나 올바르지 않은 데이터입니다.",
+          "error",
+          2000,
+        );
+      }
+    }
+
+    handleSave() {
+      const { name } = this.state;
+
+      if (!name.trim()) {
+        toastStore.add("일정 이름을 입력해 주세요.", "error", 2000);
+        return;
+      }
+
+      const updatedItem = this.parseStateToSchedule(this.state);
+
       scheduleStore.updateScheduleItem(
         scheduleStore.editingScheduleIndex,
         updatedItem,
@@ -124,20 +160,7 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
 
     onPropsPatchComplete() {
       if (this.isConnected && this.scheduleData) {
-        const item = this.scheduleData;
-        this.state = {
-          name: item.name || "",
-          type: item.type || "transport",
-          timeFrom: item.time?.from || "09:00",
-          timeTo: item.time?.to || "10:00",
-          budget: item.budget || 0,
-          routeFrom: item.route?.from || "",
-          routeTo: item.route?.to || "",
-          posName: item.position?.[0]?.name || "",
-          posAddress: item.position?.[0]?.address || "",
-          posMap: item.position?.[0]?.map || "",
-          descriptionText: (item.description || []).join("\n"),
-        };
+        this.state = this.parseScheduleToState(this.scheduleData);
       }
     }
 
@@ -158,6 +181,11 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
     template() {
       const isOpen = scheduleStore.isOpenEditSchedule;
 
+      if (isOpen && !this._isOpen) {
+        this.state = this.parseScheduleToState(this.scheduleData || scheduleStore.editingScheduleItem);
+      }
+      this._isOpen = isOpen;
+
       const {
         name,
         type,
@@ -173,12 +201,23 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
       } = this.state;
 
       const fields = [
-        { key: "posName", icon: "locationPin", placeholder: "장소명" },
-        { key: "posAddress", icon: "map", placeholder: "주소 (선택)" },
+        {
+          key: "posName",
+          icon: "locationPin",
+          placeholder: "예)도쿄 도청 전망대",
+          label: "장소명",
+        },
+        {
+          key: "posAddress",
+          icon: "map",
+          placeholder: "예) 일본 〒163-8001 Tokyo, Shinjuku City",
+          label: "주소",
+        },
         {
           key: "posMap",
           icon: "info",
-          placeholder: "구글맵 공유 링크 (선택)",
+          placeholder: "구글맵 공유 링크",
+          label: "링크",
         },
       ];
 
@@ -191,7 +230,20 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
             ? html`
                 <div class="${this.styles.formContainer}">
                   <div class="${this.styles.scrollContent}">
-                    <h3 class="${this.styles.title}">일정 편집</h3>
+                    <div class="${this.styles.titleRow}">
+                      <h3 class="${this.styles.titleText}">일정 편집</h3>
+                      <button
+                        type="button"
+                        class="${this.styles.pasteButton}"
+                        @click="${this.handlePaste}"
+                        title="일정 붙여넣기"
+                      >
+                        <ky-icon
+                          name="paste"
+                          class="${this.styles.pasteIcon}"
+                        ></ky-icon>
+                      </button>
+                    </div>
 
                     <!-- 1. 일정 이름 & 타입 선택 -->
                     <section class="${this.styles.formRow}">
@@ -202,13 +254,13 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
                         placeholder="일정 이름을 입력해주세요"
                         @change="${this.handleNameChange}"
                       >
-                        <ky-type-selector
+                        <type-selector
                           :items="${SCHEDULE_TYPES}"
                           value="${type}"
                           @change="${(e) =>
                             this.handleTypeChange(e.detail.value)}"
                           class="${this.styles.typeSelector}"
-                        ></ky-type-selector>
+                        ></type-selector>
                       </ky-input>
                     </section>
 

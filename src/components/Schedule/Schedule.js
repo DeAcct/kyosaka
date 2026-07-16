@@ -71,7 +71,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
       }
     }
 
-    handleContextMenu(e, item, index) {
+    handleContextMenu(item, index) {
       if (navigator.vibrate) navigator.vibrate(50);
       this.triggerLongPress(item, index);
     }
@@ -86,26 +86,26 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
         title: item.name,
         options: [
           {
-            text: "일정 수정",
+            text: "수정",
             icon: "edit",
             action: () => {
               scheduleStore.toggleEditSchedule(true, index);
             },
           },
           {
-            text: "일정 이름 복사",
+            text: "복사",
             icon: "copy",
             action: async () => {
               try {
-                await navigator.clipboard.writeText(item.name);
-                toastStore.add("일정 이름을 복사했어요!", "info", 2000);
+                await navigator.clipboard.writeText(JSON.stringify(item));
+                toastStore.add("일정을 복사했어요!", "info", 2000);
               } catch (err) {
-                console.error("복사 실패:", err);
+                toastStore.add("일정 복사에 실패했어요", "error", 2000);
               }
             },
           },
           {
-            text: "일정 삭제",
+            text: "삭제",
             icon: "delete",
             danger: true,
             action: () => {
@@ -150,8 +150,8 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
                   class="${this.styles.shrink}"
                   @pointerdown="${(e) =>
                     this.handlePointerDown(e, item, index)}"
-                  @contextmenu.prevent="${(e) =>
-                    this.handleContextMenu(e, item, index)}"
+                  @contextmenu.prevent="${() =>
+                    this.handleContextMenu(item, index)}"
                   style="user-select: none; -webkit-user-select: none;"
                 >
                   <schedule-icon

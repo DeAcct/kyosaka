@@ -49,19 +49,17 @@ bottom-sheet::part(content) {
     color: var(--text-500);
   }
 
-  .title {
+  .titleRow {
     position: sticky;
     z-index: 3;
     top: 0;
     background-color: var(--bg-100);
     flex-shrink: 0;
     height: 4.8rem;
-    align-content: center;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: -1rem;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--text-900);
     width: 100%;
     @include layout.concave-edge(
       top,
@@ -70,6 +68,34 @@ bottom-sheet::part(content) {
       var(--sheet-content-radius),
       var(--bg-100)
     );
+
+    .titleText {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-900);
+    }
+
+    .pasteButton {
+      position: absolute;
+      right: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      padding: 0.6rem;
+      cursor: pointer;
+      color: var(--text-600);
+      border-radius: 50%;
+      transition:
+        background-color 0.2s,
+        color 0.2s;
+      font-size: 1.6rem;
+      &:hover {
+        background-color: var(--bg-200);
+        color: var(--brand-500);
+      }
+    }
   }
 
   .nameInput {

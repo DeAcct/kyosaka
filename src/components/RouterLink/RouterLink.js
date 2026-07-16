@@ -1,5 +1,5 @@
 import { Component, define, html } from "@/lib/core";
-import { Router, router } from "@/lib/router"; // router 인스턴스 추가 임포트
+import { router } from "@/lib/router"; // router 인스턴스 추가 임포트
 
 export const RouterLink = define("router-link")(
   class extends Component {
@@ -46,19 +46,10 @@ export const RouterLink = define("router-link")(
     }
 
     updateState() {
-      const current = location.pathname.toLowerCase();
       const target = this.purePath;
       if (!target) return;
 
-      const rootPath = `/${Router.rootPath.toLowerCase()}`;
-      const normalizedCurrent =
-        current === rootPath || current === rootPath + "/" ? "/" : current;
-
-      // 3. 정규화된 경로와 비교
-      const isActive =
-        target === "/"
-          ? normalizedCurrent === "/"
-          : normalizedCurrent.startsWith(target);
+      const isActive = router.isActive(target);
 
       this.setAttribute("aria-selected", isActive ? "true" : "false");
     }

@@ -1,5 +1,7 @@
 import { Component, define, html } from "@/lib/core";
 
+import { router } from "@/lib/router";
+
 import mapping from "./navigationBar.module.scss";
 import raw from "./navigationBar.module.scss?inline";
 
@@ -13,6 +15,7 @@ export const NavigationBar = define("navigation-bar", { mapping, raw })(
       this.state = {
         isHidden: window.scrollY > 0,
       };
+      this.subscribe(router);
     }
 
     get menu() {
@@ -59,11 +62,14 @@ export const NavigationBar = define("navigation-bar", { mapping, raw })(
         <nav class="${navbarClass}">
           ${this.menu.map(
             ({ to, icon, text }) => html`
-              <router-link to="${to}" class="${this.styles.link}">
+              <router-link
+                to="${to}"
+                class="${this.styles.link}"
+              >
                 <div class="${this.styles.item}">
                   <ky-icon
                     class="${this.styles.icon}"
-                    :name="${icon}"
+                    name="${icon}${router.isActive(to) ? "-filled" : ""}"
                   ></ky-icon>
                   <span class="${this.styles.text}">${text}</span>
                 </div>

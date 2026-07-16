@@ -43,17 +43,18 @@
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 1.2rem max(var(--inner-padding), ((100dvw - 108rem) / 2))
+  padding: 1.2rem max(var(--inner-padding), calc((100dvw - 108rem) / 2))
     calc(env(safe-area-inset-bottom) + 2.4rem);
   background-color: var(--bg-300);
   height: var(--navigation-height);
 }
 .link {
   flex: 1 0 0;
+  --icon-color: var(--text-300);
+  --text-color: var(--text-300);
   &[aria-selected="true"] {
-    --icon-color: var(--brand-400);
-    --icon-bg-color: var(--brand-800);
-    --text-color: var(--brand-400);
+    --icon-color: var(--blue-000);
+    --icon-bg-color: var(--blue-tint);
     --icon-scale: 1;
   }
 }
