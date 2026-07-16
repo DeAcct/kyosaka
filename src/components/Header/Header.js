@@ -8,6 +8,7 @@ import raw from "./header.module.scss?inline";
 import { useJSONUpload } from "@/hooks/file";
 import { scheduleStore } from "@/store/scheduleStore";
 import { navStore } from "@/store/navStore";
+import { toastStore } from "@/store/toastStore";
 
 export const Header = define("ky-header", { mapping, raw })(
   class extends Component {
@@ -20,12 +21,33 @@ export const Header = define("ky-header", { mapping, raw })(
 
       return [
         // 🔥 플랜이 정말 존재할 때만 수정 버튼 액션을 배열에 추가합니다.
-        ...(hasPlan ? [{ icon: "edit", action: this.editTrip }] : []),
-        { icon: "export", action: this.exportJSON },
+        ...(hasPlan ? [{ icon: "edit", action: () => this.editTrip() }] : []),
+        { icon: "export", action: () => this.exportJSON() },
       ];
     }
 
-    exportJSON() {}
+    exportJSON() {
+      const plan = scheduleStore.selectedPlan;
+      if (!plan || !plan.id) {
+        toastStore.add("내보낼 계획표가 없습니다.", "error", 2000);
+        return;
+      }
+
+      const filename = `${plan.title || "trip"}.json`;
+      const blob = new Blob([JSON.stringify(plan, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toastStore.add("계획표를 다운로드했어요!", "success", 2000);
+    }
     editTrip() {
       scheduleStore.toggleEditTrip(true);
       console.log(scheduleStore.isOpenEditTrip);

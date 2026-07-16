@@ -54,7 +54,8 @@ json 기반 여행 계획표 앱
 - [x] 삭제
   - [x] 플랜 자체를 삭제
   - [x] 일정 개별 삭제 (\*연결)
-- [ ] SUPER YOLO mode: ai한테 하루를 짜달라 하기
+- [x] SUPER YOLO mode: ai한테 하루를 짜달라 하기
+- [x] 계획표 export
 
 ```
 // 시간표 json 명세
