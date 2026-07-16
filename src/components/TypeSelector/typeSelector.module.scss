@@ -11,6 +11,12 @@
   &::-webkit-scrollbar {
     display: none;
   }
+
+  @media screen and (pointer: fine) {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+  }
 }
 
 .typeChip {
@@ -20,28 +26,34 @@
   gap: 0.6rem;
   height: 3.6rem;
   padding: 0.8rem 1.2rem;
-  background-color: var(--bg-200);
+  background-color: var(--bg-300);
   border: 1px solid transparent;
   border-radius: 2rem;
   font-size: 1.6rem;
   font-weight: 500;
-  color: var(--text-600);
-  cursor: pointer;
+  color: var(--text-500);
   white-space: nowrap;
   transition:
     background-color 150ms ease-out,
     border-color 150ms ease-out,
     color 150ms ease-out;
 
-  &:hover {
-    background-color: var(--bg-300);
-  }
-
+  &:hover,
   &.active {
-    background-color: var(--bg-300);
+    background-color: var(--bg-500);
+    color: var(--bg-100);
   }
 
   .icon {
     font-size: 2rem;
+  }
+
+  @media screen and (pointer: fine) {
+    flex-direction: column;
+    justify-content: center;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: 1.2rem;
+    white-space: normal;
   }
 }

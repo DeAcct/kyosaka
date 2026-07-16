@@ -5,8 +5,12 @@
   overflow: hidden;
 }
 input,
-textarea {
+textarea,
+button {
   font-family: inherit;
+  border: none;
+  outline: none;
+  background: transparent;
 }
 
 *,

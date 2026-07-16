@@ -45,7 +45,7 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
         posMap: item.position?.[0]?.map || "",
         descriptionText: Array.isArray(item.description)
           ? item.description.join("\n")
-          : (item.description || ""),
+          : item.description || "",
       };
     }
 
@@ -182,7 +182,9 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
       const isOpen = scheduleStore.isOpenEditSchedule;
 
       if (isOpen && !this._isOpen) {
-        this.state = this.parseScheduleToState(this.scheduleData || scheduleStore.editingScheduleItem);
+        this.state = this.parseScheduleToState(
+          this.scheduleData || scheduleStore.editingScheduleItem,
+        );
       }
       this._isOpen = isOpen;
 
@@ -230,7 +232,7 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
             ? html`
                 <div class="${this.styles.formContainer}">
                   <div class="${this.styles.scrollContent}">
-                    <div class="${this.styles.titleRow}">
+                    <header class="${this.styles.titleRow}">
                       <h3 class="${this.styles.titleText}">일정 편집</h3>
                       <button
                         type="button"
@@ -243,7 +245,7 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
                           class="${this.styles.pasteIcon}"
                         ></ky-icon>
                       </button>
-                    </div>
+                    </header>
 
                     <!-- 1. 일정 이름 & 타입 선택 -->
                     <section class="${this.styles.formRow}">
