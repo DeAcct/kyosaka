@@ -1,6 +1,5 @@
-import { checkPromptAPIAvailability } from "./supports";
+import { checkPromptAPIAvailability, getUnsupportedReason } from "./supports";
 
-// 1. 단일 일정을 위한 JSON Schema 정의
 export const SCHEDULE_SCHEMA = {
   type: "object",
   properties: {
@@ -50,7 +49,6 @@ export const SCHEDULE_SCHEMA = {
   additionalProperties: false,
 };
 
-// 2. 하루 전체 일정을 위한 JSON Schema 정의 (SCHEDULE_SCHEMA 재사용)
 export const DAY_SCHEDULE_SCHEMA = {
   type: "object",
   properties: {
@@ -65,7 +63,6 @@ export const DAY_SCHEDULE_SCHEMA = {
   additionalProperties: false,
 };
 
-// 3. 방어적 파싱을 위한 헬퍼 함수
 export function safeJsonParse(text) {
   try {
     return JSON.parse(text);
@@ -78,7 +75,6 @@ export function safeJsonParse(text) {
   }
 }
 
-// 4. AI 모델 아웃풋 형식을 프론트엔드/데이터베이스 일정 아이템 형식으로 변환
 export function transformModelToScheduleItem(item, fallbackName = "일정") {
   const scheduleItem = {
     name: item.name || fallbackName,
@@ -113,11 +109,17 @@ export function transformModelToScheduleItem(item, fallbackName = "일정") {
   return scheduleItem;
 }
 
-// 5. 공통 Session 생성 준비 및 가용성 체크 헬퍼
 export async function getLanguageModelSession(systemPrompt) {
   const availability = await checkPromptAPIAvailability();
+
   if (availability === "no") {
-    throw new Error("Prompt API가 지원되지 않는 환경입니다.");
+    throw new Error(getUnsupportedReason());
+  }
+
+  if (availability === "after-download") {
+    throw new Error(
+      "AI 모델을 다운로드하는 중입니다. 다운로드가 완료될 때까지 잠시 후 다시 시도해 주세요.",
+    );
   }
 
   const api = window.LanguageModel || window.ai.languageModel;
