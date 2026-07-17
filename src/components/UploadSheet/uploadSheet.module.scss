@@ -1,6 +1,18 @@
 @use "@/styles/layout/button" as button;
 @use "@/styles/layout/bottom-sheet" as sheet;
 
+bottom-sheet::part(content) {
+  bottom: 0;
+  --radius: calc(var(--card-radius-base) * 1.5);
+  border-radius: var(--radius) var(--radius) 0 0;
+
+  @media screen and (min-width: 1024px) {
+    bottom: 50%;
+    border-radius: var(--radius);
+    transform: translateY(50%);
+  }
+}
+
 .uploadSheet {
   @include sheet.bottom-sheet;
 }

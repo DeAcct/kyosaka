@@ -14,14 +14,16 @@ export const BottomSheet = define("bottom-sheet", { mapping, raw })(
 
     open() {
       this.$refs.dialog.showModal();
-      this.$refs.content.style.translate = `-50% 0`;
+      // this.$refs.content.style.translate = `-50% 0`;
+      this.$refs.content.style.setProperty("--translate-y", "0px");
       this.$refs.content.style.opacity = 1;
       document.documentElement.classList.toggle("is-locked");
     }
 
     close() {
-      this.$refs.content.style.translate = `-50% 100%`;
+      // this.$refs.content.style.translate = `-50% 100%`;
       this.$refs.content.style.opacity = 0;
+      this.$refs.content.style.setProperty("--translate-y", "100%");
       this.emit("close");
       this.$refs.dialog.close();
       document.documentElement.classList.toggle("is-locked");
@@ -85,7 +87,8 @@ export const BottomSheet = define("bottom-sheet", { mapping, raw })(
         // 3. 실제 시트가 하단으로 끌려가며 닫히는 순간에만 모바일 브라우저 특유의 바운스 및 기본 스크롤 동작을 차단합니다.
         if (e.cancelable) e.preventDefault();
         this.currentY = delta;
-        this.$refs.content.style.translate = `-50% ${delta}px`;
+        // this.$refs.content.style.translate = `-50% ${delta}px`;
+        this.$refs.content.style.setProperty("--translate-y", `${delta}px`);
       }
     }
 
@@ -98,7 +101,8 @@ export const BottomSheet = define("bottom-sheet", { mapping, raw })(
         // 150px 이상 내려가면 닫기
         this.close();
       } else {
-        this.$refs.content.style.translate = `-50% 0`;
+        // this.$refs.content.style.translate = `-50% 0`;
+        this.$refs.content.style.setProperty("--translate-y", `0px`);
         this.$refs.content.style.opacity = 1;
       }
       this.currentY = 0;

@@ -37,6 +37,8 @@
   }
 
   .content {
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     position: absolute;
     bottom: calc(var(--inner-padding) + env(safe-area-inset-bottom));
@@ -45,10 +47,22 @@
     background: var(--bg-100);
     border-radius: calc(var(--card-radius-base) * 1.5);
     padding: 1.2rem 0 0;
-    // transform: translateY(100%);
-    translate: -50% 100%;
+    translate: -50% var(--translate-y, 100%);
     transition: all 300ms var(--ease-out-expo);
     will-change: transform; // 🔍 성능 최적화
+
+    @media screen and (min-width: 690px) {
+      width: calc(50dvw - 3rem);
+      translate: 0 var(--translate-y, 100%);
+      left: 2rem;
+    }
+
+    @media screen and (min-width: 1024px) {
+      width: min(47.5rem, calc(100% - calc(var(--inner-padding) * 2)));
+      translate: -50% var(--translate-y, 100%);
+      left: 50%;
+      padding-top: calc(var(--card-radius-base) * 1.5);
+    }
   }
 
   .handleBar {
@@ -58,5 +72,9 @@
     border-radius: 2px;
     margin: 0 auto 20px;
     flex-shrink: 0;
+
+    @media screen and (pointer: fine) {
+      display: none;
+    }
   }
 }

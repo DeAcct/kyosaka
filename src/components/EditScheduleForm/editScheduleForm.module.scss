@@ -4,21 +4,20 @@
 @use "@/styles/layout/layout" as layout;
 
 bottom-sheet::part(content) {
-  display: flex;
-  flex-direction: column;
-  width: min(47.5rem, 100%);
-  max-width: 100%; /* 화면 밖으로 빠져나가는 것 방지 */
   bottom: 0;
   --radius: calc(var(--card-radius-base) * 1.5);
   border-radius: var(--radius) var(--radius) 0 0;
   height: calc(100dvh - var(--header-height));
 
   @media screen and (min-width: 690px) {
-    min-height: 65dvh;
+    height: calc(100dvh - var(--header-height));
+  }
+
+  @media screen and (min-width: 1024px) {
     height: auto;
     aspect-ratio: 3 / 4;
-    border-radius: var(--radius);
     bottom: 50%;
+    border-radius: var(--radius);
     transform: translateY(50%);
   }
 }
