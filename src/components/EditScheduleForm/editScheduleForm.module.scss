@@ -14,7 +14,9 @@ bottom-sheet::part(content) {
   height: calc(100dvh - var(--header-height));
 
   @media screen and (min-width: 690px) {
-    height: 65dvh;
+    min-height: 65dvh;
+    height: auto;
+    aspect-ratio: 3 / 4;
     border-radius: var(--radius);
     bottom: 50%;
     transform: translateY(50%);
