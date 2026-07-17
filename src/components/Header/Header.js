@@ -5,7 +5,6 @@ import "@/components/Icon/Icon";
 import mapping from "./header.module.scss";
 import raw from "./header.module.scss?inline";
 
-import { useJSONUpload } from "@/hooks/file";
 import { scheduleStore } from "@/store/scheduleStore";
 import { navStore } from "@/store/navStore";
 import { toastStore } from "@/store/toastStore";
@@ -71,7 +70,10 @@ export const Header = define("ky-header", { mapping, raw })(
                 class="${this.styles.button}"
                 @click="${action}"
               >
-                <ky-icon name="${icon}" class="${this.styles.icon}"></ky-icon>
+                <ky-icon
+                  name="${icon}"
+                  class="${this.styles.icon}"
+                ></ky-icon>
               </button>
             `,
           )}

@@ -3,7 +3,10 @@ import { switcher } from "@/lib/switcher";
 import { scheduleStore } from "@/store/scheduleStore";
 import { toastStore } from "@/store/toastStore";
 import { generateDayScheduleFromPrompt } from "@/intelligence/api/yolo";
-import { checkPromptAPIAvailability, getUnsupportedReason } from "@/intelligence/supports";
+import {
+  checkPromptAPIAvailability,
+  getUnsupportedReason,
+} from "@/intelligence/supports";
 
 import mapping from "./schedule.module.scss";
 import raw from "./schedule.module.scss?inline";
@@ -163,7 +166,9 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
       toastStore.add("AI가 하루 일정을 설계하고 있어요...", "info", 3000);
 
       try {
-        const plan = scheduleStore.plans.find((p) => p.id === scheduleStore.state.selected);
+        const plan = scheduleStore.plans.find(
+          (p) => p.id === scheduleStore.state.selected,
+        );
         const dayIndex = plan ? plan.selected : -1;
         const totalDays = plan ? plan.data.length : 0;
 
@@ -175,7 +180,11 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
           isLastDay,
         });
 
-        scheduleStore.setDaySchedule(result.schedules, result.dayName, result.dayDescription);
+        scheduleStore.setDaySchedule(
+          result.schedules,
+          result.dayName,
+          result.dayDescription,
+        );
         if (this.$refs.yoloBox) {
           this.$refs.yoloBox.clear();
         }
@@ -215,6 +224,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
             $yolo-box
             loading="${this.state.isYoloLoading}"
             @yolo="${(e) => this.handleYolo(e)}"
+            class="${this.state.yoloFeature}"
           ></yolo-box>
           ${list.schedule.map(
             (item, index) => html`

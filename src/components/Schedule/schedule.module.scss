@@ -21,6 +21,10 @@ swipe-wrap {
     grid-template-columns: calc(50% + 1rem) calc(50% - 1rem);
     grid-auto-rows: min-content;
     height: 100%;
+
+    .yoloFeature {
+      grid-column: 1;
+    }
   }
 
   .colBG {
@@ -81,6 +85,7 @@ swipe-wrap {
       background-color 150ms var(--ease-out-expo);
 
     @media screen and (min-width: 690px) {
+      grid-column: 1;
       border-radius: 0.8rem;
       align-self: start;
       @starting-style {
@@ -249,4 +254,3 @@ yolo-box[loading="true"] ~ button.schedule {
     transform: scale(0.97);
   }
 }
-
