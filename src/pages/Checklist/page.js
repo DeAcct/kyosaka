@@ -10,6 +10,7 @@ import { Schedule } from "@/components/Schedule/Schedule";
 import { Progress } from "@/components/Progress/Progress";
 import { ChecklistItem } from "@/components/ChecklistItem/ChecklistItem";
 import { ControlBar } from "@/components/ControlBar/ControlBar";
+import "@/components/Input/Input";
 
 export const ChecklistPage = define("page-checklist", { mapping, raw })(
   class extends Component {
@@ -27,19 +28,20 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
       checklistStore.toggleItem(detail.id);
     }
 
-    handleNew() {
+    handleNew(e) {
       if (this.state.mode === "edit") {
         // x를 눌러 선택취소한 경우
         this.editor.exitEdit();
         return;
       }
-      const $input = this.$refs.input;
-      const text = $input.value.trim();
+      const text = e.detail?.value?.trim();
 
       if (text) {
         checklistStore.addItem(text);
-        $input.value = "";
-        $input.focus();
+        if (this.$refs.controlBar) {
+          this.$refs.controlBar.clear();
+          this.$refs.controlBar.focus();
+        }
       }
     }
 
@@ -89,36 +91,22 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
           </section>
         </div>
         <control-bar
+          $controlBar
           class="${this.styles.control}"
           @delete=${() => {
             checklistStore.removeList(this.state.deleteSelected);
             this.setState("mode", "view");
           }}
+          @submit="${(e) => {
+            this.handleNew(e);
+          }}"
           :mode="${this.state.mode}"
+          placeholder="체크리스트 추가"
+          primary-icon="add"
         >
           <span slot="counter"
             >${this.state.deleteSelected.length}개 선택됨</span
           >
-          <input
-            name="newItem"
-            type="text"
-            $input
-            placeholder="체크리스트 추가"
-            class="${this.styles.input} ${this.state.mode === "view"
-              ? this.styles.show
-              : ""}"
-          />
-          <button
-            type="button"
-            class="${this.styles.button} ${this.state.mode === "edit"
-              ? this.styles.cancel
-              : ""}"
-            @click="${(e) => {
-              this.handleNew(e);
-            }}"
-          >
-            <ky-icon class="${this.styles.icon}" name="add"></ky-icon>
-          </button>
         </control-bar>
       `;
     }

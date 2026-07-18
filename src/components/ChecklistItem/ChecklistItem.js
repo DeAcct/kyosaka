@@ -40,6 +40,7 @@ export const ChecklistItem = define("checklist-item", { mapping, raw })(
               this.emit("toggle", { detail: { id } });
             }}"
             ?disabled="${this.selectmode}"
+            class="${this.styles.checkbox}"
           ></ky-checkbox>
           <span>${text}</span>
         </label>

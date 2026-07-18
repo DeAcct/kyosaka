@@ -6,6 +6,7 @@ import "@/components/NavigationBar/NavigationBar";
 import "@/components/NavRail/NavRail";
 import "@/components/PWASheet/PWASheet";
 import "@/components/ToastConsumer/ToastConsumer";
+import "@/components/EditTripForm/EditTripForm";
 
 export const App = define("ky-app")(
   class extends Component {
@@ -27,6 +28,7 @@ export const App = define("ky-app")(
         <main data-router-view></main>
         <toast-consumer></toast-consumer>
         <navigation-bar class="${this.styles.navigationBar}"></navigation-bar>
+        <edit-trip-form></edit-trip-form>
       `;
     }
   },

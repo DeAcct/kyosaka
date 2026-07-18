@@ -266,8 +266,20 @@ button.schedule {
   }
 }
 
-yolo-box[loading="true"] ~ .schedule,
-yolo-box[loading="true"] ~ button.schedule {
+.yoloBar {
+  display: block;
+  width: calc(100% - 3.2rem);
+  margin: 0 auto 1.6rem;
+
+  @media screen and (min-width: 690px) {
+    grid-column: 1;
+    width: 100%;
+    margin: 0;
+  }
+}
+
+control-bar[loading="true"] ~ .schedule,
+control-bar[loading="true"] ~ button.schedule {
   animation: yolo-generating-pulse 1.5s ease-in-out infinite alternate;
   pointer-events: none;
 }

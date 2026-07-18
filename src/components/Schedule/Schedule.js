@@ -13,11 +13,10 @@ import raw from "./schedule.module.scss?inline";
 
 import "@/components/Fallback/Fallback";
 import "@/components/SwipeWrap/SwipeWrap";
-import "@/components/EditTripForm/EditTripForm";
 import "@/components/EditScheduleForm/EditScheduleForm";
 import "@/components/ContextMenu/ContextMenu";
 import "@/components/YoloConfirmSheet/YoloConfirmSheet";
-import "@/components/YoloBox/YoloBox";
+import "@/components/ControlBar/ControlBar";
 
 import "@/components/ScheduleIcon/ScheduleIcon";
 import "@/components/RouteCard/RouteCard";
@@ -129,7 +128,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
     }
 
     handleYolo(e) {
-      const promptText = e.detail.prompt.trim();
+      const promptText = (e.detail.value || "").trim();
       if (!promptText) {
         toastStore.add(
           "AI에게 부탁할 하루 일정을 입력해 주세요.",
@@ -185,8 +184,8 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
           result.dayName,
           result.dayDescription,
         );
-        if (this.$refs.yoloBox) {
-          this.$refs.yoloBox.clear();
+        if (this.$refs.controlBar) {
+          this.$refs.controlBar.clear();
         }
         toastStore.add("하루 일정을 성공적으로 채워넣었어요!", "success", 2000);
       } catch (err) {
@@ -220,12 +219,14 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
           @pointerup="${this.cancelLongPress}"
           @pointerleave="${this.cancelLongPress}"
         >
-          <yolo-box
-            $yolo-box
+          <control-bar
+            $controlBar
+            class="${this.styles.yoloBar} ${this.state.yoloFeature}"
             loading="${this.state.isYoloLoading}"
-            @yolo="${(e) => this.handleYolo(e)}"
-            class="${this.state.yoloFeature}"
-          ></yolo-box>
+            @submit="${(e) => this.handleYolo(e)}"
+            placeholder="AI에게 부탁할 하루 일정 입력..."
+            primary-icon="dice"
+          ></control-bar>
           ${list.schedule.map(
             (item, index) => html`
               <details
@@ -300,7 +301,6 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
             일정 추가
           </button>
         </swipe-wrap>
-        <edit-trip-form></edit-trip-form>
         <edit-schedule-form
           :schedule-data="${scheduleStore.editingScheduleItem}"
         ></edit-schedule-form>
