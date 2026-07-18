@@ -1,10 +1,10 @@
-import { Component, define, html } from "@/lib/core";
+import { Stateless, define, html } from "@/lib/core";
 
 import mapping from "./progress.module.scss";
 import raw from "./progress.module.scss?inline";
 
 export const Progress = define("ky-progress", { mapping, raw })(
-  class extends Component {
+  class extends Stateless {
     template() {
       return html`
         <div class="${this.styles.back}">

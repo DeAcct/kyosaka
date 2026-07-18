@@ -1,4 +1,4 @@
-import { Component, define, html } from "@/lib/core";
+import { Stateless, define, html } from "@/lib/core";
 import { toastStore } from "@/store/toastStore";
 
 import mapping from "./positionBox.module.scss";
@@ -7,7 +7,7 @@ import raw from "./positionBox.module.scss?inline";
 import "@/components/Icon/Icon";
 
 export const PositionBox = define("position-box", { mapping, raw })(
-  class extends Component {
+  class extends Stateless {
     get mapUrl() {
       if (
         this.data.map &&

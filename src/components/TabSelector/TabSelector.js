@@ -1,10 +1,10 @@
-import { Component, define, html } from "@/lib/core";
+import { Stateless, define, html } from "@/lib/core";
 
 import mapping from "./tabSelector.module.scss";
 import raw from "./tabSelector.module.scss?inline";
 
 export const TabSelector = define("tab-selector", { mapping, raw })(
-  class extends Component {
+  class extends Stateless {
     template() {
       return html`
         <div class="${this.styles.tabs}">

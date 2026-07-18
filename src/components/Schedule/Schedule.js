@@ -283,6 +283,8 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
                     :list="${item.description || []}"
                   ></ky-description>
                 </div>
+
+                <div class="${this.styles.mask}"></div>
               </details>
             `,
           )}

@@ -8,12 +8,15 @@ bottom-sheet::part(content) {
   --radius: calc(var(--card-radius-base) * 1.5);
   border-radius: var(--radius) var(--radius) 0 0;
   height: calc(100dvh - var(--header-height));
+  width: 100%;
 
   @media screen and (min-width: 690px) {
+    width: calc(50dvw - 3rem);
     height: calc(100dvh - var(--header-height));
   }
 
   @media screen and (min-width: 1024px) {
+    width: min(47.5rem, calc(100% - calc(var(--inner-padding) * 2)));
     height: auto;
     aspect-ratio: 3 / 4;
     bottom: 50%;

@@ -1,4 +1,4 @@
-import { Component, define, html } from "@/lib/core";
+import { Stateless, define, html } from "@/lib/core";
 import { scheduleStore } from "@/store/scheduleStore";
 import { useJSONUpload } from "@/hooks/file";
 
@@ -6,7 +6,7 @@ import mapping from "./fallback.module.scss";
 import raw from "./fallback.module.scss?inline";
 
 export const Fallback = define("ky-fallback", { mapping, raw })(
-  class extends Component {
+  class extends Stateless {
     async onJSONButtonClick() {
       await useJSONUpload((data) => {
         scheduleStore.importPlan(data);

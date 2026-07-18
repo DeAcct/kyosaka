@@ -9,9 +9,16 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/addon-interactions": "^8.6.14",
+    "@storybook/addon-links": "^10.5.2",
+    "@storybook/blocks": "^8.6.14",
+    "@storybook/html": "^10.5.2",
+    "@storybook/html-vite": "^10.5.2",
     "@yarnpkg/fslib": "^3.1.5",
     "@yarnpkg/pnp": "^4.1.7",
     "cjs-module-lexer": "^2.2.0",
+    "storybook": "^10.5.2",
     "vite": "^8.1.4",
     "vite-plugin-pwa": "^1.3.0"
   },

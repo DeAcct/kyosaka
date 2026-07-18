@@ -5,23 +5,18 @@
 }
 
 .icon {
+  display: flex;
   justify-content: center;
   align-items: center;
-  transition:
-    opacity 300ms var(--ease-in-out-back),
-    scale 300ms var(--ease-in-out-back);
   font-weight: inherit;
-  opacity: 0;
   overflow: hidden;
   white-space: nowrap;
-  scale: 0;
   fill: currentColor;
   width: 1em;
   height: 1em;
 
-  &.loaded {
-    display: block;
-    opacity: 1;
-    scale: 1;
-  }
+  // NavigationBar의 활성화(pill) 배경이 호스트의 ::before로 깔릴 때
+  // SVG가 그 위로 정상적으로 렌더링되도록 Stacking Context를 부여합니다.
+  position: relative;
+  z-index: 1;
 }

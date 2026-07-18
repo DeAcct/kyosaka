@@ -1,10 +1,10 @@
-import { Component, define, html } from "@/lib/core";
+import { Stateless, define, html } from "@/lib/core";
 
 import mapping from "./routeCard.module.scss";
 import raw from "./routeCard.module.scss?inline";
 
 export const RouteCard = define("route-card", { mapping, raw })(
-  class extends Component {
+  class extends Stateless {
     template() {
       // const from = this.getAttribute("from");
       // const to = this.getAttribute("to");
