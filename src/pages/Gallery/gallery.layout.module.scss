@@ -36,7 +36,7 @@
   position: fixed;
   position-anchor: --gallery-grid;
   width: min(calc(100% - calc(var(--inner-padding) * 2)), 47.5rem);
-  z-index: 110;
+  z-index: 121;
   bottom: calc(var(--navigation-height) + var(--inner-padding));
   left: 50%;
   translate: -50% 0;
