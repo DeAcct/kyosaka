@@ -3,6 +3,7 @@
 import resetStyle from "@/styles/base/_reset.scss?inline";
 import { patch, updateAttrs, updateProps } from "./diff";
 import { createScheduler } from "./schedule";
+export { block } from "./block";
 
 const sharedResetSheet = new CSSStyleSheet();
 sharedResetSheet.replaceSync(resetStyle);

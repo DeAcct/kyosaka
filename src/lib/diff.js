@@ -1,4 +1,5 @@
 //lib/diff.js
+import { BlockInstance } from './block';
 
 /**
  * 🔥 배열 렌더링 추적 시스템
@@ -98,6 +99,57 @@ function resolveMarkers(node, values, component) {
  */
 function patchArrayContent(parent, anchorNode, arrayData, values, component) {
   const markerId = anchorNode._arrayMarker;
+
+  // --- 🎯 Block Virtual DOM 초고속 업데이트 경로 ---
+  const isBlockArray = arrayData.length > 0 && arrayData.every(item => item && item._isBlockData);
+  const wasBlockArray = !!anchorNode._blockInstances;
+
+  if (isBlockArray || wasBlockArray) {
+    const instances = anchorNode._blockInstances || [];
+    const newInstances = [];
+    let isCurrentlyBlockArray = isBlockArray;
+    
+    // 만약 현재 빈 배열이거나 일반 배열로 전환되었다면 blockInstances를 비워야 함
+    if (!isBlockArray && arrayData.length > 0) {
+       // 블록 배열에서 일반 배열로 전환된 특이 케이스 -> 인스턴스 전부 제거 후 일반 로직으로 폴백
+       instances.forEach(inst => inst.remove());
+       anchorNode._blockInstances = null;
+    } else {
+       const maxLength = Math.max(instances.length, arrayData.length);
+       let currentDOMAnchor = anchorNode.nextSibling;
+       
+       for (let i = 0; i < maxLength; i++) {
+          const oldInst = instances[i];
+          const newBlockData = arrayData[i];
+          
+          if (oldInst && newBlockData) {
+             if (oldInst.def === newBlockData.def) {
+                // 구조가 같다면 diff 생략하고 O(1) 값만 교체
+                oldInst.patch(newBlockData.values);
+                newInstances.push(oldInst);
+                currentDOMAnchor = oldInst.rootNodes[oldInst.rootNodes.length - 1].nextSibling;
+             } else {
+                // 다른 형태의 블록일 경우 교체
+                const newInst = new BlockInstance(newBlockData.def, newBlockData.values, component);
+                oldInst.remove();
+                newInst.insertBefore(parent, currentDOMAnchor);
+                newInstances.push(newInst);
+             }
+          } else if (!oldInst && newBlockData) {
+             const newInst = new BlockInstance(newBlockData.def, newBlockData.values, component);
+             newInst.insertBefore(parent, currentDOMAnchor);
+             newInstances.push(newInst);
+          } else if (oldInst && !newBlockData) {
+             oldInst.remove();
+          }
+       }
+       
+       anchorNode._blockInstances = newInstances;
+       if (isBlockArray || arrayData.length === 0) return; // 성공적으로 블록 처리 완료
+    }
+  }
+
+  // --- 기존 범용 DOM Diffing 경로 ---
 
   const oldNodes = [];
   let current = anchorNode.nextSibling;

@@ -1,4 +1,4 @@
-import { Component, define, html, flushSync } from "@/lib/core";
+import { Component, define, html, flushSync, block } from "@/lib/core";
 import { useGalleryData } from "@/hooks/gallery";
 import { useOverlayTransition, stackIn } from "@/hooks/overlayMotion";
 
@@ -9,6 +9,22 @@ import raw from "./memory.page.module.scss?inline";
 
 import { GalleryItem } from "@/components/GalleryItem/GalleryItem";
 import { Icon } from "@/components/Icon/Icon";
+
+const memoryItemBlock = block((props) => html`
+  <gallery-item
+    data-key="item-${props.item.id}"
+    class="${props.itemClass} ${props.isSelected ? props.selectedClass : ""}"
+    :item="${props.item}"
+    @longpress="${props.onLongPress}"
+    @click="${props.onClick}"
+    style="--i:${props.index}"
+  >
+    <ky-icon
+      name="checked"
+      class="${props.checkedClass} ${props.isSelected ? props.showClass : ""}"
+    ></ky-icon>
+  </gallery-item>
+`);
 
 export const MemoryPage = define("page-memory", { mapping, raw })(
   class extends Component {
@@ -33,43 +49,35 @@ export const MemoryPage = define("page-memory", { mapping, raw })(
         <section class="${this.styles.grid}">
           ${items.map((item, index) => {
             const isSelected = mode === "edit" && selected.includes(item.id);
-            return html`
-              <gallery-item
-                data-key="item-${item.id}"
-                class="${this.styles.item} ${isSelected
-                  ? this.styles.selected
-                  : ""}"
-                :item="${item}"
-                @longpress="${(e) => {
-                  console.log("longpress", mode);
-                  if (mode === "edit") {
-                    return;
-                  }
-                  galleryStore.toggleEditMode();
+            return memoryItemBlock({
+              item,
+              index,
+              isSelected,
+              itemClass: this.styles.item,
+              selectedClass: this.styles.selected,
+              checkedClass: this.styles.checked,
+              showClass: this.styles.show,
+              onLongPress: (e) => {
+                console.log("longpress", mode);
+                if (mode === "edit") {
+                  return;
+                }
+                galleryStore.toggleEditMode();
+                galleryStore.toggleItemSelection(item.id);
+              },
+              onClick: () => {
+                console.log("click", mode);
+                if (mode === "edit") {
                   galleryStore.toggleItemSelection(item.id);
-                }}"
-                @click="${() => {
-                  console.log("click", mode);
-                  if (mode === "edit") {
-                    galleryStore.toggleItemSelection(item.id);
-                  } else {
-                    useOverlayTransition(stackIn, () => {
-                      flushSync(() => {
-                        galleryStore.openOverlay(item.id);
-                      });
+                } else {
+                  useOverlayTransition(stackIn, () => {
+                    flushSync(() => {
+                      galleryStore.openOverlay(item.id);
                     });
-                  }
-                }}"
-                style="--i:${index}"
-              >
-                <ky-icon
-                  name="checked"
-                  class="${this.styles.checked} ${isSelected
-                    ? this.styles.show
-                    : ""}"
-                ></ky-icon>
-              </gallery-item>
-            `;
+                  });
+                }
+              }
+            });
           })}
         </section>
       `;

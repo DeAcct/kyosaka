@@ -1,4 +1,4 @@
-import { Component, define, html } from "@/lib/core";
+import { Component, define, html, block } from "@/lib/core";
 
 import mapping from "./navRail.module.scss";
 import raw from "./navRail.module.scss?inline";
@@ -14,6 +14,18 @@ import "@/components/PlanItem/PlanItem";
 import "@/components/ModalSheet/ModalSheet";
 import "@/components/PlanEditbar/PlanEditbar";
 import "@/components/ImportOverwriteSheet/ImportOverwriteSheet";
+
+const planItemBlock = block((props) => html`
+  <plan-item
+    :id="${props.id}"
+    :edited="${props.edited}"
+    :title="${props.title}"
+    @longpress="${props.onLongPress}"
+    @click="${props.onClick}"
+    class="${props.itemClass} ${props.isSelected ? props.selectedClass : ""}"
+    :editmode="${props.editMode}"
+  ></plan-item>
+`);
 
 export const NavRail = define("nav-rail", { mapping, raw })(
   class extends Component {
@@ -119,25 +131,18 @@ export const NavRail = define("nav-rail", { mapping, raw })(
             )}
           </div>
           <ul class="${this.styles.plans}">
-            ${this.plans.map(
-              ({ id, edited, title }) => html`
-                <plan-item
-                  :id="${id}"
-                  :edited="${edited}"
-                  :title="${title}"
-                  @longpress="${(e) => {
-                    this.editor.onLongpressItem({ detail: { id } });
-                  }}"
-                  @click="${() => {
-                    this.editor.onClickItem(id);
-                  }}"
-                  class="${this.styles
-                    .item} ${this.state.deleteSelected.includes(id)
-                    ? this.styles.selected
-                    : ""}"
-                  :editmode="${this.state.mode === "edit"}"
-                ></plan-item>
-              `,
+            ${this.plans.map(({ id, edited, title }) =>
+              planItemBlock({
+                id,
+                edited,
+                title,
+                itemClass: this.styles.item,
+                isSelected: this.state.deleteSelected.includes(id),
+                selectedClass: this.styles.selected,
+                editMode: this.state.mode === "edit",
+                onLongPress: (e) => this.editor.onLongpressItem({ detail: { id } }),
+                onClick: () => this.editor.onClickItem(id),
+              })
             )}
           </ul>
         </nav>

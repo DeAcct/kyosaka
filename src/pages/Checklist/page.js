@@ -1,4 +1,4 @@
-import { Component, define, html } from "@/lib/core";
+import { Component, define, html, block } from "@/lib/core";
 import { checklistStore } from "@/store/checklistStore";
 import { useEdit } from "@/hooks/edit";
 import { useScroll } from "@/hooks/scroll";
@@ -6,12 +6,24 @@ import { useScroll } from "@/hooks/scroll";
 import mapping from "./checklist.page.module.scss";
 import raw from "./checklist.page.module.scss?inline";
 
-import { DaySelector } from "@/components/DaySelector/DaySelector";
-import { Schedule } from "@/components/Schedule/Schedule";
-import { Progress } from "@/components/Progress/Progress";
-import { ChecklistItem } from "@/components/ChecklistItem/ChecklistItem";
-import { ControlBar } from "@/components/ControlBar/ControlBar";
 import "@/components/Input/Input";
+import "@/components/ControlBar/ControlBar";
+import "@/components/ChecklistItem/ChecklistItem";
+
+const checklistItemBlock = block(
+  (props) => html`
+    <checklist-item
+      data-key="item-${props.item.id}"
+      class="${props.itemClass} ${props.isSelected ? props.selectedClass : ""}"
+      style="--i:${props.index}"
+      :item="${props.item}"
+      @toggle="${props.onToggle}"
+      @longpress="${props.onLongPress}"
+      @click="${props.onClick}"
+      :selectmode="${props.selectMode}"
+    ></checklist-item>
+  `,
+);
 
 export const ChecklistPage = define("page-checklist", { mapping, raw })(
   class extends Component {
@@ -48,54 +60,31 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
     }
 
     template() {
-      const {
-        percentage: percent,
-        progress,
-        items,
-        allChecked,
-      } = checklistStore;
+      const { items } = checklistStore;
       return html`
         <global @scroll="${this.handleScroll}"></global>
         <div class="${this.styles.doubleCol}">
-          <ky-progress
-            :progress="${progress}"
-            class="${this.styles.sticky}"
-            style="--list-length: ${items.length + 2}"
-          >
-            <span class="${this.styles.title}">체크리스트 완료 현황</span>
-            <strong class="${this.styles.progress}">
-              ${allChecked.length} / ${items.length}
-            </strong>
-          </ky-progress>
           <section class="${this.styles.list}">
-            ${items.map(
-              (item, index) => html`
-                <checklist-item
-                  data-key="item-${item.id}"
-                  class="${this.styles
-                    .item} ${this.state.deleteSelected.includes(item.id)
-                    ? this.styles.selected
-                    : ""}"
-                  style="--i:${index}"
-                  :item="${item}"
-                  @toggle="${(e) => {
-                    this.onToggleItem(e);
-                  }}"
-                  @longpress="${(e) => {
-                    this.editor.onLongpressItem(e);
-                  }}"
-                  @click="${() => {
-                    this.editor.onClickItem(item.id);
-                  }}"
-                  :selectmode="${this.state.mode === "edit"}"
-                ></checklist-item>
-              `,
+            ${items.map((item, index) =>
+              checklistItemBlock({
+                item,
+                index,
+                itemClass: this.styles.item,
+                isSelected: this.state.deleteSelected.includes(item.id),
+                selectedClass: this.styles.selected,
+                onToggle: (e) => this.onToggleItem(e),
+                onLongPress: (e) => this.editor.onLongpressItem(e),
+                onClick: () => this.editor.onClickItem(item.id),
+                selectMode: this.state.mode === "edit",
+              }),
             )}
           </section>
         </div>
         <control-bar
           $controlBar
-          class="${this.styles.control} ${this.state.isScrolled ? this.styles.scrolled : ""}"
+          class="${this.styles.control} ${this.state.isScrolled
+            ? this.styles.scrolled
+            : ""}"
           @delete=${() => {
             checklistStore.removeList(this.state.deleteSelected);
             this.setState("mode", "view");
