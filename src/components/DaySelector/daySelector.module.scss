@@ -21,9 +21,9 @@
   &[open] {
     .description {
       display: block;
-      white-space: normal; // 줄바꿈 제한을 풀어서 풀내용이 노출되도록 합니다.
-      word-break: keep-all; // 한글 단어 단위로 예쁘게 떨어지도록 조절
-      word-wrap: break-word; // 긴 영문/숫자 방어선
+      white-space: normal;
+      word-break: keep-all;
+      word-wrap: break-word;
       overflow: visible;
     }
   }

@@ -74,6 +74,23 @@ export const ControlBar = define("control-bar", { mapping, raw })(
               </button>`
             : ""}
 
+          ${this.getAttribute("show-move") === "true"
+            ? html`<button
+                type="button"
+                class="${this.styles.button} ${this.styles.move} ${this.mode !== "edit"
+                  ? this.styles.hide
+                  : ""}"
+                @click="${(e) => {
+                  this.emit("move");
+                }}"
+              >
+                <ky-icon
+                  class="${this.styles.icon}"
+                  name="editDays"
+                ></ky-icon>
+              </button>`
+            : ""}
+
           <button
             type="button"
             class="${this.styles.button} ${this.styles.delete} ${this.mode !== "edit"

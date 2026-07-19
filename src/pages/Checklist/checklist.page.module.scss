@@ -1,36 +1,91 @@
 @use "@/styles/layout/layout" as layout;
 @use "@/styles/layout/button" as button;
 
-.doubleCol {
-  margin: 0 auto;
+.tabBar {
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: var(--header-height);
+  z-index: 101;
+  background-color: var(--bg-100);
+  @include layout.concave-edge(
+    top,
+    calc(var(--card-radius-base) * 2),
+    var(--card-radius-base),
+    var(--card-radius-base),
+    transparent
+  );
+}
+
+.container {
+  margin: 0 auto 0;
   @include layout.safe-area;
-  @include layout.double-col-layout;
-  min-height: 100dvh;
-  row-gap: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--header-height);
   align-content: start;
   anchor-name: --center-position;
+  padding: var(--header-height) 0 calc(var(--navigation-height) + 2rem);
+}
+
+.sidebar {
+  display: block;
+  width: 100%;
+
+  position: sticky;
+  top: calc(var(--header-height) + 4.8rem);
+  z-index: 110;
+  min-width: 0;
+
+  @include layout.concave-edge(
+    top,
+    100%,
+    var(--card-radius-base),
+    var(--card-radius-base),
+    var(--bg-100)
+  );
 
   @media screen and (min-width: 690px) {
-    column-gap: 2rem;
-    row-gap: 0.8rem;
+    flex: 1;
+    &::before,
+    &::after {
+      content: none;
+    }
   }
+}
+
+.content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+
+  @media screen and (min-width: 690px) {
+    flex-direction: row;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+}
+
+.hide {
+  display: none !important;
 }
 
 .list {
-  display: contents;
-}
-.item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
   @include layout.round-list("y");
-  background-color: var(--bg-200);
-  border: 1px solid transparent;
+  overflow: hidden;
 
   @media screen and (min-width: 690px) {
-    &,
-    &:first-of-type,
-    &:last-of-type {
-      border-radius: var(--card-radius-base);
-    }
+    flex: 1;
+    min-width: 0;
   }
+}
+.item {
+  background-color: var(--bg-200);
+  border: 1px solid transparent;
+  border-radius: 0.8rem;
 
   &.selected {
     border-color: var(--brand-500);
@@ -126,5 +181,128 @@
     @starting-style {
       opacity: 0;
     }
+  }
+}
+
+.sheetContent {
+  padding: 2.4rem var(--inner-padding);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 2.4rem);
+}
+
+.sheetTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: var(--text-100);
+}
+
+.dayList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.dayListItem {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  padding: 1.6rem;
+  background-color: var(--bg-200);
+  border-radius: 1.2rem;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: var(--bg-300);
+  }
+}
+
+.dayListIcon {
+  font-size: 2.4rem;
+  color: var(--brand-500);
+}
+
+.dayListText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--text-100);
+}
+
+.dayListDay {
+  font-size: 1.6rem;
+}
+
+.dayListDate {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--text-400);
+}
+
+.deleteActions {
+  display: flex;
+  gap: 1.2rem;
+  margin-top: 2rem;
+}
+
+.cancelBtn {
+  @include button.ky-button;
+  flex: 1;
+  padding: 1.4rem;
+  background-color: var(--bg-200);
+  color: var(--text-200);
+  font-size: 1.6rem;
+  font-weight: 600;
+  border-radius: 1.2rem;
+  border: none;
+  cursor: pointer;
+}
+
+.deleteBtn {
+  @include button.ky-button;
+  flex: 1;
+  padding: 1.4rem;
+  background-color: var(--brand-danger);
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 600;
+  border-radius: 1.2rem;
+  border: none;
+  cursor: pointer;
+}
+
+.moveSelect {
+  width: 100%;
+  padding: 1.2rem 1.4rem;
+  margin-top: 1.2rem;
+  font-size: 1.6rem;
+  color: var(--text-100);
+  background-color: var(--bg-200);
+  border: 0.1rem solid var(--border-200);
+  border-radius: 1.2rem;
+  appearance: none;
+  cursor: pointer;
+}
+
+.confirmBtn {
+  @include button.ky-button;
+  width: 100%;
+  margin-top: 1.2rem;
+  padding: 1.4rem;
+  background-color: var(--brand-500);
+  color: var(--bg-100);
+  font-size: 1.6rem;
+  font-weight: 600;
+  border-radius: 1.2rem;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--brand-600);
   }
 }

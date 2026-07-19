@@ -42,6 +42,7 @@
   display: none;
   transition: all 150ms var(--ease-in-out-quad);
   transition-behavior: allow-discrete;
+  height: 4.8rem;
 
   &.show {
     display: flex;
@@ -99,6 +100,14 @@
 
     &:hover:not(:disabled) {
       background-color: var(--red-600);
+    }
+  }
+
+  &.move {
+    background-color: var(--blue-500);
+
+    &:hover:not(:disabled) {
+      background-color: var(--blue-600);
     }
   }
 

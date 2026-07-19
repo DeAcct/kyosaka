@@ -143,12 +143,9 @@ dialog {
   border: none;
 }
 
-// #Overay {
-//   position: fixed;
-//   bottom: 0;
-//   left: 0;
-//   z-index: 1000;
-// }
+::picker-icon {
+  display: none;
+}
 
 a,
 button:not(:disabled),

@@ -1,0 +1,15 @@
+@use "@/styles/layout/modal-sheet" as sheet;
+
+.content {
+  @include sheet.modal-sheet;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-100);
+  margin-bottom: 1.6rem;
+}
+.select {
+  margin-bottom: 2rem;
+}

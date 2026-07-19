@@ -2,7 +2,10 @@ import Store from "@/lib/store";
 class ChecklistStore extends Store {
   get items() {
     const { items } = this.state;
-    return items;
+    return items.map(item => ({
+      ...item,
+      day: item.day !== undefined ? item.day : null
+    }));
   }
   get progress() {
     const { items } = this.state;
@@ -33,13 +36,14 @@ class ChecklistStore extends Store {
     this.commit("items", newItems);
   }
 
-  addItem(text) {
+  addItem(text, day = null) {
     if (!text.trim()) return;
 
     const newItem = {
       id: crypto.randomUUID(),
       text,
       checked: false,
+      day,
     };
 
     const newItems = [...this.state.items, newItem];
@@ -58,6 +62,13 @@ class ChecklistStore extends Store {
 
   removeList(idList) {
     const newItems = this.items.filter(({ id }) => !idList.includes(id));
+    this.commit("items", newItems);
+  }
+
+  moveItemsToDay(idList, targetDay) {
+    const newItems = this.items.map((item) =>
+      idList.includes(item.id) ? { ...item, day: targetDay } : item
+    );
     this.commit("items", newItems);
   }
 }

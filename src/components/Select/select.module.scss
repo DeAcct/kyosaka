@@ -1,0 +1,115 @@
+.kyselect {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background-color: var(--bg-200);
+  border: 1px solid transparent;
+  border-radius: var(--sheet-content-radius, 1.2rem);
+  transition:
+    border-color 150ms ease-out,
+    background-color 150ms ease-out;
+  position: relative;
+  &:focus-within {
+    border-color: var(--brand-500);
+  }
+
+  .icon {
+    position: absolute;
+    left: 1.6rem;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+    color: var(--text-500);
+    margin-right: 1.2rem;
+  }
+}
+
+.trigger {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 4.8rem;
+  padding: 0;
+  padding-left: 4.8rem;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--text-100);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  min-width: 0;
+
+  /* 💡 1. 이 버튼을 팝오버가 추적할 기준점(Anchor)으로 등록 */
+  anchor-name: --ky-select-anchor;
+}
+
+.label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  font-size: 1.8rem;
+  color: var(--text-500);
+  flex-shrink: 0;
+  margin-left: 0.8rem;
+}
+
+.popover {
+  position: fixed;
+  inset: unset;
+  margin: 0;
+  padding: 0.6rem;
+  background-color: var(--bg-100);
+  border: 0.1rem solid var(--border-200);
+  border-radius: 1.2rem;
+  box-shadow:
+    0 0.8rem 2.4rem rgba(0, 0, 0, 0.12),
+    0 0.2rem 0.6rem rgba(0, 0, 0, 0.08);
+
+  position-anchor: --ky-select-anchor;
+  top: calc(anchor(bottom) + 0.8rem);
+  left: anchor(left);
+  min-width: anchor-size(width);
+  position-try-fallbacks: flip-block;
+
+  &:popover-open {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 4.8rem;
+  padding: 0 1.6rem;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--text-100);
+  background: transparent;
+  border: none;
+  border-radius: 0.8rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 100ms ease;
+
+  &:hover {
+    background-color: var(--bg-200);
+  }
+}
+
+.optionSelected {
+  background-color: color-mix(in srgb, var(--brand-500) 10%, transparent);
+  color: var(--brand-500);
+  font-weight: 600;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--brand-500) 15%, transparent);
+  }
+}
