@@ -1,6 +1,7 @@
 import { Component, define, html } from "@/lib/core";
 import { checklistStore } from "@/store/checklistStore";
 import { useEdit } from "@/hooks/edit";
+import { useScroll } from "@/hooks/scroll";
 
 import mapping from "./checklist.page.module.scss";
 import raw from "./checklist.page.module.scss?inline";
@@ -21,6 +22,7 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
       };
 
       this.subscribe(checklistStore);
+      this.handleScroll = useScroll(this, "isScrolled");
     }
 
     onToggleItem({ detail }) {
@@ -53,6 +55,7 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
         allChecked,
       } = checklistStore;
       return html`
+        <global @scroll="${this.handleScroll}"></global>
         <div class="${this.styles.doubleCol}">
           <ky-progress
             :progress="${progress}"
@@ -92,7 +95,7 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
         </div>
         <control-bar
           $controlBar
-          class="${this.styles.control}"
+          class="${this.styles.control} ${this.state.isScrolled ? this.styles.scrolled : ""}"
           @delete=${() => {
             checklistStore.removeList(this.state.deleteSelected);
             this.setState("mode", "view");

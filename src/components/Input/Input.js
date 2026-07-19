@@ -54,6 +54,14 @@ ${value}</textarea
                     value="${value}"
                     placeholder="${placeholder}"
                     @change="${this.handleChange}"
+                    @keydown="${(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        this.emit("enter", {
+                          detail: { value: e.target.value },
+                        });
+                      }
+                    }}"
                     part="input"
                   />
                 `}

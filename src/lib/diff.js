@@ -99,7 +99,7 @@ function resolveMarkers(node, values, component) {
 function patchArrayContent(parent, anchorNode, arrayData, values, component) {
   const markerId = anchorNode._arrayMarker;
 
-  const nodesToRemove = [];
+  const oldNodes = [];
   let current = anchorNode.nextSibling;
 
   // 🎯 자신의 고유 end 앵커를 만날 때까지만 수집 (다른 형제 노드 침범 방지)
@@ -111,22 +111,41 @@ function patchArrayContent(parent, anchorNode, arrayData, values, component) {
     ) {
       break;
     }
-    nodesToRemove.push(current);
+    oldNodes.push(current);
     current = current.nextSibling;
   }
 
-  nodesToRemove.forEach((node) => {
-    cleanupEventListeners(node);
-    node.remove();
-  });
+  const endAnchor = current;
 
-  // 이제 current는 안전하게 end 앵커를 가리키고 있음
-  const refNode = current;
-
+  // 새로운 노드들을 메모리 상에 렌더링
+  const newNodes = [];
   arrayData.forEach((item) => {
     const rendered = renderValue(item, component);
-    parent.insertBefore(rendered, refNode);
+    if (rendered.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+      newNodes.push(...Array.from(rendered.childNodes));
+    } else {
+      newNodes.push(rendered);
+    }
   });
+
+  const maxLength = Math.max(oldNodes.length, newNodes.length);
+
+  for (let i = 0; i < maxLength; i++) {
+    const oldChild = oldNodes[i];
+    const newChild = newNodes[i];
+
+    if (!oldChild && newChild) {
+      // 새로운 노드 추가
+      parent.insertBefore(newChild, endAnchor);
+    } else if (oldChild && !newChild) {
+      // 남는 예전 노드 삭제
+      cleanupEventListeners(oldChild);
+      oldChild.remove();
+    } else if (oldChild && newChild) {
+      // 기존 노드 업데이트 (DOM 재사용)
+      patch(parent, newChild, oldChild, i, values, component);
+    }
+  }
 }
 
 // lib/diff.js
@@ -390,6 +409,35 @@ export function updateProps(blueprint, target, values, component) {
         }
 
         const eventHandler = (e) => {
+          if (e instanceof KeyboardEvent) {
+            const keyMap = {
+              enter: "Enter",
+              escape: "Escape",
+              space: [" ", "Spacebar"],
+              up: "ArrowUp",
+              down: "ArrowDown",
+              left: "ArrowLeft",
+              right: "ArrowRight",
+            };
+            
+            // 키(key) 관련 수식어가 포함되어 있는지 확인
+            const activeKeyModifiers = modifiers.filter(m => keyMap[m] !== undefined);
+            if (activeKeyModifiers.length > 0) {
+              const isMatch = activeKeyModifiers.some(m => {
+                const targetKey = keyMap[m];
+                if (Array.isArray(targetKey)) return targetKey.includes(e.key);
+                return e.key === targetKey;
+              });
+              if (!isMatch) return; // 누른 키가 수식어에 명시된 키와 다르면 실행 취소
+            }
+
+            // 시스템 키(ctrl, shift, alt, meta) 수식어 확인
+            if (modifiers.includes("ctrl") && !e.ctrlKey) return;
+            if (modifiers.includes("shift") && !e.shiftKey) return;
+            if (modifiers.includes("alt") && !e.altKey) return;
+            if (modifiers.includes("meta") && !e.metaKey) return;
+          }
+
           if (modifiers.includes("prevent")) e.preventDefault();
           if (modifiers.includes("stop")) e.stopPropagation();
           if (modifiers.includes("self") && e.target !== e.currentTarget)

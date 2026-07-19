@@ -60,6 +60,11 @@
   width: min(calc(100% - var(--inner-padding) * 2), 1080px);
   z-index: 121;
   bottom: calc(var(--navigation-height) + var(--inner-padding));
+  transition: bottom 150ms ease-out;
+
+  &.scrolled {
+    bottom: 2rem;
+  }
   left: 50%;
   translate: -50% 0;
   position-anchor: --center-position;

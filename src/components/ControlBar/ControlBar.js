@@ -49,6 +49,9 @@ export const ControlBar = define("control-bar", { mapping, raw })(
                   ? this.styles.show
                   : ""}"
                 placeholder="${placeholder}"
+                @keydown.enter="${() => {
+                  this.handleSubmit();
+                }}"
               ></ky-input>`
             : ""}
 

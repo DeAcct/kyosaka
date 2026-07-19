@@ -4,7 +4,7 @@ import { router } from "@/lib/router"; // router 인스턴스 추가 임포트
 export const RouterLink = define("router-link")(
   class extends Component {
     setup() {
-      this.updateState();
+      this.subscribe(router);
     }
 
     get resolvedPath() {
@@ -45,18 +45,8 @@ export const RouterLink = define("router-link")(
       return this.resolvedPath.split("?")[0];
     }
 
-    updateState() {
-      const target = this.purePath;
-      if (!target) return;
-
-      const isActive = router.isActive(target);
-
-      this.setAttribute("aria-selected", isActive ? "true" : "false");
-    }
-
     // 변경점: data-link 전역 위임 대신 자체적으로 클릭 이벤트 처리
-    handleClick(e) {
-      e.preventDefault();
+    handleClick() {
       const path = this.resolvedPath;
 
       // transition 속성이 존재하면 View Transition 적용
@@ -73,12 +63,12 @@ export const RouterLink = define("router-link")(
     }
 
     template() {
+      const target = this.purePath;
+      const isActive = target ? router.isActive(target) : false;
+
       return html`
-        <global
-          @popstate="${() => this.updateState()}"
-          @locationchange="${() => this.updateState()}"
-        ></global>
-        <a href="${this.resolvedPath}" @click="${(e) => this.handleClick(e)}">
+        <host aria-selected="${isActive ? "true" : "false"}"></host>
+        <a href="${this.resolvedPath}" @click.prevent="${this.handleClick}">
           <slot></slot>
         </a>
       `;
