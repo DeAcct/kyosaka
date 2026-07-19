@@ -6,7 +6,7 @@ import mapping from "./editTripForm.module.scss";
 import raw from "./editTripForm.module.scss?inline";
 
 import "@/components/DatePicker/DatePicker";
-import "@/components/BottomSheet/BottomSheet";
+import "@/components/ModalSheet/ModalSheet";
 
 export const EditTripForm = define("edit-trip-form", { mapping, raw })(
   class extends Component {
@@ -145,7 +145,7 @@ export const EditTripForm = define("edit-trip-form", { mapping, raw })(
       const dates = this.calculatedDateList;
 
       return html`
-        <bottom-sheet
+        <modal-sheet
           $sheet
           @close="${() => scheduleStore.toggleEditTrip(false)}"
         >
@@ -245,7 +245,7 @@ export const EditTripForm = define("edit-trip-form", { mapping, raw })(
                 </div>
               `
             : html``}
-        </bottom-sheet>
+        </modal-sheet>
       `;
     }
   },

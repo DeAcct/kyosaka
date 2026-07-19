@@ -2,7 +2,7 @@ import { Component, define, html } from "@/lib/core";
 import mapping from "./yoloConfirmSheet.module.scss";
 import raw from "./yoloConfirmSheet.module.scss?inline";
 
-import "@/components/BottomSheet/BottomSheet";
+import "@/components/ModalSheet/ModalSheet";
 
 export const YoloConfirmSheet = define("yolo-confirm-sheet", { mapping, raw })(
   class extends Component {
@@ -36,7 +36,7 @@ export const YoloConfirmSheet = define("yolo-confirm-sheet", { mapping, raw })(
 
     template() {
       return html`
-        <bottom-sheet
+        <modal-sheet
           $sheet
           @close="${() => this.handleCancel()}"
         >
@@ -63,7 +63,7 @@ export const YoloConfirmSheet = define("yolo-confirm-sheet", { mapping, raw })(
               </button>
             </div>
           </div>
-        </bottom-sheet>
+        </modal-sheet>
       `;
     }
   },

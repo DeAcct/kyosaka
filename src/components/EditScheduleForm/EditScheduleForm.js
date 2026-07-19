@@ -6,7 +6,7 @@ import { toastStore } from "@/store/toastStore";
 import mapping from "./editScheduleForm.module.scss";
 import raw from "./editScheduleForm.module.scss?inline";
 
-import "@/components/BottomSheet/BottomSheet";
+import "@/components/ModalSheet/ModalSheet";
 import "@/components/Icon/Icon";
 import "@/components/Input/Input";
 import "@/components/TypeSelector/TypeSelector";
@@ -329,7 +329,7 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
       ];
 
       return html`
-        <bottom-sheet
+        <modal-sheet
           $sheet
           @close="${() => scheduleStore.toggleEditSchedule(false)}"
         >
@@ -506,7 +506,7 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
                 </div>
               `
             : html``}
-        </bottom-sheet>
+        </modal-sheet>
       `;
     }
   },

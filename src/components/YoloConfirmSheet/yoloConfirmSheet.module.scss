@@ -1,8 +1,8 @@
 @use "@/styles/layout/button" as button;
-@use "@/styles/layout/bottom-sheet" as sheet;
+@use "@/styles/layout/modal-sheet" as sheet;
 
 .container {
-  @include sheet.bottom-sheet;
+  @include sheet.modal-sheet;
 
   .title {
     font-size: 2rem;

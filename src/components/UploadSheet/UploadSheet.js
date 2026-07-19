@@ -4,7 +4,7 @@ import { galleryStore } from "@/store/galleryStore";
 import mapping from "./uploadSheet.module.scss";
 import raw from "./uploadSheet.module.scss?inline";
 
-import "@/components/BottomSheet/BottomSheet";
+import "@/components/ModalSheet/ModalSheet";
 import "@/components/RadioGroup/RadioGroup";
 
 export const UploadSheet = define("upload-sheet", { mapping, raw })(
@@ -79,7 +79,7 @@ export const UploadSheet = define("upload-sheet", { mapping, raw })(
         ? `background-image: linear-gradient(rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.3)), url(${previewUrl}); color: white;`
         : "";
       return html`
-        <bottom-sheet $sheet @close="${this.reset}">
+        <modal-sheet $sheet @close="${this.reset}">
           <div class="${this.styles.uploadSheet}">
             <h3 class="${this.styles.title}">새 사진 추가</h3>
 
@@ -143,7 +143,7 @@ export const UploadSheet = define("upload-sheet", { mapping, raw })(
               </button>
             </div>
           </div>
-        </bottom-sheet>
+        </modal-sheet>
       `;
     }
   },

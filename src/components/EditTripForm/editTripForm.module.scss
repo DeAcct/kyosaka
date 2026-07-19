@@ -1,10 +1,10 @@
 /* components/EditTripForm/editTripForm.module.scss */
 
 // 🎯 공용 바텀시트 믹스인 및 레이아웃 파일 수혈
-@use "@/styles/layout/bottom-sheet" as bs;
+@use "@/styles/layout/modal-sheet" as bs;
 @use "@/styles/layout/layout" as layout;
 
-bottom-sheet::part(content) {
+modal-sheet::part(content) {
   bottom: 0;
   --radius: calc(var(--card-radius-base) * 1.5);
   border-radius: var(--radius) var(--radius) 0 0;
@@ -27,7 +27,7 @@ bottom-sheet::part(content) {
 }
 
 .formContainer {
-  @include bs.bottom-sheet;
+  @include bs.modal-sheet;
   flex-grow: 1;
   min-height: 0;
   width: 100%;

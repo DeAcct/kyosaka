@@ -1,9 +1,9 @@
-// components/BottomSheet/BottomSheet.js
+// components/ModalSheet/ModalSheet.js
 import { Component, define, html } from "@/lib/core";
-import mapping from "./bottomSheet.module.scss";
-import raw from "./bottomSheet.module.scss?inline";
+import mapping from "./modalSheet.module.scss";
+import raw from "./modalSheet.module.scss?inline";
 
-export const BottomSheet = define("bottom-sheet", { mapping, raw })(
+export const ModalSheet = define("modal-sheet", { mapping, raw })(
   class extends Component {
     setup() {
       this.startY = 0;
@@ -14,14 +14,12 @@ export const BottomSheet = define("bottom-sheet", { mapping, raw })(
 
     open() {
       this.$refs.dialog.showModal();
-      // this.$refs.content.style.translate = `-50% 0`;
       this.$refs.content.style.setProperty("--translate-y", "0px");
       this.$refs.content.style.opacity = 1;
       document.documentElement.classList.toggle("is-locked");
     }
 
     close() {
-      // this.$refs.content.style.translate = `-50% 100%`;
       this.$refs.content.style.opacity = 0;
       this.$refs.content.style.setProperty("--translate-y", "100%");
       this.emit("close");
@@ -36,10 +34,10 @@ export const BottomSheet = define("bottom-sheet", { mapping, raw })(
 
     // 🔍 스와이프 로직
     handleTouchStart(e) {
-      this.startY = e.touches[0].clientY; //
+      this.startY = e.touches[0].clientY;
       this.currentY = 0;
-      this.isDragging = true; //
-      this.$refs.content.style.transition = "none"; //
+      this.isDragging = true;
+      this.$refs.content.style.transition = "none";
 
       this.scrollEl = null;
 
@@ -47,7 +45,7 @@ export const BottomSheet = define("bottom-sheet", { mapping, raw })(
       const path = e.composedPath();
 
       for (const cur of path) {
-        // bottom-sheet 본체 호스트(this)나 content 껍데기를 만나면 탐색을 멈춰 에러를 방지합니다.
+        // modal-sheet 본체 호스트(this)나 content 껍데기를 만나면 탐색을 멈춰 에러를 방지합니다.
         if (cur === this || cur === this.$refs.content) {
           break;
         }
@@ -87,7 +85,6 @@ export const BottomSheet = define("bottom-sheet", { mapping, raw })(
         // 3. 실제 시트가 하단으로 끌려가며 닫히는 순간에만 모바일 브라우저 특유의 바운스 및 기본 스크롤 동작을 차단합니다.
         if (e.cancelable) e.preventDefault();
         this.currentY = delta;
-        // this.$refs.content.style.translate = `-50% ${delta}px`;
         this.$refs.content.style.setProperty("--translate-y", `${delta}px`);
       }
     }
@@ -101,7 +98,6 @@ export const BottomSheet = define("bottom-sheet", { mapping, raw })(
         // 150px 이상 내려가면 닫기
         this.close();
       } else {
-        // this.$refs.content.style.translate = `-50% 0`;
         this.$refs.content.style.setProperty("--translate-y", `0px`);
         this.$refs.content.style.opacity = 1;
       }

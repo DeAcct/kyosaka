@@ -1,5 +1,5 @@
 import { Component, define, html } from "@/lib/core";
-import "@/components/BottomSheet/BottomSheet";
+import "@/components/ModalSheet/ModalSheet";
 
 import mapping from "./contextMenu.module.scss";
 import raw from "./contextMenu.module.scss?inline";
@@ -33,7 +33,7 @@ export const ContextMenu = define("context-menu", { mapping, raw })(
         template() {
             const { title, options } = this.state;
             return html`
-        <bottom-sheet $sheet>
+        <modal-sheet $sheet>
           <div class="${this.styles.contextMenu}">
             ${title ? html`<h3 class="${this.styles.title}">${title}</h3>` : ""}
             <ul class="${this.styles.list}">
@@ -55,7 +55,7 @@ export const ContextMenu = define("context-menu", { mapping, raw })(
             )}
             </ul>
           </div>
-        </bottom-sheet>
+        </modal-sheet>
       `;
         }
     },

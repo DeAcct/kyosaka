@@ -27,6 +27,30 @@ class ScheduleStore extends Store {
     this.commit("plans", (currentPlans) => [newItem, ...currentPlans]);
     this.changePlan(newItem.id);
   }
+
+  overwritePlan(data) {
+    const newItem = {
+      title: "제목 없는 여행",
+      data: [DEFAULT_DAY],
+      ...data,
+      edited: Temporal.Now.plainDateTimeISO(),
+      selected: 0,
+    };
+    this.commit("plans", (currentPlans) =>
+      currentPlans.map((plan) => (plan.id === data.id ? newItem : plan)),
+    );
+    this.changePlan(newItem.id);
+  }
+
+  hasPlan(id) {
+    if (!id) return false;
+    return this.plans.some((p) => p.id === id);
+  }
+
+  getPlan(id) {
+    if (!id) return null;
+    return this.plans.find((p) => p.id === id) || null;
+  }
   newPlan() {
     // 인자 없이 호출하면 빈 객체({})가 들어가면서 기본값들로 채워짐
     this.importPlan();

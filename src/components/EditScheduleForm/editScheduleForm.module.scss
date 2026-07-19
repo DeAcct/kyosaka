@@ -1,9 +1,9 @@
 /* components/EditScheduleForm/editScheduleForm.module.scss */
 
-@use "@/styles/layout/bottom-sheet" as bs;
+@use "@/styles/layout/modal-sheet" as bs;
 @use "@/styles/layout/layout" as layout;
 
-bottom-sheet::part(content) {
+modal-sheet::part(content) {
   bottom: 0;
   --radius: calc(var(--card-radius-base) * 1.5);
   border-radius: var(--radius) var(--radius) 0 0;
@@ -26,7 +26,7 @@ bottom-sheet::part(content) {
 }
 
 .formContainer {
-  @include bs.bottom-sheet;
+  @include bs.modal-sheet;
   padding: 0 0 2rem; // 믹스인의 좌우 패딩 덮어쓰기해 제거
 
   flex-grow: 1;

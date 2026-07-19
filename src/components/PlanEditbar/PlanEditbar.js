@@ -2,6 +2,7 @@ import { Component, define, html } from "@/lib/core";
 
 import mapping from "./planEditbar.module.scss";
 import raw from "./planEditbar.module.scss?inline";
+import "@/components/ModalSheet/ModalSheet";
 
 export const PlanEditbar = define("plan-editbar", { mapping, raw })(
   class extends Component {
@@ -39,7 +40,7 @@ export const PlanEditbar = define("plan-editbar", { mapping, raw })(
             삭제 (${counter})
           </button>
         </div>
-        <bottom-sheet $sheet>
+        <modal-sheet $sheet>
           <div class="${this.styles.editSheet}">
             <strong class="${this.styles.title}"
               >정말 ${counter}개의 여행 계획표를 삭제하시겠어요?</strong
@@ -64,7 +65,7 @@ export const PlanEditbar = define("plan-editbar", { mapping, raw })(
               </button>
             </div>
           </div>
-        </bottom-sheet>
+        </modal-sheet>
       `;
     }
   },

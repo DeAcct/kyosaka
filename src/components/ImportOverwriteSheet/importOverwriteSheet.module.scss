@@ -1,0 +1,16 @@
+@use "@/styles/layout/modal-sheet" as sheet;
+
+.container {
+  @include sheet.modal-sheet;
+
+
+
+  .actions {
+    .button {
+      &.danger {
+        background-color: var(--red-500);
+        color: var(--bg-100);
+      }
+    }
+  }
+}

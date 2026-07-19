@@ -11,8 +11,9 @@ import { useEdit } from "@/hooks/edit";
 
 import "@/components/Icon/Icon";
 import "@/components/PlanItem/PlanItem";
-import "@/components/BottomSheet/BottomSheet";
+import "@/components/ModalSheet/ModalSheet";
 import "@/components/PlanEditbar/PlanEditbar";
+import "@/components/ImportOverwriteSheet/ImportOverwriteSheet";
 
 export const NavRail = define("nav-rail", { mapping, raw })(
   class extends Component {
@@ -38,10 +39,13 @@ export const NavRail = define("nav-rail", { mapping, raw })(
 
     async importJSON() {
       await useJSONUpload((data) => {
-        // scheduleStore.commit("list", data);
-        scheduleStore.importPlan(data);
+        if (scheduleStore.hasPlan(data.id)) {
+          this.$refs.overwriteSheet.open(data);
+        } else {
+          scheduleStore.importPlan(data);
+          this.closeNav();
+        }
       });
-      this.closeNav();
     }
 
     newPlan() {
@@ -149,6 +153,10 @@ export const NavRail = define("nav-rail", { mapping, raw })(
           class="${this.styles.backdrop}"
           @click="${this.closeNav}"
         ></div>
+        <import-overwrite-sheet
+          $overwrite-sheet
+          @confirm="${() => this.closeNav()}"
+        ></import-overwrite-sheet>
       `;
     }
   },

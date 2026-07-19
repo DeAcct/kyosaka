@@ -4,7 +4,7 @@ import { toastStore } from "@/store/toastStore";
 import mapping from "./pwaSheet.module.scss";
 import raw from "./pwaSheet.module.scss?inline";
 
-import "@/components/BottomSheet/BottomSheet";
+import "@/components/ModalSheet/ModalSheet";
 
 export const PWASheet = define("pwa-sheet", { mapping, raw })(
   class extends Component {
@@ -42,7 +42,7 @@ export const PWASheet = define("pwa-sheet", { mapping, raw })(
             toastStore.add("앱이 설치되었어요!", "checked", 1500);
           }}"
         ></global>
-        <bottom-sheet $sheet @close="${this.reset}">
+        <modal-sheet $sheet @close="${this.reset}">
           <div class="${this.styles.pwaSheet}">
             <strong class="${this.styles.title}">앱을 사용해보실래요?</strong>
             <p class="${this.styles.sub}">
@@ -64,7 +64,7 @@ export const PWASheet = define("pwa-sheet", { mapping, raw })(
               </button>
             </div>
           </div>
-        </bottom-sheet>
+        </modal-sheet>
       `;
     }
   },

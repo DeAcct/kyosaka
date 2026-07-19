@@ -1,7 +1,7 @@
 @use "@/styles/layout/button" as button;
-@use "@/styles/layout/bottom-sheet" as sheet;
+@use "@/styles/layout/modal-sheet" as sheet;
 
-bottom-sheet::part(content) {
+modal-sheet::part(content) {
   bottom: 0;
   --radius: calc(var(--card-radius-base) * 1.5);
   border-radius: var(--radius) var(--radius) 0 0;
@@ -14,7 +14,7 @@ bottom-sheet::part(content) {
 }
 
 .uploadSheet {
-  @include sheet.bottom-sheet;
+  @include sheet.modal-sheet;
 }
 
 .types {

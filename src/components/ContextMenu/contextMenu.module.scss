@@ -1,7 +1,7 @@
-@use "@/styles/layout/bottom-sheet" as sheet;
+@use "@/styles/layout/modal-sheet" as sheet;
 
 .contextMenu {
-  @include sheet.bottom-sheet;
+  @include sheet.modal-sheet;
   padding: 0 var(--inner-padding)
     calc(var(--inner-padding) + env(safe-area-inset-bottom));
   --radius: calc(var(--card-radius-base) * 1.5 - var(--card-radius-base));

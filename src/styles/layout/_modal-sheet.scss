@@ -1,7 +1,7 @@
 @use "@/styles/layout/button" as button;
 @use "@/styles/layout/layout" as layout;
 
-@mixin bottom-sheet {
+@mixin modal-sheet {
   display: flex;
   flex-direction: column;
   padding: 0 2rem 2rem;

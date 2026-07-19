@@ -1,8 +1,8 @@
-@use "@/styles/layout/bottom-sheet" as sheet;
+@use "@/styles/layout/modal-sheet" as sheet;
 :host {
   display: contents;
 }
 
 .pwaSheet {
-  @include sheet.bottom-sheet;
+  @include sheet.modal-sheet;
 }
