@@ -1,5 +1,4 @@
 import { Component, define, html } from "@/lib/core";
-import { checklistStore } from "@/store/checklistStore";
 import { useLongPress } from "@/hooks/touch";
 
 import mapping from "./checklistItem.module.scss";
@@ -22,6 +21,7 @@ export const ChecklistItem = define("checklist-item", { mapping, raw })(
 
     template() {
       const { checked, text, id } = this.item;
+      const isSelectMode = this.selectmode || false;
       const { pointerdown, pointermove, pointerup, pointerleave } =
         this.longPressHandlers;
 
@@ -32,14 +32,24 @@ export const ChecklistItem = define("checklist-item", { mapping, raw })(
           @pointermove="${pointermove}"
           @pointerleave="${pointerleave}"
           @contextmenu.prevent="${() => {}}"
+          @click="${(e) => {
+            if (isSelectMode) {
+              e.stopPropagation();
+              e.preventDefault();
+              this.emit("item-click", { detail: { id } });
+            }
+          }}"
         ></host>
         <label class="${this.styles.label}">
           <ky-checkbox
             :checked="${checked}"
-            @change="${() => {
-              this.emit("toggle", { detail: { id } });
+            ?disabled="${isSelectMode}"
+            @change="${(e) => {
+              e?.stopPropagation?.();
+              if (!isSelectMode) {
+                this.emit("toggle", { detail: { id } });
+              }
             }}"
-            ?disabled="${this.selectmode}"
             class="${this.styles.checkbox}"
           ></ky-checkbox>
           <span>${text}</span>

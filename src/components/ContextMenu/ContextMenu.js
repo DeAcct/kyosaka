@@ -9,14 +9,23 @@ export const ContextMenu = define("context-menu", { mapping, raw })(
     setup() {
       this.state = {
         title: "",
-        options: [], // Array of { text, icon, danger, action }
+        options: [],
+        passthrough: false,
       };
     }
 
-    open({ title, options }) {
+    open({ title, options, passthrough, noBackdrop } = {}) {
+      const isPassthrough =
+        passthrough ??
+        noBackdrop ??
+        this.hasAttribute("passthrough") ??
+        this.hasAttribute("no-backdrop");
+
       this.setState("title", title || "");
       this.setState("options", options || []);
-      this.$refs.sheet.open();
+      this.setState("passthrough", Boolean(isPassthrough));
+
+      this.$refs.sheet.open({ passthrough: isPassthrough });
     }
 
     close() {
@@ -31,34 +40,56 @@ export const ContextMenu = define("context-menu", { mapping, raw })(
     }
 
     template() {
-      const { title, options } = this.state;
+      const { title, options, passthrough } = this.state;
+
+      const isPassthrough =
+        passthrough ||
+        this.hasAttribute("passthrough") ||
+        this.hasAttribute("no-backdrop");
+
       return html`
-        <modal-sheet $sheet>
+        <modal-sheet
+          $sheet
+          ?passthrough="${isPassthrough}"
+          @close="${() => this.emit("close", { bubbles: true })}"
+        >
           <div class="${this.styles.contextMenu}">
-            ${title ? html`<h3 class="${this.styles.title}">${title}</h3>` : ""}
-            <ul class="${this.styles.list}">
-              ${options.map(
-                (option) => html`
-                  <li class="${this.styles.item}">
-                    <button
-                      type="button"
-                      class="${this.styles.button} ${option.danger
-                        ? this.styles.danger
-                        : ""}"
-                      @click="${() => this.handleAction(option)}"
-                    >
-                      ${option.icon
-                        ? html`<ky-icon
-                            class="${this.styles.icon}"
-                            name="${option.icon}"
-                          ></ky-icon>`
-                        : ""}
-                      <span class="${this.styles.text}">${option.text}</span>
-                    </button>
-                  </li>
-                `,
-              )}
-            </ul>
+            <slot name="title">
+              ${title
+                ? html`<h3 class="${this.styles.title}">${title}</h3>`
+                : ""}
+            </slot>
+            <slot name="content"></slot>
+            <slot></slot>
+            ${options && options.length > 0
+              ? html`
+                  <ul class="${this.styles.list}">
+                    ${options.map(
+                      (option) => html`
+                        <li class="${this.styles.item}">
+                          <button
+                            type="button"
+                            class="${this.styles.button} ${option.danger
+                              ? this.styles.danger
+                              : ""}"
+                            @click="${() => this.handleAction(option)}"
+                          >
+                            ${option.icon
+                              ? html`<ky-icon
+                                  class="${this.styles.icon}"
+                                  name="${option.icon}"
+                                ></ky-icon>`
+                              : ""}
+                            <span class="${this.styles.text}"
+                              >${option.text}</span
+                            >
+                          </button>
+                        </li>
+                      `,
+                    )}
+                  </ul>
+                `
+              : ""}
           </div>
         </modal-sheet>
       `;

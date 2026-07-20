@@ -18,9 +18,11 @@ import "@/components/ChecklistDeleteSheet/ChecklistDeleteSheet";
 const checklistItemBlock = block(
   (props) => html`
     <checklist-item
-      class="${props.itemClass}"
+      class="${props.itemClass} ${props.isSelected ? props.selectedClass : ""}"
       :item="${props.item}"
+      :selectmode="${props.isSelectMode}"
       @toggle="${props.onToggle}"
+      @item-click="${props.onItemClick}"
       @longpress="${props.onLongpress}"
     ></checklist-item>
   `,
@@ -32,7 +34,6 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
       this.state = {
         isScrolled: false,
         tab: "day",
-        activeItemId: null,
       };
 
       this.subscribe(checklistStore);
@@ -40,8 +41,104 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
       this.handleScroll = useScroll(this, "isScrolled");
     }
 
+    handleGlobalClick(e) {
+      if (!checklistStore.isSelectMode) return;
+
+      const path = e.composedPath();
+      const isInsideInteractive = path.some((target) => {
+        if (!target || !target.tagName) return false;
+        const tag = target.tagName.toLowerCase();
+        return (
+          tag === "checklist-item" ||
+          tag === "context-menu" ||
+          tag === "checklist-move-sheet" ||
+          tag === "checklist-delete-sheet" ||
+          tag === "modal-sheet"
+        );
+      });
+
+      if (!isInsideInteractive) {
+        checklistStore.clearSelection();
+        this.$refs.contextMenu?.close();
+      }
+    }
+
+    updateContextMenuTitle() {
+      if (!checklistStore.isSelectMode || !this.$refs.contextMenu) {
+        this.$refs.contextMenu?.close();
+        return;
+      }
+
+      const { selectedIds, items } = checklistStore;
+      const count = selectedIds.length;
+      if (count === 0) {
+        this.$refs.contextMenu?.close();
+        return;
+      }
+
+      const firstItem = items.find((i) => i.id === selectedIds[0]);
+      const firstText = firstItem?.text || "";
+
+      let title = "";
+      if (count === 1) {
+        title = `${firstText} 선택됨`;
+      } else if (count > 1) {
+        title = `${firstText} 외 ${count - 1}개 선택됨`;
+      }
+
+      const options = [
+        {
+          text: "이동",
+          icon: "move_up",
+          action: () => {
+            this.$refs.moveSheet.open({
+              currentDay: firstItem?.day ?? null,
+            });
+          },
+        },
+        {
+          text: "삭제",
+          icon: "delete",
+          danger: true,
+          action: () => {
+            this.$refs.deleteSheet.open({
+              count: checklistStore.selectedIds.length,
+            });
+          },
+        },
+      ];
+
+      this.$refs.contextMenu.open({
+        title,
+        options,
+        passthrough: true,
+      });
+    }
+
     onToggleItem({ detail }) {
-      checklistStore.toggleItem(detail.id);
+      const { id } = detail;
+      if (checklistStore.isSelectMode) {
+        checklistStore.toggleSelectItem(id);
+        if (!checklistStore.isSelectMode) {
+          this.$refs.contextMenu?.close();
+        } else {
+          this.updateContextMenuTitle();
+        }
+      } else {
+        checklistStore.toggleItem(id);
+      }
+    }
+
+    onItemClick({ detail }) {
+      const { id } = detail;
+      if (checklistStore.isSelectMode) {
+        checklistStore.toggleSelectItem(id);
+        if (!checklistStore.isSelectMode) {
+          this.$refs.contextMenu?.close();
+        } else {
+          this.updateContextMenuTitle();
+        }
+      }
     }
 
     handleNew(e) {
@@ -62,46 +159,20 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
 
     openContextMenu(e) {
       const id = e.detail.id;
-      this.setState("activeItemId", id);
-
-      const item = checklistStore.items.find((i) => i.id === id);
-
-      this.$refs.contextMenu.open({
-        title: item?.text || "",
-        options: [
-          {
-            text: "이동",
-            icon: "move_up",
-            action: () => this.$refs.moveSheet.open({ currentDay: item?.day ?? null }),
-          },
-          {
-            text: "삭제",
-            icon: "delete",
-            danger: true,
-            action: () => this.$refs.deleteSheet.open(),
-          },
-        ],
-      });
+      checklistStore.selectItem(id);
+      this.updateContextMenuTitle();
     }
 
     moveItem(dayIndex) {
-      const { activeItemId } = this.state;
-      if (!activeItemId) return;
-
-      checklistStore.moveItemsToDay([activeItemId], dayIndex);
-      this.setState("activeItemId", null);
+      checklistStore.moveSelectedToDay(dayIndex);
     }
 
     deleteItem() {
-      const { activeItemId } = this.state;
-      if (!activeItemId) return;
-
-      checklistStore.removeList([activeItemId]);
-      this.setState("activeItemId", null);
+      checklistStore.removeSelected();
     }
 
     template() {
-      const { items } = checklistStore;
+      const { items, selectedIds, isSelectMode } = checklistStore;
       const selectedDayIndex = scheduleStore.selectedPlan?.selected ?? 0;
 
       const filteredItems = items.filter((item) =>
@@ -111,7 +182,10 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
       );
 
       return html`
-        <global @scroll="${this.handleScroll}"></global>
+        <global
+          @scroll="${this.handleScroll}"
+          @click="${(e) => this.handleGlobalClick(e)}"
+        ></global>
 
         <div class="${this.styles.container}">
           <nav class="${this.styles.tabBar}">
@@ -121,7 +195,10 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
                 { name: "공통", value: "common" },
               ]}"
               value="${this.state.tab}"
-              @change="${(e) => this.setState("tab", e.detail)}"
+              @change="${(e) => {
+                this.setState("tab", e.detail);
+                checklistStore.clearSelection();
+              }}"
             ></tab-selector>
           </nav>
           <div class="${this.styles.content}">
@@ -136,7 +213,11 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
                   item,
                   index,
                   itemClass: this.styles.item,
+                  isSelected: selectedIds.includes(item.id),
+                  selectedClass: isSelectMode && selectedIds.includes(item.id) ? this.styles.selected : "",
+                  isSelectMode: isSelectMode,
                   onToggle: (e) => this.onToggleItem(e),
+                  onItemClick: (e) => this.onItemClick(e),
                   onLongpress: (e) => this.openContextMenu(e),
                 }),
               )}
@@ -149,22 +230,27 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
           class="${this.styles.control} ${this.state.isScrolled
             ? this.styles.scrolled
             : ""}"
-          @submit="${(e) => this.handleNew(e)}"
           mode="view"
           placeholder="체크리스트 추가"
           primary-icon="add"
+          @submit="${(e) => this.handleNew(e)}"
         >
         </control-bar>
 
-        <context-menu $context-menu></context-menu>
+        <context-menu
+          $context-menu
+          @close="${() => checklistStore.clearSelection()}"
+        ></context-menu>
 
         <checklist-move-sheet
           $move-sheet
-          @confirm="${(e) => this.moveItem(e.detail)}"
+          @close="${() => checklistStore.clearSelection()}"
+          @confirm="${(e) => this.moveItem(e.detail?.dayIndex ?? e.detail)}"
         ></checklist-move-sheet>
 
         <checklist-delete-sheet
           $delete-sheet
+          @close="${() => checklistStore.clearSelection()}"
           @confirm="${() => this.deleteItem()}"
         ></checklist-delete-sheet>
       `;

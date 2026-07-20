@@ -39,7 +39,7 @@ export const GalleryItem = define("gallery-item", { mapping, raw })(
         ></host>
         <img
           part="image"
-          src="${validUrl}"
+          :src="${validUrl}"
           alt="${name}"
           style="${transitionStyle}"
           class="${this.styles.img} ${validUrl ? this.styles.loaded : ""}"

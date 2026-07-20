@@ -9,7 +9,13 @@ export const ChecklistDeleteSheet = define("checklist-delete-sheet", {
   raw,
 })(
   class extends Component {
-    open() {
+    setup() {
+      this.state = { count: 1, targetIds: null };
+    }
+
+    open({ count = 1, targetIds } = {}) {
+      this.setState("count", count);
+      this.setState("targetIds", targetIds || null);
       this.$refs.sheet.open();
     }
 
@@ -18,18 +24,25 @@ export const ChecklistDeleteSheet = define("checklist-delete-sheet", {
     }
 
     handleDelete() {
-      this.emit("confirm", { bubbles: true });
+      this.emit("confirm", {
+        bubbles: true,
+        detail: { ids: this.state.targetIds },
+      });
       this.close();
     }
 
     template() {
+      const { count } = this.state;
+      const title =
+        count > 1 ? `${count}개 항목을 삭제하시겠습니까?` : "항목을 삭제하시겠습니까?";
+
       return html`
         <modal-sheet
           $sheet
           @close="${() => this.emit("close")}"
         >
           <div class="${this.styles.content}">
-            <h3 class="${this.styles.title}">항목을 삭제하시겠습니까?</h3>
+            <h3 class="${this.styles.title}">${title}</h3>
             <div class="${this.styles.actions}">
               <button
                 class="${this.styles.button}"

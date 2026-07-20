@@ -12,16 +12,17 @@ export const ChecklistMoveSheet = define("checklist-move-sheet", {
 })(
   class extends Component {
     setup() {
-      this.state = { currentValue: "__common__" };
+      this.state = { currentValue: "__common__", targetIds: null };
       this.subscribe(scheduleStore);
     }
 
-    open({ currentDay } = {}) {
+    open({ currentDay, targetIds } = {}) {
       const val =
         currentDay === null || currentDay === undefined
           ? "__common__"
           : String(currentDay);
       this.setState("currentValue", val);
+      this.setState("targetIds", targetIds || null);
       this.$refs.sheet.open();
     }
 
@@ -32,7 +33,10 @@ export const ChecklistMoveSheet = define("checklist-move-sheet", {
     handleConfirm() {
       const val = this.$refs.kySelect?.value;
       const dayIndex = val === "__common__" ? null : Number(val);
-      this.emit("confirm", { bubbles: true, detail: dayIndex });
+      this.emit("confirm", {
+        bubbles: true,
+        detail: { dayIndex, ids: this.state.targetIds },
+      });
       this.close();
     }
 

@@ -1,5 +1,6 @@
 import { Component, define, html } from "@/lib/core";
 import { galleryStore } from "@/store/galleryStore";
+import { router } from "@/lib/router";
 
 import mapping from "./uploadSheet.module.scss";
 import raw from "./uploadSheet.module.scss?inline";
@@ -10,6 +11,7 @@ import "@/components/RadioGroup/RadioGroup";
 export const UploadSheet = define("upload-sheet", { mapping, raw })(
   class extends Component {
     setup() {
+      this.defaultType = "memory";
       this.state = {
         pendingFile: null,
         name: "",
@@ -24,9 +26,8 @@ export const UploadSheet = define("upload-sheet", { mapping, raw })(
       this.setState("pendingFile", null);
       this.setState("previewUrl", "");
       this.setState("name", "");
-      this.setState("selectedType", "memory");
+      this.setState("selectedType", this.defaultType || "memory");
 
-      // 3. 네이티브 input 값 초기화 (같은 파일을 다시 올릴 때 change 이벤트 보장)
       if (this.$refs.fileInput) {
         this.$refs.fileInput.value = "";
       }
@@ -34,6 +35,7 @@ export const UploadSheet = define("upload-sheet", { mapping, raw })(
 
     set selected(value) {
       if (value) {
+        this.defaultType = value;
         this.setState("selectedType", value);
       }
     }
@@ -46,7 +48,6 @@ export const UploadSheet = define("upload-sheet", { mapping, raw })(
       const file = e.target.files[0];
       if (!file) return;
 
-      // 이전 프리뷰가 있다면 메모리 해제
       if (this.state.previewUrl) {
         URL.revokeObjectURL(this.state.previewUrl);
       }
@@ -56,7 +57,6 @@ export const UploadSheet = define("upload-sheet", { mapping, raw })(
       this.setState("pendingFile", file);
       this.setState("previewUrl", imageUrl);
 
-      // 이름이 비어있을 때만 파일명으로 채움
       if (!this.state.name) {
         this.setState("name", file.name.split(".")[0]);
       }
@@ -69,11 +69,11 @@ export const UploadSheet = define("upload-sheet", { mapping, raw })(
       await galleryStore.saveItem(pendingFile, selectedType, name);
       this.$refs.sheet.close();
       this.reset();
+      router.navigate(`/gallery/${selectedType}`);
     }
 
     template() {
       const { name, selectedType, pendingFile, previewUrl } = this.state;
-      console.log(selectedType);
 
       const previewStyle = previewUrl
         ? `background-image: linear-gradient(rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.3)), url(${previewUrl}); color: white;`

@@ -7,11 +7,28 @@
   padding: 0;
   margin: 0;
   position: fixed;
-  bottom: 0;
+  inset: 0;
+  z-index: 1000;
   transition:
     opacity 300ms var(--ease-out-expo),
     display 300ms allow-discrete,
     overlay 300ms allow-discrete;
+
+  &[open] {
+    display: flex;
+  }
+
+  &.passthrough,
+  &.noBackdrop {
+    pointer-events: none !important;
+
+    &::backdrop {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+  }
+
   &:open {
     display: flex;
     @starting-style {
@@ -19,9 +36,9 @@
     }
 
     &::backdrop {
-      opacity: 1;
+      opacity: var(--backdrop-opacity, 1);
+      background: var(--backdrop-bg, rgba(0, 0, 0, 0.1));
 
-      /* 나타날 때의 시작점 정의 */
       @starting-style {
         opacity: 0;
       }
@@ -37,6 +54,7 @@
   }
 
   .content {
+    pointer-events: auto !important;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -49,7 +67,7 @@
     padding: 1.2rem 0 0;
     translate: -50% var(--translate-y, 100%);
     transition: all 300ms var(--ease-out-expo);
-    will-change: transform; // 🔍 성능 최적화
+    will-change: transform;
 
     @media screen and (min-width: 690px) {
       width: calc(50dvw - 3rem);
