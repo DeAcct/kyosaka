@@ -14,18 +14,21 @@ import "@/components/PlanItem/PlanItem";
 import "@/components/ModalSheet/ModalSheet";
 import "@/components/PlanEditbar/PlanEditbar";
 import "@/components/ImportOverwriteSheet/ImportOverwriteSheet";
+import "@/components/DarkModeToggle/DarkModeToggle";
 
-const planItemBlock = block((props) => html`
-  <plan-item
-    :id="${props.id}"
-    :edited="${props.edited}"
-    :title="${props.title}"
-    @longpress="${props.onLongPress}"
-    @click="${props.onClick}"
-    class="${props.itemClass} ${props.isSelected ? props.selectedClass : ""}"
-    :editmode="${props.editMode}"
-  ></plan-item>
-`);
+const planItemBlock = block(
+  (props) => html`
+    <plan-item
+      :id="${props.id}"
+      :edited="${props.edited}"
+      :title="${props.title}"
+      @longpress="${props.onLongPress}"
+      @click="${props.onClick}"
+      class="${props.itemClass} ${props.isSelected ? props.selectedClass : ""}"
+      :editmode="${props.editMode}"
+    ></plan-item>
+  `,
+);
 
 export const NavRail = define("nav-rail", { mapping, raw })(
   class extends Component {
@@ -110,6 +113,9 @@ export const NavRail = define("nav-rail", { mapping, raw })(
               ></ky-icon>
             </button>
             <strong class="${this.styles.logo}">kyosaka</strong>
+            <dark-mode-toggle
+              class="${this.styles.darkmode}"
+            ></dark-mode-toggle>
           </header>
           <div class="${this.styles.actions}">
             ${this.actions.map(
@@ -140,9 +146,10 @@ export const NavRail = define("nav-rail", { mapping, raw })(
                 isSelected: this.state.deleteSelected.includes(id),
                 selectedClass: this.styles.selected,
                 editMode: this.state.mode === "edit",
-                onLongPress: (e) => this.editor.onLongpressItem({ detail: { id } }),
+                onLongPress: (e) =>
+                  this.editor.onLongpressItem({ detail: { id } }),
                 onClick: () => this.editor.onClickItem(id),
-              })
+              }),
             )}
           </ul>
         </nav>

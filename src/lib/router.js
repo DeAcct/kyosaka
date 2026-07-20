@@ -115,6 +115,7 @@ export class Router {
   }
 
   handleLocationChange() {
+    document.documentElement.classList.remove("is-locked");
     window.dispatchEvent(
       new CustomEvent("locationchange", {
         detail: { path: window.location.pathname },

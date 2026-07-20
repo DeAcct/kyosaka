@@ -188,16 +188,16 @@
   );
   padding: 4rem 2rem;
   text-align: center;
-  color: var(--text-secondary, #666);
 
   .lockIcon {
     font-size: 4.8rem;
-    color: var(--text-primary, #111);
+    color: var(--text-500);
   }
 
   .lockMessage {
     font-size: 1.6rem;
     font-weight: 500;
+    color: var(--text-300);
   }
 
   .unlockButton {

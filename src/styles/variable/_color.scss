@@ -252,7 +252,7 @@
   --bg-500: var(--gray-600);
 }
 
-#app[data-theme="dark"] {
+:root[data-theme="dark"] {
   --text-100: var(--gray-950);
   --text-200: var(--gray-900);
   --text-300: var(--gray-800);
