@@ -7,6 +7,14 @@ import "@/components/Icon/Icon";
 
 export const ControlBar = define("control-bar", { mapping, raw })(
   class extends Component {
+    get mode() {
+      return this._mode || this.getAttribute("mode") || "view";
+    }
+
+    set mode(val) {
+      this._mode = val;
+    }
+
     handleSubmit() {
       const input = this.$refs.input?.shadowRoot?.querySelector("input");
       const val = input ? input.value : "";
@@ -24,6 +32,7 @@ export const ControlBar = define("control-bar", { mapping, raw })(
     }
 
     template() {
+      const mode = this.mode;
       const placeholder = this.getAttribute("placeholder");
       const primaryIcon = this.getAttribute("primary-icon");
       const isLoading = this.loading || this.getAttribute("loading") === "true";
@@ -36,7 +45,7 @@ export const ControlBar = define("control-bar", { mapping, raw })(
           }}"
         >
           <strong
-            class="${this.styles.counter} ${this.mode === "edit"
+            class="${this.styles.counter} ${mode === "edit"
               ? this.styles.show
               : ""}"
           >
@@ -45,7 +54,7 @@ export const ControlBar = define("control-bar", { mapping, raw })(
           ${placeholder != null
             ? html`<ky-input
                 $input
-                class="${this.styles.input} ${this.mode !== "edit"
+                class="${this.styles.input} ${mode !== "edit"
                   ? this.styles.show
                   : ""}"
                 placeholder="${placeholder}"
@@ -55,56 +64,25 @@ export const ControlBar = define("control-bar", { mapping, raw })(
               ></ky-input>`
             : ""}
 
-          <slot></slot>
-
-          ${primaryIcon != null
-            ? html`<button
-                type="submit"
-                class="${this.styles.button} ${this.mode === "edit"
-                  ? this.styles.cancel
-                  : ""}"
-                ${isLoading ? "disabled" : ""}
-              >
-                <ky-icon
-                  name="${primaryIcon}"
-                  class="${this.styles.icon} ${isLoading
-                    ? this.styles.spin
+          <div class="${this.styles.actions}">
+            ${primaryIcon != null
+              ? html`<button
+                  type="submit"
+                  class="${this.styles.button} ${mode === "edit"
+                    ? this.styles.cancel
                     : ""}"
-                ></ky-icon>
-              </button>`
-            : ""}
-
-          ${this.getAttribute("show-move") === "true"
-            ? html`<button
-                type="button"
-                class="${this.styles.button} ${this.styles.move} ${this.mode !== "edit"
-                  ? this.styles.hide
-                  : ""}"
-                @click="${(e) => {
-                  this.emit("move");
-                }}"
-              >
-                <ky-icon
-                  class="${this.styles.icon}"
-                  name="editDays"
-                ></ky-icon>
-              </button>`
-            : ""}
-
-          <button
-            type="button"
-            class="${this.styles.button} ${this.styles.delete} ${this.mode !== "edit"
-              ? this.styles.hide
-              : ""}"
-            @click="${(e) => {
-              this.emit("delete");
-            }}"
-          >
-            <ky-icon
-              class="${this.styles.icon}"
-              name="delete"
-            ></ky-icon>
-          </button>
+                  ${isLoading ? "disabled" : ""}
+                >
+                  <ky-icon
+                    name="${primaryIcon}"
+                    class="${this.styles.icon} ${isLoading
+                      ? this.styles.spin
+                      : ""}"
+                  ></ky-icon>
+                </button>`
+              : ""}
+            <slot name="actions"></slot>
+          </div>
         </form>
       `;
     }

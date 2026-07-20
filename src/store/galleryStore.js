@@ -1,63 +1,252 @@
-// store/galleryStore.js
 import Store from "@/lib/store";
+import CryptoJS from "crypto-js";
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function dataUrlToBlob(dataUrl) {
+  const parts = dataUrl.split(",");
+  if (parts.length < 2) return null;
+  const mimeMatch = parts[0].match(/:(.*?);/);
+  const mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
+  const bstr = atob(parts[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
+}
 
 class GalleryStore extends Store {
   CACHE_NAME = "kyosaka-gallery";
-  tempUrls = new Map(); // 🔍 메모리에만 존재 (LocalStorage에 저장 안 됨)
+  tempUrls = new Map();
+  sessionPassword = "";
+
+  get hasPassword() {
+    return Boolean(this.state.passwordHash);
+  }
+
+  get isLocked() {
+    return Boolean(this.state.passwordHash && !this.state.isUnlocked);
+  }
+
+  get mode() {
+    return this.state.ui.mode;
+  }
+
+  get selected() {
+    return this.state.ui.selected;
+  }
 
   async hydrate() {
     this.commit("isLoading", true);
+
+    if (this.isLocked) {
+      this.clearTempUrls();
+      this.commit("isLoading", false);
+      return;
+    }
+
     const cache = await caches.open(this.CACHE_NAME);
 
-    // 1. 캐시에서 파일을 꺼내 URL만 새로 생성하여 Map에 저장
     await Promise.all(
       this.state.items.map(async (item) => {
         const response = await cache.match(item.id);
-        if (response) {
+        if (!response) return;
+
+        try {
           const blob = await response.blob();
-          const url = URL.createObjectURL(blob);
-          this.tempUrls.set(item.id, url); // 🎯 메모리 맵만 갱신
+
+          if (blob.type && blob.type.startsWith("image/")) {
+            this.tempUrls.set(item.id, URL.createObjectURL(blob));
+            return;
+          }
+
+          const content = await blob.text();
+
+          if (content.startsWith("data:")) {
+            const b = dataUrlToBlob(content);
+            if (b) {
+              this.tempUrls.set(item.id, URL.createObjectURL(b));
+              return;
+            }
+          }
+
+          if (this.sessionPassword) {
+            try {
+              const bytes = CryptoJS.AES.decrypt(content, this.sessionPassword);
+              const decryptedDataUrl = bytes.toString(CryptoJS.enc.Utf8);
+              if (decryptedDataUrl && decryptedDataUrl.startsWith("data:")) {
+                const b = dataUrlToBlob(decryptedDataUrl);
+                if (b) {
+                  this.tempUrls.set(item.id, URL.createObjectURL(b));
+                  return;
+                }
+              }
+            } catch (decErr) {
+              // 복호화 실패 시 폴백
+            }
+          }
+
+          if (blob.size > 0) {
+            const imageBlob = blob.type
+              ? blob
+              : new Blob([blob], { type: "image/jpeg" });
+            this.tempUrls.set(item.id, URL.createObjectURL(imageBlob));
+          }
+        } catch (e) {
+          console.error("Hydrate error for item:", item.id, e);
         }
       }),
     );
 
-    // 2. 상태를 갱신하여 컴포넌트 리렌더링 유도 (url은 포함하지 않음!)
     this.commit("isLoading", false);
   }
 
   async saveItem(file, type, customName) {
     const id = crypto.randomUUID();
-
     const cache = await caches.open(this.CACHE_NAME);
+    const dataUrl = await fileToDataUrl(file);
 
-    // 1. 파일은 캐시에 저장
-    await cache.put(id, new Response(file));
+    let storagePayload = dataUrl;
+    if (this.hasPassword && this.sessionPassword) {
+      storagePayload = CryptoJS.AES.encrypt(
+        dataUrl,
+        this.sessionPassword,
+      ).toString();
+    }
 
-    // 2. 메모리 맵에 임시 URL 저장
-    const url = URL.createObjectURL(file);
+    await cache.put(id, new Response(storagePayload));
+
+    const blob = file;
+    const url = URL.createObjectURL(blob);
     this.tempUrls.set(id, url);
 
-    // 3. 메타데이터 저장
     const newItem = { id, type, name: customName || file.name };
     this.commit("items", [...this.state.items, newItem]);
   }
 
-  /**
-   * 🔍 편집 모드 진입 시 특정 ID를 즉시 선택하도록 수정
-   */
-  // toggleUIMode(initialId = null) {
-  //   const currentMode = this.state.ui.mode;
-  //   const nextMode = currentMode === "view" ? "edit" : "view";
+  verifyPassword(inputPassword) {
+    const hash = CryptoJS.SHA256(inputPassword).toString();
+    if (hash === this.state.passwordHash) {
+      this.sessionPassword = inputPassword;
+      this.commit("isUnlocked", true);
+      this.hydrate();
+      return true;
+    }
+    return false;
+  }
 
-  //   this.commit("ui/mode", nextMode);
+  async setPassword(newPassword) {
+    const newHash = CryptoJS.SHA256(newPassword).toString();
+    const oldPassword = this.sessionPassword;
 
-  //   if (nextMode === "view") {
-  //     this.commit("ui/selected", []);
-  //   } else if (initialId) {
-  //     // 🎯 편집 모드 진입과 동시에 해당 아이템 선택
-  //     this.commit("ui/selected", [initialId]);
-  //   }
-  // }
+    if (this.state.items.length > 0) {
+      const cache = await caches.open(this.CACHE_NAME);
+      await Promise.all(
+        this.state.items.map(async (item) => {
+          const response = await cache.match(item.id);
+          if (response) {
+            const blob = await response.blob();
+            const content = await blob.text();
+            let dataUrl = "";
+
+            if (content.startsWith("data:")) {
+              dataUrl = content;
+            } else if (oldPassword) {
+              try {
+                const bytes = CryptoJS.AES.decrypt(content, oldPassword);
+                dataUrl = bytes.toString(CryptoJS.enc.Utf8);
+              } catch (e) {
+                dataUrl = "";
+              }
+            }
+
+            if (!dataUrl || !dataUrl.startsWith("data:")) {
+              dataUrl = await fileToDataUrl(blob);
+            }
+
+            if (dataUrl) {
+              const encrypted = CryptoJS.AES.encrypt(
+                dataUrl,
+                newPassword,
+              ).toString();
+              await cache.put(item.id, new Response(encrypted));
+            }
+          }
+        }),
+      );
+    }
+
+    this.sessionPassword = newPassword;
+    this.commit("passwordHash", newHash);
+    this.commit("isUnlocked", true);
+    this.hydrate();
+    return true;
+  }
+
+  async clearPassword() {
+    if (this.hasPassword && this.sessionPassword) {
+      const cache = await caches.open(this.CACHE_NAME);
+      await Promise.all(
+        this.state.items.map(async (item) => {
+          const response = await cache.match(item.id);
+          if (response) {
+            const blob = await response.blob();
+            const content = await blob.text();
+            let dataUrl = "";
+
+            if (content.startsWith("data:")) {
+              dataUrl = content;
+            } else {
+              try {
+                const bytes = CryptoJS.AES.decrypt(
+                  content,
+                  this.sessionPassword,
+                );
+                dataUrl = bytes.toString(CryptoJS.enc.Utf8);
+              } catch (e) {
+                dataUrl = "";
+              }
+            }
+
+            if (dataUrl && dataUrl.startsWith("data:")) {
+              const rawBlob = dataUrlToBlob(dataUrl);
+              if (rawBlob) {
+                await cache.put(item.id, new Response(rawBlob));
+              }
+            }
+          }
+        }),
+      );
+    }
+
+    this.sessionPassword = "";
+    this.commit("passwordHash", "");
+    this.commit("isUnlocked", false);
+    this.hydrate();
+  }
+
+  lock() {
+    this.clearTempUrls();
+    this.sessionPassword = "";
+    this.commit("isUnlocked", false);
+    this.commit("isLoading", false);
+  }
+
+  clearTempUrls() {
+    this.tempUrls.forEach((url) => {
+      URL.revokeObjectURL(url);
+    });
+    this.tempUrls.clear();
+  }
 
   toggleEditMode() {
     this.commit("ui/selected", []);
@@ -65,9 +254,6 @@ class GalleryStore extends Store {
     this.commit("ui/mode", nextMode);
   }
 
-  /**
-   * 🔍 선택 상태 토글 (클릭 시 사용)
-   */
   toggleItemSelection(id) {
     if (this.state.ui.mode !== "edit") return;
 
@@ -80,73 +266,52 @@ class GalleryStore extends Store {
     this.commit("ui/selected", next);
   }
 
-  /**
-   * 🗑️ 선택된 아이템 일괄 삭제 (캐시 + 메모리 + 스토어)
-   */
   async deleteSelectedItems() {
     const targets = this.state.ui.selected;
     if (targets.length === 0) return;
 
     const cache = await caches.open(this.CACHE_NAME);
 
-    // 1. 물리적 파일 및 메모리 주소 삭제 루프
     targets.forEach((id) => {
-      // 캐시 삭제
       cache.delete(id);
-
-      // Blob URL 해제 (메모리 누수 방지 핵심!)
       if (this.tempUrls.has(id)) {
         URL.revokeObjectURL(this.tempUrls.get(id));
         this.tempUrls.delete(id);
       }
     });
 
-    // 2. 스토어 메타데이터 필터링
     const nextItems = this.state.items.filter(
       (item) => !targets.includes(item.id),
     );
 
-    // 3. 일괄 커밋: 데이터와 UI 상태를 동시에 정렬
     this.commit("items", nextItems);
-    // this.commit("ui/selected", []);
-    // this.commit("ui/mode", "view");
     this.clearUI();
-
-    console.log(`[Gallery] ${targets.length}개의 항목이 영구 삭제되었습니다.`);
   }
 
   openOverlay(id) {
-    // this.commit("ui", { overlay: id, mode: "overlay" });
     this.commit("ui", { selected: [id], mode: "overlay" });
-    // this.commit("ui/overlay", mode:)
   }
 
   clearUI() {
     this.commit("ui", { selected: [], mode: "view" });
   }
 
-  get mode() {
-    return this.state.ui.mode;
-  }
-  get selected() {
-    return this.state.ui.selected;
-  }
   findItemById(targetId) {
     return this.state.items.find(({ id }) => id === targetId);
   }
 }
 
-// 초기 상태 정의
 export const galleryStore = new GalleryStore(
   "galleryStore",
   {
     items: [],
     isLoading: false,
+    passwordHash: "",
+    isUnlocked: false,
     ui: {
       selected: [],
-      // overlay: null,
       mode: "view",
     },
   },
-  { exclude: ["ui"] },
+  { exclude: ["ui", "isUnlocked"] },
 );

@@ -4,6 +4,7 @@
 .tabBar {
   display: flex;
   align-items: center;
+  justify-content: center;
   position: sticky;
   top: var(--header-height);
   z-index: 101;
@@ -15,10 +16,14 @@
     var(--card-radius-base),
     transparent
   );
+  border-bottom: 1px solid var(--bg-300);
+  tab-selector {
+    width: min(100% - var(--inner-padding) * 2, 108rem);
+  }
 }
 
 .container {
-  margin: 0 auto 0;
+  margin: 2rem auto 0;
   @include layout.safe-area;
   display: flex;
   flex-direction: column;
@@ -33,7 +38,7 @@
   width: 100%;
 
   position: sticky;
-  top: calc(var(--header-height) + 4.8rem);
+  top: calc(var(--header-height) + 6.9rem);
   z-index: 110;
   min-width: 0;
 
@@ -174,8 +179,35 @@
       transition: all 150ms var(--ease-in-out-quad);
     }
 
+    &.delete {
+      background-color: var(--red-500);
+      color: #ffffff;
+      border-radius: 0.4rem;
+
+      &:hover:not(:disabled) {
+        background-color: var(--red-600);
+      }
+    }
+
+    &.move {
+      background-color: var(--bg-300);
+      color: var(--text-400);
+      border-radius: 0.4rem;
+
+      &:hover:not(:disabled) {
+        background-color: var(--bg-400);
+      }
+    }
+
     &.cancel {
       --rotation: 45deg;
+      background-color: var(--bg-300);
+      color: var(--text-400);
+      border-radius: 0.4rem;
+
+      &:hover:not(:disabled) {
+        background-color: var(--bg-400);
+      }
     }
 
     @starting-style {

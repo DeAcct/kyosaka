@@ -39,6 +39,7 @@ export const ChecklistDeleteSheet = define("checklist-delete-sheet", {
       return html`
         <modal-sheet
           $sheet
+          exportparts="content"
           @close="${() => this.emit("close")}"
         >
           <div class="${this.styles.content}">
