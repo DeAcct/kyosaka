@@ -17,6 +17,7 @@ import "@/components/EditScheduleForm/EditScheduleForm";
 import "@/components/ContextMenu/ContextMenu";
 import "@/components/YoloConfirmSheet/YoloConfirmSheet";
 import "@/components/ControlBar/ControlBar";
+import "@/components/DeleteConfirmSheet/DeleteConfirmSheet";
 
 import "@/components/ScheduleIcon/ScheduleIcon";
 import "@/components/RouteCard/RouteCard";
@@ -31,6 +32,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
 
     state = {
       isYoloLoading: false,
+      pendingDeleteIndex: -1,
     };
 
     setup() {
@@ -119,8 +121,8 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
             icon: "delete",
             danger: true,
             action: () => {
-              scheduleStore.removeScheduleItem(index);
-              toastStore.add("일정을 삭제했어요!", "info", 2000);
+              this.setState("pendingDeleteIndex", index);
+              this.$refs.deleteSheet.open({ name: item.name });
             },
           },
         ],
@@ -305,6 +307,19 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
           :schedule-data="${scheduleStore.editingScheduleItem}"
         ></edit-schedule-form>
         <context-menu $context-menu></context-menu>
+        <delete-confirm-sheet
+          $delete-sheet
+          @confirm="${() => {
+            const idx = this.state.pendingDeleteIndex;
+            if (idx >= 0) {
+              scheduleStore.removeScheduleItem(idx);
+              toastStore.add("일정을 삭제했어요!", "info", 2000);
+              this.setState("pendingDeleteIndex", -1);
+            }
+          }}"
+        >
+          <h3 class="title">일정을 삭제하시겠습니까?</h3>
+        </delete-confirm-sheet>
         <yolo-confirm-sheet
           $yolo-confirm-sheet
           @confirm="${(e) => this.executeYolo(e.detail.prompt)}"

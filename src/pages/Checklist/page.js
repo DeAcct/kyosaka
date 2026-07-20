@@ -12,7 +12,7 @@ import "@/components/ChecklistItem/ChecklistItem";
 import "@/components/DaySelector/DaySelector";
 import "@/components/TabSelector/TabSelector";
 import "@/components/ChecklistMoveSheet/ChecklistMoveSheet";
-import "@/components/ChecklistDeleteSheet/ChecklistDeleteSheet";
+import "@/components/DeleteConfirmSheet/DeleteConfirmSheet";
 
 const checklistItemBlock = block(
   (props) => html`
@@ -209,9 +209,7 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
                   type="button"
                   class="${this.styles.button} ${this.styles.delete}"
                   @click="${() => {
-                    this.$refs.deleteSheet.open({
-                      count: selectedIds.length,
-                    });
+                    this.$refs.deleteSheet.open();
                   }}"
                 >
                   <ky-icon
@@ -229,11 +227,15 @@ export const ChecklistPage = define("page-checklist", { mapping, raw })(
           @confirm="${(e) => this.moveItem(e.detail?.dayIndex ?? e.detail)}"
         ></checklist-move-sheet>
 
-        <checklist-delete-sheet
+        <delete-confirm-sheet
           $delete-sheet
           @close="${() => checklistStore.clearSelection()}"
           @confirm="${() => this.deleteItem()}"
-        ></checklist-delete-sheet>
+        >
+          <h3 class="title">
+            ${selectedIds.length}개 항목을 삭제하시겠습니까?
+          </h3>
+        </delete-confirm-sheet>
       `;
     }
   },

@@ -1,0 +1,44 @@
+@use "@/styles/layout/modal-sheet" as sheet;
+@use "@/styles/layout/button" as button;
+@use "@/styles/layout/layout" as layout;
+
+.content {
+  @include sheet.modal-sheet;
+
+  ::slotted(.title),
+  ::slotted(h3) {
+    font-size: 1.8rem;
+    margin-bottom: 1.2rem;
+  }
+
+  ::slotted(.sub),
+  ::slotted(p) {
+    font-size: 1.6rem;
+    color: var(--gray-400);
+    margin-bottom: 2rem;
+    line-height: 1.3;
+  }
+
+  .actions {
+    display: flex;
+    margin-top: 2rem;
+
+    .button {
+      @include button.ky-button;
+      flex: 1 0 0;
+      font-size: 1.6rem;
+      color: var(--gray-200);
+      border-radius: calc(var(--card-radius-base) * 1.5 - 2rem);
+      background-color: var(--bg-200);
+
+      &.delete {
+        background-color: var(--red-500);
+        color: #ffffff;
+
+        &:hover:not(:disabled) {
+          background-color: var(--red-600);
+        }
+      }
+    }
+  }
+}

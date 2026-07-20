@@ -13,6 +13,7 @@ import { TabSelector } from "@/components/TabSelector/TabSelector";
 import { UploadSheet } from "@/components/UploadSheet/UploadSheet";
 import { PasswordModal } from "@/components/PasswordModal/PasswordModal";
 import "@/components/ContextMenu/ContextMenu";
+import "@/components/DeleteConfirmSheet/DeleteConfirmSheet";
 
 const TABS = [
   {
@@ -207,7 +208,9 @@ export const GalleryLayout = define("layout-gallery", { mapping, raw })(
                     slot="actions"
                     type="button"
                     class="${this.styles.deleteButton}"
-                    @click="${() => galleryStore.deleteSelectedItems()}"
+                    @click="${() => {
+                      this.$refs.deleteSheet.open();
+                    }}"
                   >
                     <ky-icon
                       class="${this.styles.icon}"
@@ -226,6 +229,18 @@ export const GalleryLayout = define("layout-gallery", { mapping, raw })(
           <password-modal $password-modal></password-modal>
 
           <context-menu $context-menu></context-menu>
+
+          <delete-confirm-sheet
+            $delete-sheet
+            @confirm="${() => galleryStore.deleteSelectedItems()}"
+          >
+            <h3 class="title">
+              ${galleryStore.selected.length > 1
+                ? `${galleryStore.selected.length}개 사진을 삭제하시겠습니까?`
+                : "이 사진을 삭제하시겠습니까?"}
+            </h3>
+            <p class="sub">삭제된 사진은 복구할 수 없습니다.</p>
+          </delete-confirm-sheet>
 
           ${galleryStore.mode === "overlay"
             ? html` <memory-overlay></memory-overlay> `
