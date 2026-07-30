@@ -1,4 +1,4 @@
-import { Component, define, html } from "@/lib/core";
+import { Component, define, html, block } from "@/lib/core";
 import { switcher } from "@/lib/switcher";
 import { scheduleStore } from "@/store/scheduleStore";
 import { toastStore } from "@/store/toastStore";
@@ -24,6 +24,66 @@ import "@/components/RouteCard/RouteCard";
 import "@/components/PositionBox/PositionBox";
 import "@/components/Description/Description";
 import "@/components/Icon/Icon";
+
+const scheduleItemBlock = block(
+  (props) => html`
+    <details
+      name="itinerary"
+      class="${props.styles.schedule}"
+      $details
+      style="--schedule-rows:${props.totalRows}; --i:${props.index};"
+    >
+      <summary
+        class="${props.styles.shrink}"
+        @pointerdown="${props.onPointerDown}"
+        @contextmenu.prevent="${props.onContextMenu}"
+        style="user-select: none; -webkit-user-select: none;"
+      >
+        <schedule-icon
+          class="${props.styles.icon}"
+          name="${props.item.type}"
+        ></schedule-icon>
+
+        <div class="${props.styles.text}">
+          <h2 class="${props.styles.name}">${props.item.name}</h2>
+          <p class="${props.styles.time}">
+            ${props.item.time.from} ~ ${props.item.time.to}
+          </p>
+        </div>
+        <ky-icon
+          class="${props.styles.arrow}"
+          name="chevron"
+        ></ky-icon>
+      </summary>
+
+      <div class="${props.styles.content}">
+        <strong class="${props.styles.contentTitle}">
+          ${props.item.name}
+        </strong>
+
+        ${props.item.route
+          ? html`<route-card
+              :from="${props.item.route.from}"
+              :to="${props.item.route.to}"
+            ></route-card>`
+          : ""}
+        ${props.item.position
+          ? props.item.position.map(
+              (location) =>
+                html`<position-box
+                  :data="${location}"
+                ></position-box>`,
+            )
+          : ""}
+        <ky-description
+          :list="${props.item.description || []}"
+        ></ky-description>
+      </div>
+
+      <div class="${props.styles.mask}"></div>
+    </details>
+  `,
+);
 
 export const Schedule = define("ky-schedule", { mapping, raw })(
   class extends Component {
@@ -229,67 +289,15 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
             placeholder="AI에게 부탁할 하루 일정 입력..."
             primary-icon="dice"
           ></control-bar>
-          ${list.schedule.map(
-            (item, index) => html`
-              <details
-                name="itinerary"
-                class="${this.styles.schedule}"
-                $details
-                style="--schedule-rows:${list.schedule.length +
-                1}; --i:${index};"
-              >
-                <summary
-                  class="${this.styles.shrink}"
-                  @pointerdown="${(e) =>
-                    this.handlePointerDown(e, item, index)}"
-                  @contextmenu.prevent="${() =>
-                    this.handleContextMenu(item, index)}"
-                  style="user-select: none; -webkit-user-select: none;"
-                >
-                  <schedule-icon
-                    class="${this.styles.icon}"
-                    name="${item.type}"
-                  ></schedule-icon>
-
-                  <div class="${this.styles.text}">
-                    <h2 class="${this.styles.name}">${item.name}</h2>
-                    <p class="${this.styles.time}">
-                      ${item.time.from} ~ ${item.time.to}
-                    </p>
-                  </div>
-                  <ky-icon
-                    class="${this.styles.arrow}"
-                    name="chevron"
-                  ></ky-icon>
-                </summary>
-
-                <div class="${this.styles.content}">
-                  <strong class="${this.styles.contentTitle}">
-                    ${item.name}
-                  </strong>
-
-                  ${item.route
-                    ? html`<route-card
-                        :from="${item.route.from}"
-                        :to="${item.route.to}"
-                      ></route-card>`
-                    : ""}
-                  ${item.position
-                    ? item.position.map(
-                        (location) =>
-                          html`<position-box
-                            :data="${location}"
-                          ></position-box>`,
-                      )
-                    : ""}
-                  <ky-description
-                    :list="${item.description || []}"
-                  ></ky-description>
-                </div>
-
-                <div class="${this.styles.mask}"></div>
-              </details>
-            `,
+          ${list.schedule.map((item, index) =>
+            scheduleItemBlock({
+              item,
+              index,
+              totalRows: list.schedule.length + 1,
+              styles: this.styles,
+              onPointerDown: (e) => this.handlePointerDown(e, item, index),
+              onContextMenu: () => this.handleContextMenu(item, index),
+            }),
           )}
           <button
             type="button"
