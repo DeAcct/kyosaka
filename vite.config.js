@@ -4,6 +4,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import path from "node:path";
 
 export default defineConfig({
+  envPrefix: ["VITE_", "GEMINI_"],
   plugins: [
     VitePWA({
       includeAssets: ["favicon.svg", "robots.txt"],

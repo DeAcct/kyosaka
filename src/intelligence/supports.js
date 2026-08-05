@@ -15,7 +15,35 @@ export async function checkPromptAPIAvailability() {
   }
 }
 
+export function hasGeminiApiKey() {
+  const key = import.meta.env.GEMINI_API_KEY;
+  return typeof key === "string" && key.trim().length > 0;
+}
+
+export async function getAIProvider() {
+  const isOnline = typeof navigator !== "undefined" ? navigator.onLine : true;
+
+  if (isOnline && hasGeminiApiKey()) {
+    return "remote-gemini";
+  }
+
+  const promptStatus = await checkPromptAPIAvailability();
+  if (promptStatus === "readily" || promptStatus === "after-download") {
+    return "chrome-prompt-api";
+  }
+
+  return "none";
+}
+
 export function getUnsupportedReason() {
+  const isOnline = typeof navigator !== "undefined" ? navigator.onLine : true;
+
+  if (!isOnline) {
+    return "이 기기는 오프라인 상태에서 온디바이스 AI를 지원하지 않습니다. 네트워크 연결 후 다시 시도해 주세요.";
+  }
+
+  if (hasGeminiApiKey()) return "";
+
   if (typeof window === "undefined") return "";
 
   const ua = navigator.userAgent;
@@ -33,5 +61,7 @@ export function getUnsupportedReason() {
     return "일반 Chromebook은 아직 온디바이스 AI를 지원하지 않습니다. 서비스가 확대될 수 있도록 노력하겠습니다.";
   }
 
-  return "온디바이스 AI 기능을 사용하기 위해 브라우저 설정이 필요합니다. Windows 10/11, macOS 13+, Linux, ChromeOS(Chromebook Plus)의 Google Chrome 최신 버전(126 이상)에서 AI 설정을 켜주세요.";
+  return "온디바이스 AI 기능을 사용하기 위해 브라우저 설정이 필요하거나, .env에 GEMINI_API_KEY 설정이 필요합니다. Google Chrome 최신 버전에서 AI 설정을 켜시거나 API 키를 등록해주세요.";
 }
+
+

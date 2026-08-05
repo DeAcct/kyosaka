@@ -26,9 +26,9 @@
   padding: 0.8rem 1.6rem;
   min-height: calc(var(--card-radius-base) * 2);
   border-radius: 0.8rem;
-  background: oklch(from var(--gray-050) l c h / 0.8);
+  background: oklch(from var(--bg-200) l c h / 0.85);
   backdrop-filter: blur(10px);
-  color: var(--gray-900);
+  color: var(--text-100);
   font-size: 1.6rem;
   font-weight: 500;
   word-break: keep-all;
@@ -48,11 +48,11 @@
   flex-shrink: 0;
   margin-top: -0.1rem;
   &.success {
-    color: var(--bg-100);
+    color: var(--gray-950);
     background-color: var(--green-500);
   }
   &.error {
-    color: var(--bg-100);
+    color: var(--gray-950);
     background-color: var(--tangerine-500);
   }
 }

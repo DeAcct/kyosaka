@@ -125,7 +125,7 @@ summary {
 }
 
 *:focus-visible {
-  outline: 2px solid oklch(var(--brand-500));
+  outline: 2px solid var(--brand-500);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -133,7 +133,7 @@ summary {
   display: none;
 }
 *::-webkit-scrollbar-thumb {
-  background-color: oklch(var(--gray-050));
+  background-color: var(--bg-300);
   border-radius: 9999px;
 }
 

@@ -43,11 +43,11 @@
       border-radius: calc(var(--card-radius-base) * 1.5 - 2rem);
       &.primary {
         background-color: var(--brand-500);
-        color: var(--gray-900);
+        color: var(--gray-950);
 
         &:disabled {
           background-color: var(--bg-300);
-          color: var(--gray-500);
+          color: var(--text-500);
         }
       }
     }

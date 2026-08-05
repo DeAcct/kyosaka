@@ -1,5 +1,5 @@
 //lib/diff.js
-import { BlockInstance } from './block';
+import { BlockInstance } from "./block";
 
 /**
  * 🔥 배열 렌더링 추적 시스템
@@ -101,60 +101,68 @@ function patchArrayContent(parent, anchorNode, arrayData, values, component) {
   const markerId = anchorNode._arrayMarker;
 
   // --- 🎯 Block Virtual DOM 초고속 업데이트 경로 ---
-  const isBlockArray = arrayData.length > 0 && arrayData.every(item => item && item._isBlockData);
+  const isBlockArray =
+    arrayData.length > 0 &&
+    arrayData.every((item) => item && item._isBlockData);
   const wasBlockArray = !!anchorNode._blockInstances;
 
   if (isBlockArray || wasBlockArray) {
     const instances = anchorNode._blockInstances || [];
     const newInstances = [];
     let isCurrentlyBlockArray = isBlockArray;
-    
+
     // 만약 현재 빈 배열이거나 일반 배열로 전환되었다면 blockInstances를 비워야 함
     if (!isBlockArray && arrayData.length > 0) {
-       // 블록 배열에서 일반 배열로 전환된 특이 케이스 -> 인스턴스 전부 제거 후 일반 로직으로 폴백
-       instances.forEach(inst => inst.remove());
-       anchorNode._blockInstances = null;
+      // 블록 배열에서 일반 배열로 전환된 특이 케이스 -> 인스턴스 전부 제거 후 일반 로직으로 폴백
+      instances.forEach((inst) => inst.remove());
+      anchorNode._blockInstances = null;
     } else {
-       const maxLength = Math.max(instances.length, arrayData.length);
-       let currentDOMAnchor = anchorNode.nextSibling;
-       
-       for (let i = 0; i < maxLength; i++) {
-          const oldInst = instances[i];
-          const newBlockData = arrayData[i];
-          
-          if (oldInst && newBlockData) {
-             if (oldInst.def === newBlockData.def) {
-                // 구조가 같다면 diff 생략하고 O(1) 값만 교체
-                oldInst.patch(newBlockData.values);
-                newInstances.push(oldInst);
-                currentDOMAnchor = oldInst.rootNodes[oldInst.rootNodes.length - 1].nextSibling;
-             } else {
-                // 다른 형태의 블록일 경우 교체
-                const newInst = new BlockInstance(newBlockData.def, newBlockData.values, component);
-                oldInst.remove();
-                newInst.insertBefore(parent, currentDOMAnchor);
-                newInstances.push(newInst);
-             }
-          } else if (!oldInst && newBlockData) {
-             const newInst = new BlockInstance(newBlockData.def, newBlockData.values, component);
-             newInst.insertBefore(parent, currentDOMAnchor);
-             newInstances.push(newInst);
-          } else if (oldInst && !newBlockData) {
-             oldInst.remove();
+      const maxLength = Math.max(instances.length, arrayData.length);
+      let currentDOMAnchor = anchorNode.nextSibling;
+
+      for (let i = 0; i < maxLength; i++) {
+        const oldInst = instances[i];
+        const newBlockData = arrayData[i];
+
+        if (oldInst && newBlockData) {
+          if (oldInst.def === newBlockData.def) {
+            // 구조가 같다면 diff 생략하고 O(1) 값만 교체
+            oldInst.patch(newBlockData.values);
+            newInstances.push(oldInst);
+            currentDOMAnchor =
+              oldInst.rootNodes[oldInst.rootNodes.length - 1].nextSibling;
+          } else {
+            // 다른 형태의 블록일 경우 교체
+            const newInst = new BlockInstance(
+              newBlockData.def,
+              newBlockData.values,
+              component,
+            );
+            oldInst.remove();
+            newInst.insertBefore(parent, currentDOMAnchor);
+            newInstances.push(newInst);
           }
-       }
-       
-       anchorNode._blockInstances = newInstances;
-       if (isBlockArray || arrayData.length === 0) return; // 성공적으로 블록 처리 완료
+        } else if (!oldInst && newBlockData) {
+          const newInst = new BlockInstance(
+            newBlockData.def,
+            newBlockData.values,
+            component,
+          );
+          newInst.insertBefore(parent, currentDOMAnchor);
+          newInstances.push(newInst);
+        } else if (oldInst && !newBlockData) {
+          oldInst.remove();
+        }
+      }
+
+      anchorNode._blockInstances = newInstances;
+      if (isBlockArray || arrayData.length === 0) return;
     }
   }
-
-  // --- 기존 범용 DOM Diffing 경로 ---
 
   const oldNodes = [];
   let current = anchorNode.nextSibling;
 
-  // 🎯 자신의 고유 end 앵커를 만날 때까지만 수집 (다른 형제 노드 침범 방지)
   while (current) {
     if (
       current.nodeType === Node.COMMENT_NODE &&
@@ -169,9 +177,7 @@ function patchArrayContent(parent, anchorNode, arrayData, values, component) {
 
   const endAnchor = current;
 
-  // 기존 범용 DOM Diffing 경로에서는 속성/프로퍼티 갱신이 불가능하므로 (values 컨텍스트 분리),
-  // 기존 노드를 모두 삭제하고 새로 렌더링된 노드를 삽입합니다.
-  oldNodes.forEach(node => {
+  oldNodes.forEach((node) => {
     cleanupEventListeners(node);
     node.remove();
   });
@@ -181,8 +187,6 @@ function patchArrayContent(parent, anchorNode, arrayData, values, component) {
     parent.insertBefore(rendered, endAnchor);
   });
 }
-
-// lib/diff.js
 
 export function patch(parent, newNode, oldNode, index, values, component) {
   // 🎯 오직 start 앵커일 때만 배열 패치 진입
@@ -194,8 +198,12 @@ export function patch(parent, newNode, oldNode, index, values, component) {
     const markerId = oldNode._arrayMarker;
     const realValue = values[markerId];
 
-    if (Array.isArray(realValue)) {
-      patchArrayContent(parent, oldNode, realValue, values, component);
+    const isHtmlObject =
+      realValue && typeof realValue === "object" && realValue.strings;
+
+    if (Array.isArray(realValue) || isHtmlObject) {
+      const arrayData = isHtmlObject ? [realValue] : realValue;
+      patchArrayContent(parent, oldNode, arrayData, values, component);
       return;
     }
   }
@@ -224,15 +232,11 @@ export function patch(parent, newNode, oldNode, index, values, component) {
     if (oldNode) cleanupEventListeners(oldNode);
     targetNode = newNode.cloneNode(true);
 
-    // 🔥 [핵심]: appendChild / replaceChild로 실DOM에 꽂기 "전에"
-    // 속성과 프로퍼티(:type 등)를 컴포넌트 인스턴스에 동기식으로 먼저 주입합니다.
     if (newNode.nodeType === Node.ELEMENT_NODE) {
       updateAttrs(newNode, targetNode, values);
       updateProps(newNode, targetNode, values, component);
     }
 
-    // 데이터가 이미 완벽하게 안착된 상태에서 DOM에 바인딩되므로,
-    // 이 직후 터지는 connectedCallback() -> template() 내부에서 this.type을 정상 인식합니다.
     if (!oldNode) parent.appendChild(targetNode);
     else parent.replaceChild(targetNode, oldNode);
   }
@@ -245,18 +249,17 @@ export function patch(parent, newNode, oldNode, index, values, component) {
       const markerId = match[1];
       const realValue = values[markerId];
 
-      if (Array.isArray(realValue)) {
+      const isHtmlObject =
+        realValue && typeof realValue === "object" && realValue.strings;
+
+      if (Array.isArray(realValue) || isHtmlObject) {
+        const arrayData = isHtmlObject ? [realValue] : realValue;
         const startAnchor = createArrayAnchor(markerId, "start");
         const endAnchor = createArrayAnchor(markerId, "end");
         parent.replaceChild(startAnchor, targetNode);
         parent.insertBefore(endAnchor, startAnchor.nextSibling);
 
-        patchArrayContent(parent, startAnchor, realValue, values, component);
-        return;
-      }
-
-      if (realValue && typeof realValue === "object" && realValue.strings) {
-        parent.replaceChild(renderValue(realValue, component), targetNode);
+        patchArrayContent(parent, startAnchor, arrayData, values, component);
         return;
       }
 
@@ -453,11 +456,13 @@ export function updateProps(blueprint, target, values, component) {
               left: "ArrowLeft",
               right: "ArrowRight",
             };
-            
+
             // 키(key) 관련 수식어가 포함되어 있는지 확인
-            const activeKeyModifiers = modifiers.filter(m => keyMap[m] !== undefined);
+            const activeKeyModifiers = modifiers.filter(
+              (m) => keyMap[m] !== undefined,
+            );
             if (activeKeyModifiers.length > 0) {
-              const isMatch = activeKeyModifiers.some(m => {
+              const isMatch = activeKeyModifiers.some((m) => {
                 const targetKey = keyMap[m];
                 if (Array.isArray(targetKey)) return targetKey.includes(e.key);
                 return e.key === targetKey;

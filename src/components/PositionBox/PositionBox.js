@@ -6,6 +6,15 @@ import raw from "./positionBox.module.scss?inline";
 
 import "@/components/Icon/Icon";
 
+function isDomestic(name = "", address = "") {
+  const text = `${name} ${address}`;
+  const domesticPattern = /대한민국|서울|경기|인천|강원|충북|충남|전북|전남|경북|경남|제주|부산|대구|광주|대전|울산|세종|특별시|광역시|특별자치/i;
+  if (domesticPattern.test(text)) return true;
+
+  const krAddressPattern = /[가-힣]+(?:시|군|구|읍|면|동|리|가|로|길)\s?\d*/;
+  return krAddressPattern.test(address);
+}
+
 export const PositionBox = define("position-box", { mapping, raw })(
   class extends Stateless {
     get mapUrl() {
@@ -19,7 +28,11 @@ export const PositionBox = define("position-box", { mapping, raw })(
       const query = this.data.address
         ? `${this.data.name} ${this.data.address}`
         : this.data.name;
-      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query.trim())}`;
+      const qStr = query.trim();
+      if (isDomestic(this.data.name, this.data.address)) {
+        return `https://map.naver.com/p/search/${encodeURIComponent(qStr)}`;
+      }
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(qStr)}`;
     }
 
     async handleCopy() {
@@ -87,5 +100,5 @@ export const PositionList = define("ky-position-list", { mapping, raw })(
         </div>
       `;
     }
-  }
+  },
 );

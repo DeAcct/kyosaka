@@ -35,7 +35,7 @@
     width: 100%;
     font-size: 2rem;
     background: linear-gradient(
-      oklch(from var(--gray-950) l c h / 0.5),
+      oklch(from var(--gray-000) l c h / 0.7),
       transparent
     );
   }
@@ -48,6 +48,7 @@
     width: 4.8rem;
     height: 4.8rem;
     background-color: var(--gray-950);
+    color: var(--gray-050);
     font-size: 2.4rem;
     border-radius: 50%;
     pointer-events: all;

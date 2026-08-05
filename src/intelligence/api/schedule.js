@@ -3,7 +3,7 @@ import {
   SCHEDULE_SCHEMA,
   safeJsonParse,
   transformModelToScheduleItem,
-  getLanguageModelSession,
+  executeAIPrompt,
 } from "../helpers";
 
 export async function generateScheduleFromPrompt(
@@ -40,12 +40,12 @@ export async function generateScheduleFromPrompt(
 사용자가 구체적인 장소나 시간 대신 테마성 키워드나 제안을 입력한 경우(예: '주변 맛집 추천'), 해당 조건에 어울리는 가상의 구체적인 장소명과 내용을 생성해라.
 만약 정보가 부족하다면 자연스러운 기본값(시간은 09:00~10:00, 예산은 0 등)이나 그럴듯한 내용으로 필드를 채워라.${contextPrompt}`;
 
-  const session = await getLanguageModelSession(systemPrompt);
-
   try {
-    const response = await session.prompt(finalPrompt, {
-      responseConstraint: SCHEDULE_SCHEMA,
-    });
+    const response = await executeAIPrompt(
+      systemPrompt,
+      finalPrompt,
+      SCHEDULE_SCHEMA,
+    );
 
     const data = safeJsonParse(response.trim());
     return transformModelToScheduleItem(data, finalPrompt);

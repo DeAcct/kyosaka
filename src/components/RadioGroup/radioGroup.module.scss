@@ -14,10 +14,10 @@
   border-radius: 1.2rem;
   transition: 150ms ease-out;
   font-weight: 500;
-  color: var(--gray-200);
+  color: var(--text-400);
   &.active {
     font-weight: 600;
-    color: var(--gray-100);
+    color: var(--text-100);
     background-color: var(--bg-100);
   }
 }

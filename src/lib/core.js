@@ -226,6 +226,26 @@ export const updateDOM = (parent, templateResult, component) => {
   const temp = document.createElement("template");
   temp.innerHTML = fullHTML;
 
+  const splitTextNodes = (node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent;
+      const markerRegex = /(__VAL_\d+__)/g;
+      if (markerRegex.test(text)) {
+        const parts = text.split(markerRegex);
+        if (parts.length > 3 || parts[0] !== "" || parts[2] !== "") {
+          const parent = node.parentNode;
+          parts.forEach((part) => {
+            if (part) parent.insertBefore(document.createTextNode(part), node);
+          });
+          node.remove();
+        }
+      }
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      Array.from(node.childNodes).forEach(splitTextNodes);
+    }
+  };
+  Array.from(temp.content.childNodes).forEach(splitTextNodes);
+
   const globalEventBinderElement = temp.content.querySelector("global");
   if (globalEventBinderElement) {
     if (component._globalHandlers) {

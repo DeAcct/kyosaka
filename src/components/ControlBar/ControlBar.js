@@ -33,7 +33,7 @@ export const ControlBar = define("control-bar", { mapping, raw })(
 
     template() {
       const mode = this.mode;
-      const placeholder = this.getAttribute("placeholder");
+      const placeholder = this.placeholder || this.getAttribute("placeholder");
       const primaryIcon = this.getAttribute("primary-icon");
       const isLoading = this.loading || this.getAttribute("loading") === "true";
 

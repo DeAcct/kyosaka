@@ -3,10 +3,6 @@ import { switcher } from "@/lib/switcher";
 import { scheduleStore } from "@/store/scheduleStore";
 import { toastStore } from "@/store/toastStore";
 import { generateDayScheduleFromPrompt } from "@/intelligence/api/yolo";
-import {
-  checkPromptAPIAvailability,
-  getUnsupportedReason,
-} from "@/intelligence/supports";
 
 import mapping from "./schedule.module.scss";
 import raw from "./schedule.module.scss?inline";
@@ -26,57 +22,51 @@ import "@/components/Description/Description";
 import "@/components/Icon/Icon";
 
 const scheduleItemBlock = (props) => html`
-    <details
-      name="itinerary"
-      class="${props.styles.schedule}"
-      $details
-      style="--schedule-rows:${props.totalRows}; --i:${props.index};"
+  <details
+    name="itinerary"
+    class="${props.styles.schedule}"
+    $details
+    style="--schedule-rows:${props.totalRows}; --i:${props.index};"
+  >
+    <summary
+      class="${props.styles.shrink}"
+      @pointerdown="${props.onPointerDown}"
+      @contextmenu.prevent="${props.onContextMenu}"
+      style="user-select: none; -webkit-user-select: none;"
     >
-      <summary
-        class="${props.styles.shrink}"
-        @pointerdown="${props.onPointerDown}"
-        @contextmenu.prevent="${props.onContextMenu}"
-        style="user-select: none; -webkit-user-select: none;"
-      >
-        <schedule-icon
-          class="${props.styles.icon}"
-          name="${props.item.type}"
-        ></schedule-icon>
+      <schedule-icon
+        class="${props.styles.icon}"
+        name="${props.item.type}"
+      ></schedule-icon>
 
-        <div class="${props.styles.text}">
-          <h2 class="${props.styles.name}">${props.item.name}</h2>
-          <p class="${props.styles.time}">
-            ${props.item.time.from} ~ ${props.item.time.to}
-          </p>
-        </div>
-        <ky-icon
-          class="${props.styles.arrow}"
-          name="chevron"
-        ></ky-icon>
-      </summary>
-
-      <div class="${props.styles.content}">
-        <strong class="${props.styles.contentTitle}">
-          ${props.item.name}
-        </strong>
-
-        ${props.item.route
-          ? html`<route-card
-              :from="${props.item.route.from}"
-              :to="${props.item.route.to}"
-            ></route-card>`
-          : ""}
-        <ky-position-list
-          :list="${props.item.position || []}"
-        ></ky-position-list>
-        <ky-description
-          :list="${props.item.description || []}"
-        ></ky-description>
+      <div class="${props.styles.text}">
+        <h2 class="${props.styles.name}">${props.item.name}</h2>
+        <p class="${props.styles.time}">
+          ${props.item.time.from} ~ ${props.item.time.to}
+        </p>
       </div>
+      <ky-icon
+        class="${props.styles.arrow}"
+        name="chevron"
+      ></ky-icon>
+    </summary>
 
-      <div class="${props.styles.mask}"></div>
-    </details>
-  `;
+    <div class="${props.styles.content}">
+      <strong class="${props.styles.contentTitle}"> ${props.item.name} </strong>
+
+      ${props.item.route
+        ? html`<route-card
+            :from="${props.item.route.from}"
+            :to="${props.item.route.to}"
+          ></route-card>`
+        : ""}
+      <ky-position-list :list="${props.item.position || []}"></ky-position-list>
+      <ky-description :list="${props.item.description || []}"></ky-description>
+    </div>
+
+    <div class="${props.styles.mask}"></div>
+  </details>
+`;
 
 export const Schedule = define("ky-schedule", { mapping, raw })(
   class extends Component {
@@ -86,6 +76,8 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
     state = {
       isYoloLoading: false,
       pendingDeleteIndex: -1,
+      temporarySchedule: null,
+      yoloStatusText: "",
     };
 
     setup() {
@@ -200,23 +192,9 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
     }
 
     async executeYolo(promptText) {
-      const availability = await checkPromptAPIAvailability();
-
-      if (availability === "no") {
-        toastStore.add(getUnsupportedReason(), "error", 3000);
-        return;
-      }
-
-      if (availability === "after-download") {
-        toastStore.add(
-          "AI 연산에 필요한 로컬 인공지능 모델을 다운로드하고 있습니다. 다운로드가 끝날 때까지 잠시만 기다리신 후 다시 시도해 주세요.",
-          "error",
-          3000,
-        );
-        return;
-      }
-
       this.setState("isYoloLoading", true);
+      this.setState("temporarySchedule", []);
+      this.setState("yoloStatusText", "AI에 요청중...");
       toastStore.add("AI가 하루 일정을 설계하고 있어요...", "info", 3000);
 
       try {
@@ -229,16 +207,26 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
         const isFirstDay = dayIndex === 0;
         const isLastDay = dayIndex === totalDays - 1;
 
-        const result = await generateDayScheduleFromPrompt(promptText, {
+        const stream = generateDayScheduleFromPrompt(promptText, {
           isFirstDay,
           isLastDay,
         });
 
-        scheduleStore.setDaySchedule(
-          result.schedules,
-          result.dayName,
-          result.dayDescription,
-        );
+        let finalResult = null;
+        for await (const result of stream) {
+          this.setState("yoloStatusText", "AI가 만든 일정 분석중...");
+          this.setState("temporarySchedule", result.schedules);
+          finalResult = result;
+        }
+
+        if (finalResult) {
+          scheduleStore.setDaySchedule(
+            finalResult.schedules,
+            finalResult.dayName,
+            finalResult.dayDescription,
+          );
+        }
+
         if (this.$refs.controlBar) {
           this.$refs.controlBar.clear();
         }
@@ -251,6 +239,8 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
         );
       } finally {
         this.setState("isYoloLoading", false);
+        this.setState("temporarySchedule", null);
+        this.setState("yoloStatusText", "");
       }
     }
 
@@ -261,6 +251,11 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
       if (!plans || plans.length === 0) {
         return html`<ky-fallback>등록된 여행 플랜이 없습니다.</ky-fallback>`;
       }
+
+      const renderSchedule =
+        this.state.isYoloLoading && this.state.temporarySchedule
+          ? this.state.temporarySchedule
+          : list.schedule;
 
       return html`
         <slot name="selector"></slot>
@@ -279,30 +274,38 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
             class="${this.styles.yoloBar} ${this.state.yoloFeature}"
             loading="${this.state.isYoloLoading}"
             @submit="${(e) => this.handleYolo(e)}"
-            placeholder="AI에게 부탁할 하루 일정 입력..."
+            :placeholder="${this.state.isYoloLoading
+              ? this.state.yoloStatusText
+              : "AI에게 부탁할 하루 일정 입력..."}"
             primary-icon="dice"
           ></control-bar>
-          ${list.schedule.map((item, index) =>
+          ${renderSchedule.map((item, index) =>
             scheduleItemBlock({
               item,
               index,
-              totalRows: list.schedule.length + 1,
+              totalRows: renderSchedule.length + 1,
               styles: this.styles,
               onPointerDown: (e) => this.handlePointerDown(e, item, index),
               onContextMenu: () => this.handleContextMenu(item, index),
             }),
           )}
-          <button
-            type="button"
-            class="${this.styles.schedule}"
-            @click="${() => scheduleStore.toggleEditSchedule(true, -1)}"
-          >
-            <ky-icon
-              name="add"
-              class="${this.styles.addIcon}"
-            ></ky-icon>
-            일정 추가
-          </button>
+          ${this.state.isYoloLoading
+            ? []
+            : [
+                html`
+                  <button
+                    type="button"
+                    class="${this.styles.schedule}"
+                    @click="${() => scheduleStore.toggleEditSchedule(true, -1)}"
+                  >
+                    <ky-icon
+                      name="add"
+                      class="${this.styles.addIcon}"
+                    ></ky-icon>
+                    일정 추가
+                  </button>
+                `,
+              ]}
         </swipe-wrap>
         <edit-schedule-form
           :schedule-data="${scheduleStore.editingScheduleItem}"

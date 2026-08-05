@@ -108,7 +108,7 @@ swipe-wrap {
   .icon {
     flex-shrink: 0;
     background-color: var(--bg-300);
-    color: var(--bg-500);
+    color: var(--text-400);
     font-size: 2.4rem;
   }
 
@@ -133,7 +133,7 @@ swipe-wrap {
     font-size: 3.6rem;
     margin-left: auto;
     flex-shrink: 0;
-    color: var(--bg-500);
+    color: var(--text-400);
 
     // 🔍 미디어 쿼리별 특수 정렬 및 오버라이딩 정보만 본진에 잔류시킵니다.
     @media screen and (min-width: 690px) {

@@ -1,4 +1,9 @@
-import { checkPromptAPIAvailability, getUnsupportedReason } from "./supports";
+import {
+  checkPromptAPIAvailability,
+  getUnsupportedReason,
+  getAIProvider,
+} from "./supports";
+import { promptGemini, promptStreamGemini } from "./providers/remoteGemini";
 
 export const SCHEDULE_SCHEMA = {
   type: "object",
@@ -124,4 +129,101 @@ export async function getLanguageModelSession(systemPrompt) {
 
   const api = window.LanguageModel || window.ai.languageModel;
   return await api.create({ systemPrompt, language: "en" });
+}
+
+export async function executeAIPrompt(systemPrompt, userPrompt, schema) {
+  const provider = await getAIProvider();
+
+  if (provider === "chrome-prompt-api") {
+    const session = await getLanguageModelSession(systemPrompt);
+    return await session.prompt(userPrompt, {
+      responseConstraint: schema,
+    });
+  }
+
+  if (provider === "remote-gemini") {
+    return await promptGemini(systemPrompt, userPrompt, schema);
+  }
+
+  throw new Error(getUnsupportedReason() || "사용 가능한 AI 서비스가 없습니다.");
+}
+
+export async function* executeAIStreamPrompt(systemPrompt, userPrompt, schema) {
+  const provider = await getAIProvider();
+
+  if (provider === "chrome-prompt-api") {
+    const session = await getLanguageModelSession(systemPrompt);
+    const stream = await session.promptStreaming(userPrompt, {
+      responseConstraint: schema,
+    });
+    for await (const chunk of stream) {
+      yield chunk;
+    }
+    return;
+  }
+
+  if (provider === "remote-gemini") {
+    const stream = promptStreamGemini(systemPrompt, userPrompt, schema);
+    for await (const chunk of stream) {
+      yield chunk;
+    }
+    return;
+  }
+
+  throw new Error(getUnsupportedReason() || "사용 가능한 AI 서비스가 없습니다.");
+}
+
+export function extractPartialSchedule(text) {
+  let dayName = "로딩 중...";
+  let dayDescription = "일정을 생성하고 있습니다...";
+  let schedules = [];
+
+  const nameMatch = text.match(/"dayName"\s*:\s*"([^"]+)/);
+  if (nameMatch) dayName = nameMatch[1];
+
+  const descMatch = text.match(/"dayDescription"\s*:\s*"([^"]+)/);
+  if (descMatch) dayDescription = descMatch[1];
+
+  const schedulesMatch = text.match(/"schedules"\s*:\s*\[(.*)/s);
+  if (schedulesMatch) {
+    const schedulesText = schedulesMatch[1];
+    let depth = 0;
+    let objStart = -1;
+    let inString = false;
+    let escape = false;
+
+    for (let i = 0; i < schedulesText.length; i++) {
+      const char = schedulesText[i];
+      if (escape) {
+        escape = false;
+        continue;
+      }
+      if (char === '\\') {
+        escape = true;
+        continue;
+      }
+      if (char === '"') {
+        inString = !inString;
+        continue;
+      }
+      if (!inString) {
+        if (char === '{') {
+          if (depth === 0) objStart = i;
+          depth++;
+        } else if (char === '}') {
+          depth--;
+          if (depth === 0 && objStart !== -1) {
+            const objStr = schedulesText.substring(objStart, i + 1);
+            try {
+              schedules.push(JSON.parse(objStr));
+            } catch (e) {
+              // ignore parse errors for partial objects
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return { dayName, dayDescription, schedules };
 }

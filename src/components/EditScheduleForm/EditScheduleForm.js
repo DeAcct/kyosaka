@@ -13,10 +13,6 @@ import "@/components/TypeSelector/TypeSelector";
 import "@/components/TimeRange/TimeRange";
 import "@/components/EditPositionItem/EditPositionItem";
 import { generateScheduleFromPrompt } from "@/intelligence/api/schedule";
-import {
-  checkPromptAPIAvailability,
-  getUnsupportedReason,
-} from "@/intelligence/supports";
 
 const SCHEDULE_TYPES = [
   { value: "transport", label: "이동", icon: "transport" },
@@ -29,11 +25,6 @@ const SCHEDULE_TYPES = [
   { value: "photo_camera", label: "사진", icon: "photo_camera" },
   { value: "temple_buddhist", label: "전통", icon: "temple_buddhist" },
 ];
-
-const SUPPORTS_PROMPT_API =
-  typeof window !== "undefined" &&
-  ("LanguageModel" in window ||
-    ("ai" in window && "languageModel" in window.ai));
 
 export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
   class extends Component {
@@ -72,7 +63,7 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
         const currentSchedules = scheduleStore.selectedDayList?.schedule || [];
         if (currentSchedules.length > 0) {
           const sortedSchedules = [...currentSchedules].sort((a, b) =>
-            a.time.to.localeCompare(b.time.to)
+            a.time.to.localeCompare(b.time.to),
           );
           const lastSchedule = sortedSchedules[sortedSchedules.length - 1];
           if (lastSchedule.time && lastSchedule.time.to) {
@@ -83,8 +74,6 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
 
             if (nextHours >= 24) {
               if (hours === 23 && minutes === 59) {
-                // If the last schedule ends at 23:59, we can't really add another one easily,
-                // but we will fallback to something reasonable.
                 defaultTimeFrom = "22:59";
                 defaultTimeTo = "23:59";
               } else {
@@ -238,22 +227,6 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
         promptText = defaultPrompts[type] || "여행 일정 추천";
       }
 
-      const availability = await checkPromptAPIAvailability();
-
-      if (availability === "no") {
-        toastStore.add(getUnsupportedReason(), "error", 3000);
-        return;
-      }
-
-      if (availability === "after-download") {
-        toastStore.add(
-          "AI 연산에 필요한 로컬 인공지능 모델을 다운로드하고 있습니다. 다운로드가 끝날 때까지 잠시만 기다리신 후 다시 시도해 주세요.",
-          "error",
-          3000,
-        );
-        return;
-      }
-
       this.setState("isAiLoading", true);
       toastStore.add("AI가 일정을 분석하고 있어요...", "info", 3000);
 
@@ -287,7 +260,11 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
       }
 
       if (timeFrom >= timeTo) {
-        toastStore.add("시작 시간은 종료 시간보다 앞서야 합니다.", "error", 2000);
+        toastStore.add(
+          "시작 시간은 종료 시간보다 앞서야 합니다.",
+          "error",
+          2000,
+        );
         return;
       }
 
@@ -304,7 +281,11 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
       });
 
       if (isOverlapping) {
-        toastStore.add("다른 일정과 겹치는 시간에는 저장할 수 없습니다.", "error", 2000);
+        toastStore.add(
+          "다른 일정과 겹치는 시간에는 저장할 수 없습니다.",
+          "error",
+          2000,
+        );
         return;
       }
 
@@ -373,15 +354,11 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
 
       const tooltips = [
         { icon: "paste", title: "일정 붙여넣기", onClick: this.handlePaste },
-        ...(SUPPORTS_PROMPT_API
-          ? [
-              {
-                icon: "ai",
-                title: "일정 ai추천",
-                onClick: () => this.handleAi(),
-              },
-            ]
-          : []),
+        {
+          icon: "ai",
+          title: "일정 ai추천",
+          onClick: () => this.handleAi(),
+        },
       ];
 
       return html`

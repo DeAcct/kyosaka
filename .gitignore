@@ -26,6 +26,8 @@ dist-ssr
 *.sln
 *.sw?
 
+.env
+
 mock.json
 시안.png
 test.jpg

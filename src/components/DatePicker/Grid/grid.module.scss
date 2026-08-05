@@ -69,6 +69,7 @@
       &.end {
         z-index: 2;
         font-weight: 700;
+        color: var(--gray-050);
 
         &::before {
           content: "";
@@ -89,7 +90,7 @@
   &.dayMode {
     .day {
       &:not(.inRange):not(.empty) {
-        color: var(--bg-500);
+        color: var(--text-500);
       }
 
       &.activeDay {

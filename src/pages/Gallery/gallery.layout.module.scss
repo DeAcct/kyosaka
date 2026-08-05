@@ -89,7 +89,7 @@
   align-items: center;
   justify-content: center;
   background-color: var(--brand-500);
-  color: var(--bg-100);
+  color: var(--gray-950);
 
   &:hover:not(:disabled) {
     background-color: var(--brand-600);
@@ -110,7 +110,7 @@
   width: auto;
   white-space: nowrap;
   background-color: var(--brand-500);
-  color: var(--bg-100);
+  color: var(--gray-950);
 
   &:hover:not(:disabled) {
     background-color: var(--brand-600);
@@ -154,7 +154,7 @@
   align-items: center;
   justify-content: center;
   background-color: var(--red-500);
-  color: #ffffff;
+  color: var(--gray-950);
 
   &:hover:not(:disabled) {
     background-color: var(--red-600);
@@ -205,7 +205,7 @@
     padding: 1rem 2.4rem;
     border-radius: 1.2rem;
     font-size: 1.4rem;
-    background-color: var(--primary, #3b82f6);
-    color: #fff;
+    background-color: var(--brand-500);
+    color: var(--gray-950);
   }
 }
