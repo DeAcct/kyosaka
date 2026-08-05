@@ -227,8 +227,4 @@ export function extractPartialSchedule(text) {
   return { dayName, dayDescription, schedules };
 }
 
-export function isNorthKoreaPrompt(promptText = "", planTitle = "") {
-  const pattern = /북한|평양|조선민주주의인민공화국|north\s*korea/i;
-  return pattern.test(promptText || "") || pattern.test(planTitle || "");
-}
 
