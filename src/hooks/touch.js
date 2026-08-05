@@ -12,7 +12,9 @@ export function useSwipe(callbacks, threshold = 10) {
       isTriggered = false;
       startPos = { x: e.clientX, y: e.clientY };
 
-      if (e.pointerType === "mouse") e.preventDefault();
+      if (e.pointerType === "mouse" && e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") {
+        e.preventDefault();
+      }
     },
 
     move: (e) => {

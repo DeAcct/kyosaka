@@ -279,6 +279,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
             class="${this.styles.yoloBar} ${this.state.yoloFeature}"
             loading="${this.state.isYoloLoading}"
             @submit="${(e) => this.handleYolo(e)}"
+            @pointerdown.stop
             :placeholder="${this.state.isYoloLoading
               ? this.state.yoloStatusText
               : "AI에게 부탁할 하루 일정 입력..."}"

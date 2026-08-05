@@ -39,6 +39,8 @@
   transition: all 150ms var(--ease-in-out-quad);
   transition-behavior: allow-discrete;
   height: 4.8rem;
+  user-select: text;
+  cursor: text;
 
   &.show {
     display: flex;
