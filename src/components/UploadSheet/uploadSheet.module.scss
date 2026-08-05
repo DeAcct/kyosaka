@@ -53,7 +53,4 @@ modal-sheet::part(content) {
     font-size: 1.6rem;
     color: var(--text-500);
   }
-  &:focus-visible {
-    border-color: var(--brand-500);
-  }
 }

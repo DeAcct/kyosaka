@@ -8,28 +8,62 @@ import {
 } from "../helpers";
 
 export async function* generateDayScheduleFromPrompt(promptText, options = {}) {
-  const { isFirstDay, isLastDay } = options;
+  const {
+    isFirstDay,
+    isLastDay,
+    planTitle = "",
+    contextSchedules = [],
+  } = options;
   const sanitized = sanitizePrompt(promptText);
-  const finalPrompt = sanitized
-    ? `${sanitized} (반드시 모든 텍스트 필드를 한국어로 작성해줘.)`
-    : "하루 여행 일정 추천 (반드시 모든 텍스트 필드를 한국어로 작성해줘.)";
+
+  const sessionNonce = Math.random().toString(36).substring(7);
+  let finalPrompt = "";
+  if (planTitle && planTitle.trim() && planTitle.trim() !== "제목 없는 여행") {
+    finalPrompt += `[전체 여행 제목]: ${planTitle.trim()}\n`;
+  }
+  if (sanitized && sanitized.trim()) {
+    finalPrompt += `[사용자 요청]: ${sanitized.trim()}\n`;
+  } else {
+    finalPrompt += `[사용자 요청]: 하루 여행 일정 추천\n`;
+  }
+  finalPrompt += `[요청 식별키]: ${sessionNonce}\n(반드시 모든 텍스트 필드를 한국어로 작성해줘.)`;
+
+  let contextPrompt = "";
+  if (Array.isArray(contextSchedules) && contextSchedules.length > 0) {
+    contextPrompt =
+      `\n\n[이 날의 기존 일정들]:\n` +
+      contextSchedules
+        .map((s, idx) => {
+          const timeStr = s.time ? `${s.time.from}~${s.time.to}` : "";
+          const routeStr = s.route ? ` (${s.route.from} -> ${s.route.to})` : "";
+          const posStr =
+            s.position && s.position[0] ? ` [장소: ${s.position[0].name}]` : "";
+          return `${idx + 1}. [${s.type}] ${s.name} ${timeStr}${routeStr}${posStr}`;
+        })
+        .join("\n") +
+      "\n위 기존 일정의 동선과 시간이 자연스럽게 연결되도록 하루 일정을 구성해라.";
+  }
 
   let airportInstruction = "";
   if (isFirstDay && isLastDay) {
     airportInstruction = `\n[특수 상황 - 1일짜리 여행]: 오늘은 당일치기 여행(출발 및 귀국이 같은 날)이다. 하루 일정의 시작은 공항에서 출발하여 이동하는 일정으로, 하루 일정의 끝은 다시 공항으로 돌아가는 일정으로 양쪽에 공항 관련 일정을 포함해라.`;
   } else if (isFirstDay) {
-    airportInstruction = `\n[특수 상황 - 첫째 날]: 오늘은 여행의 첫째 날(출발일)이다. 하루 일정의 맨 처음에는 공항(예: 간사이 공항, 하네다 공항 등)에 도착하여 시내로 이동하는 일정(교통편 등)이 반드시 포함되도록 구성해라.`;
+    airportInstruction = `\n[특수 상황 - 첫째 날]: 오늘은 여행의 첫째 날(출발일)이다. 하루 일정의 맨 처음에는 주요 공항에 도착하여 시내로 이동하는 일정(교통편 등)이 반드시 포함되도록 구성해라.`;
   } else if (isLastDay) {
-    airportInstruction = `\n[특수 상황 - 마지막 날]: 오늘은 여행의 마지막 날(귀국일)이다. 하루 일정의 맨 마지막에는 시내에서 공항(예: 간사이 공항, 하네다 공항 등)으로 이동하여 귀국 비행기를 타러 가는 일정(교통편 등)이 반드시 포함되도록 구성해라.`;
+    airportInstruction = `\n[특수 상황 - 마지막 날]: 오늘은 여행의 마지막 날(귀국일)이다. 하루 일정의 맨 마지막에는 시내에서 주요 공항으로 이동하여 귀국 비행기를 타러 가는 일정(교통편 등)이 반드시 포함되도록 구성해라.`;
   }
 
   const systemPrompt = `너는 한국인을 위한 여행 하루 일정을 짜주는 AI 어시스턴트이다.
-[필수 규칙]: 모든 문자열 필드(name, descriptionText, posName, posAddress 등)의 값은 반드시 한국어로만 작성해야 한다. 영어 장소명이 입력되어도 한국어 발음이나 한글 번역으로 변환하여 입력해라. (예: "Shibuya Station" -> "시부야역")
+[필수 규칙]: 모든 문자열 필드(name, descriptionText, posName, posAddress 등)의 값은 반드시 한국어로만 작성해야 한다. 영어 장소명이 입력되어도 한국어 발음이나 한글 번역으로 변환하여 입력해라.
 ${airportInstruction}
+${contextPrompt}
 
-사용자가 입력한 테마나 지역에 맞게 하루 일정을 생성해라.
-반드시 이 일정에 걸맞은 하루의 제목(dayName, 예: "오사카 도심 탐방과 식도락")과 하루 소개(dayDescription, 예: "도톤보리 주변 맛집을 탐방하고 번화가를 걷는 신나는 하루입니다.")를 함께 구성해라.
-각 일정의 시간대(timeFrom, timeTo)는 겹치지 않고 시간 순서대로(예: 오전 09:00부터 순차적으로) 자연스럽게 흘러가도록 배치해라.
+[여행지 선정 규칙]:
+1. 사용자 요청이나 전체 여행 제목(planTitle)에 특정 도시나 지역이 이미 지정되어 있는 경우에는 반드시 해당 지정 지역을 바탕으로 일정을 작성해라.
+2. 사용자 요청 및 여행 제목에 구체적인 지명이나 도시가 전혀 언급되지 않은 경우에는 전 세계에서 독창적이고 매력적인 목적지를 AI가 스스로 무작위 선정하여 일정을 다채롭고 신선하게 창의적으로 생성해라.
+
+반드시 이 일정에 걸맞은 하루의 제목(dayName)과 하루 소개(dayDescription)를 함께 구성해라.
+각 일정의 시간대(timeFrom, timeTo)는 겹치지 않고 시간 순서대로 자연스럽게 흘러가도록 배치해라.
 날짜는 하루를 넘겨서는 안 되며, 00:00~23:59 사이에서 작성하라.
 모든 텍스트 필드는 어떠한 꾸밈 기호도 없는 "순수 텍스트(Plain Text)"로만 작성해야 한다.
 특수문자(*, _, #, ~, \`)를 절대 섞지 말고 한글과 숫자, 공백으로만 구성해라.

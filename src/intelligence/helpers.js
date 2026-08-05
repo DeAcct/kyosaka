@@ -128,7 +128,7 @@ export async function getLanguageModelSession(systemPrompt) {
   }
 
   const api = window.LanguageModel || window.ai.languageModel;
-  return await api.create({ systemPrompt, language: "en" });
+  return await api.create({ systemPrompt, language: "en", temperature: 1.0, topK: 10 });
 }
 
 export async function executeAIPrompt(systemPrompt, userPrompt, schema) {

@@ -84,6 +84,8 @@ a {
 input,
 textarea {
   background-color: transparent;
+  border: none;
+  outline: none;
 }
 a,
 button,
@@ -92,6 +94,7 @@ summary {
   border-radius: 0;
   background-color: transparent;
   cursor: default;
+  outline: none;
 }
 ul,
 li {

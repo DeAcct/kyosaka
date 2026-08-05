@@ -31,7 +31,7 @@ export async function generateScheduleFromPrompt(
       "\n위 기존 일정들의 동선과 시간 흐름을 고려하여 자연스럽게 이어지도록 새로운 일정을 생성해라. 시간이 겹치지 않게 조율해야 한다.";
   }
 
-  const systemPrompt = `너는 한국인을 위한 일본 여행 계획표 작성을 돕는 AI 어시스턴트이다.
+  const systemPrompt = `너는 한국인을 위한 여행 계획표 작성을 돕는 AI 어시스턴트이다.
 [필수 규칙]: 모든 문자열 필드(name, descriptionText, posName, posAddress 등)의 값은 반드시 한국어로만 작성해야 한다. 영어 장소명이 입력되어도 한국어 발음이나 한글 번역으로 변환하여 입력해라. (예: "Shibuya Station" -> "시부야역")
 
 사용자가 입력한 자연어를 분석하여 하루 일정에 맞는 데이터로 변환해라.

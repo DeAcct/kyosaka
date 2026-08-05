@@ -201,15 +201,20 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
         const plan = scheduleStore.plans.find(
           (p) => p.id === scheduleStore.state.selected,
         );
+        const planTitle = plan ? plan.title : "";
         const dayIndex = plan ? plan.selected : -1;
         const totalDays = plan ? plan.data.length : 0;
 
         const isFirstDay = dayIndex === 0;
         const isLastDay = dayIndex === totalDays - 1;
+        const currentDayData = plan && plan.data ? plan.data[dayIndex] : null;
+        const contextSchedules = currentDayData ? currentDayData.schedule : [];
 
         const stream = generateDayScheduleFromPrompt(promptText, {
           isFirstDay,
           isLastDay,
+          planTitle,
+          contextSchedules,
         });
 
         let finalResult = null;

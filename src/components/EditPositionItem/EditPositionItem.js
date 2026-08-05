@@ -30,7 +30,7 @@ export const EditPositionItem = define("edit-position-item", { mapping, raw })(
           key: "address",
           label: "주소",
           icon: "map",
-          placeholder: "예) 일본 〒163-8001 Tokyo, Shinjuku City",
+          placeholder: "예) 위치 주소 입력",
         },
         {
           key: "map",

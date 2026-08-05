@@ -1,10 +1,15 @@
-export const SUPPORTS_PROMPT_API =
-  typeof window !== "undefined" &&
-  ("LanguageModel" in window ||
-    ("ai" in window && "languageModel" in window.ai));
+export function isPromptAPISupported() {
+  return (
+    typeof window !== "undefined" &&
+    ("LanguageModel" in window ||
+      ("ai" in window && "languageModel" in window.ai))
+  );
+}
+
+export const SUPPORTS_PROMPT_API = typeof window !== "undefined";
 
 export async function checkPromptAPIAvailability() {
-  if (!SUPPORTS_PROMPT_API) return "no";
+  if (!isPromptAPISupported()) return "no";
 
   try {
     const api = window.LanguageModel || window.ai.languageModel;
@@ -21,7 +26,7 @@ export function hasGeminiApiKey() {
 }
 
 export async function getAIProvider() {
-  const isOnline = typeof navigator !== "undefined" ? navigator.onLine : true;
+  const isOnline = typeof navigator !== "undefined" ? Boolean(navigator.onLine) : true;
 
   if (isOnline && hasGeminiApiKey()) {
     return "remote-gemini";

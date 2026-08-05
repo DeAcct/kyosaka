@@ -1,17 +1,24 @@
 import Store from "@/lib/store";
 
+function getTodayDateString() {
+  return Temporal.Now.plainDateISO().toString();
+}
+
 const DEFAULT_SCHEDULE = {
   name: "공항버스",
   type: "transport",
   time: { from: "05:10", to: "07:10" },
   description: ["버스 탑승하기"],
 };
-const DEFAULT_DAY = {
-  name: "제목 없는 날",
-  day: "2000-01-01",
-  description: "즐거운 여행~",
-  schedule: [DEFAULT_SCHEDULE],
-};
+
+function createDefaultDay() {
+  return {
+    name: "제목 없는 날",
+    day: getTodayDateString(),
+    description: "즐거운 여행~",
+    schedule: [{ ...DEFAULT_SCHEDULE }],
+  };
+}
 
 class ScheduleStore extends Store {
   importPlan(data = {}) {
@@ -19,7 +26,7 @@ class ScheduleStore extends Store {
       id: crypto.randomUUID(),
       edited: Temporal.Now.plainDateTimeISO(),
       title: "제목 없는 여행",
-      data: [DEFAULT_DAY],
+      data: [createDefaultDay()],
       ...data,
       selected: 0,
     };
@@ -31,7 +38,7 @@ class ScheduleStore extends Store {
   overwritePlan(data) {
     const newItem = {
       title: "제목 없는 여행",
-      data: [DEFAULT_DAY],
+      data: [createDefaultDay()],
       ...data,
       edited: Temporal.Now.plainDateTimeISO(),
       selected: 0,
@@ -52,7 +59,6 @@ class ScheduleStore extends Store {
     return this.plans.find((p) => p.id === id) || null;
   }
   newPlan() {
-    // 인자 없이 호출하면 빈 객체({})가 들어가면서 기본값들로 채워짐
     this.importPlan();
   }
   editPlan(id, updatedData) {
@@ -65,7 +71,7 @@ class ScheduleStore extends Store {
         return {
           ...plan,
           edited: Temporal.Now.plainDateTimeISO(),
-          data: [...plan.data, ...updatedData], // 무조건 배열이므로 단순 병합
+          data: [...plan.data, ...updatedData],
         };
       }),
     );
@@ -76,12 +82,10 @@ class ScheduleStore extends Store {
       return -1;
     }
 
-    // 🎯 추가되기 전의 배열 길이가 새로 추가될 요소의 인덱스가 됨
     const newIndex = plan.data.length;
 
-    this.editPlan(id, [DEFAULT_DAY]);
+    this.editPlan(id, [createDefaultDay()]);
 
-    // 🎯 생성된 요소의 인덱스 반환
     return newIndex;
   }
 

@@ -47,12 +47,17 @@ export async function promptGemini(systemPrompt, userPrompt, jsonSchema = null) 
     body.systemInstruction = { parts: [{ text: systemPrompt }] };
   }
 
+  const generationConfig = {
+    temperature: 1.0,
+    topP: 0.95,
+  };
+
   if (jsonSchema) {
-    body.generationConfig = {
-      responseMimeType: "application/json",
-      responseSchema: convertJsonSchemaToGeminiSchema(jsonSchema),
-    };
+    generationConfig.responseMimeType = "application/json";
+    generationConfig.responseSchema = convertJsonSchemaToGeminiSchema(jsonSchema);
   }
+
+  body.generationConfig = generationConfig;
 
   const response = await fetch(url, {
     method: "POST",
@@ -86,12 +91,17 @@ export async function* promptStreamGemini(systemPrompt, userPrompt, jsonSchema =
     body.systemInstruction = { parts: [{ text: systemPrompt }] };
   }
 
+  const generationConfig = {
+    temperature: 1.0,
+    topP: 0.95,
+  };
+
   if (jsonSchema) {
-    body.generationConfig = {
-      responseMimeType: "application/json",
-      responseSchema: convertJsonSchemaToGeminiSchema(jsonSchema),
-    };
+    generationConfig.responseMimeType = "application/json";
+    generationConfig.responseSchema = convertJsonSchemaToGeminiSchema(jsonSchema);
   }
+
+  body.generationConfig = generationConfig;
 
   const response = await fetch(url, {
     method: "POST",
