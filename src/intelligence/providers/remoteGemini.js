@@ -37,8 +37,6 @@ export async function promptGemini(systemPrompt, userPrompt, jsonSchema = null) 
   const apiKey = import.meta.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("Gemini API Key가 설정되지 않았습니다.");
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-
   const body = {
     contents: [{ role: "user", parts: [{ text: userPrompt }] }],
   };
@@ -59,30 +57,41 @@ export async function promptGemini(systemPrompt, userPrompt, jsonSchema = null) 
 
   body.generationConfig = generationConfig;
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  const models = ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite"];
+  let lastError;
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Gemini API 오류 (${response.status}): ${errorText}`);
+  for (const model of models) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      if (response.status === 429) {
+        lastError = new Error(`Gemini API 오류 (${response.status}): ${errorText}`);
+        continue; // 다음 모델 시도
+      }
+      throw new Error(`Gemini API 오류 (${response.status}): ${errorText}`);
+    }
+
+    const data = await response.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error("Gemini API로부터 응답 텍스트를 수신하지 못했습니다.");
+
+    return text;
   }
 
-  const data = await response.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error("Gemini API로부터 응답 텍스트를 수신하지 못했습니다.");
-
-  return text;
+  throw lastError;
 }
 
 export async function* promptStreamGemini(systemPrompt, userPrompt, jsonSchema = null) {
   const apiKey = import.meta.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("Gemini API Key가 설정되지 않았습니다.");
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:streamGenerateContent?alt=sse&key=${apiKey}`;
-
   const body = {
     contents: [{ role: "user", parts: [{ text: userPrompt }] }],
   };
@@ -103,18 +112,37 @@ export async function* promptStreamGemini(systemPrompt, userPrompt, jsonSchema =
 
   body.generationConfig = generationConfig;
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  const models = ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite"];
+  let lastError;
+  let successResponse = null;
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Gemini API 스트리밍 오류 (${response.status}): ${errorText}`);
+  for (const model of models) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      if (response.status === 429) {
+        lastError = new Error(`Gemini API 스트리밍 오류 (${response.status}): ${errorText}`);
+        continue;
+      }
+      throw new Error(`Gemini API 스트리밍 오류 (${response.status}): ${errorText}`);
+    }
+
+    successResponse = response;
+    break;
   }
 
-  const reader = response.body.getReader();
+  if (!successResponse) {
+    throw lastError;
+  }
+
+  const reader = successResponse.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
 

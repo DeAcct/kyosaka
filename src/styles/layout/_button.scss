@@ -12,4 +12,7 @@
   &:active {
     scale: 0.8;
   }
+  &:focus-visible {
+    outline: none;
+  }
 }
