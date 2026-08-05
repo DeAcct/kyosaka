@@ -6,8 +6,7 @@ import raw from "./routeCard.module.scss?inline";
 export const RouteCard = define("route-card", { mapping, raw })(
   class extends Stateless {
     template() {
-      // const from = this.getAttribute("from");
-      // const to = this.getAttribute("to");
+      if (!this.from && !this.to) return html``;
       return html`
         <div class="${this.styles.routeCard}">
           <p class="${this.styles.point}">

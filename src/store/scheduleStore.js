@@ -301,6 +301,8 @@ class ScheduleStore extends Store {
           );
         }
 
+        updatedSchedule.sort((a, b) => a.time.from.localeCompare(b.time.from));
+
         const updatedData = plan.data.map((day, index) =>
           index === dayIndex ? { ...day, schedule: updatedSchedule } : day,
         );

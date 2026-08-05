@@ -25,8 +25,7 @@ import "@/components/PositionBox/PositionBox";
 import "@/components/Description/Description";
 import "@/components/Icon/Icon";
 
-const scheduleItemBlock = block(
-  (props) => html`
+const scheduleItemBlock = (props) => html`
     <details
       name="itinerary"
       class="${props.styles.schedule}"
@@ -67,14 +66,9 @@ const scheduleItemBlock = block(
               :to="${props.item.route.to}"
             ></route-card>`
           : ""}
-        ${props.item.position
-          ? props.item.position.map(
-              (location) =>
-                html`<position-box
-                  :data="${location}"
-                ></position-box>`,
-            )
-          : ""}
+        <ky-position-list
+          :list="${props.item.position || []}"
+        ></ky-position-list>
         <ky-description
           :list="${props.item.description || []}"
         ></ky-description>
@@ -82,8 +76,7 @@ const scheduleItemBlock = block(
 
       <div class="${props.styles.mask}"></div>
     </details>
-  `,
-);
+  `;
 
 export const Schedule = define("ky-schedule", { mapping, raw })(
   class extends Component {

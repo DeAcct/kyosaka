@@ -169,35 +169,17 @@ function patchArrayContent(parent, anchorNode, arrayData, values, component) {
 
   const endAnchor = current;
 
-  // 새로운 노드들을 메모리 상에 렌더링
-  const newNodes = [];
-  arrayData.forEach((item) => {
-    const rendered = renderValue(item, component);
-    if (rendered.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-      newNodes.push(...Array.from(rendered.childNodes));
-    } else {
-      newNodes.push(rendered);
-    }
+  // 기존 범용 DOM Diffing 경로에서는 속성/프로퍼티 갱신이 불가능하므로 (values 컨텍스트 분리),
+  // 기존 노드를 모두 삭제하고 새로 렌더링된 노드를 삽입합니다.
+  oldNodes.forEach(node => {
+    cleanupEventListeners(node);
+    node.remove();
   });
 
-  const maxLength = Math.max(oldNodes.length, newNodes.length);
-
-  for (let i = 0; i < maxLength; i++) {
-    const oldChild = oldNodes[i];
-    const newChild = newNodes[i];
-
-    if (!oldChild && newChild) {
-      // 새로운 노드 추가
-      parent.insertBefore(newChild, endAnchor);
-    } else if (oldChild && !newChild) {
-      // 남는 예전 노드 삭제
-      cleanupEventListeners(oldChild);
-      oldChild.remove();
-    } else if (oldChild && newChild) {
-      // 기존 노드 업데이트 (DOM 재사용)
-      patch(parent, newChild, oldChild, i, values, component);
-    }
-  }
+  arrayData.forEach((item) => {
+    const rendered = renderValue(item, component);
+    parent.insertBefore(rendered, endAnchor);
+  });
 }
 
 // lib/diff.js

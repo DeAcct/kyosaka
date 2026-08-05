@@ -37,9 +37,9 @@
     .button {
       @include button.ky-button;
       flex: 1 0 0;
-      background-color: var(--bg-300);
+      background-color: var(--bg-200);
       font-size: 1.6rem;
-      color: var(--bg-500);
+      color: var(--text-500);
       border-radius: calc(var(--card-radius-base) * 1.5 - 2rem);
       &.primary {
         background-color: var(--brand-500);

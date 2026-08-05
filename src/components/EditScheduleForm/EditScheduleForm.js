@@ -65,11 +65,45 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
             }))
           : [{ name: "", address: "", map: "" }];
 
+      let defaultTimeFrom = "09:00";
+      let defaultTimeTo = "10:00";
+
+      if (!item) {
+        const currentSchedules = scheduleStore.selectedDayList?.schedule || [];
+        if (currentSchedules.length > 0) {
+          const sortedSchedules = [...currentSchedules].sort((a, b) =>
+            a.time.to.localeCompare(b.time.to)
+          );
+          const lastSchedule = sortedSchedules[sortedSchedules.length - 1];
+          if (lastSchedule.time && lastSchedule.time.to) {
+            defaultTimeFrom = lastSchedule.time.to;
+
+            const [hours, minutes] = defaultTimeFrom.split(":").map(Number);
+            const nextHours = hours + 1;
+
+            if (nextHours >= 24) {
+              if (hours === 23 && minutes === 59) {
+                // If the last schedule ends at 23:59, we can't really add another one easily,
+                // but we will fallback to something reasonable.
+                defaultTimeFrom = "22:59";
+                defaultTimeTo = "23:59";
+              } else {
+                defaultTimeTo = "23:59";
+              }
+            } else {
+              defaultTimeTo = `${nextHours.toString().padStart(2, "0")}:${minutes
+                .toString()
+                .padStart(2, "0")}`;
+            }
+          }
+        }
+      }
+
       return {
         name: target.name || "",
         type: target.type || "transport",
-        timeFrom: target.time?.from || "09:00",
-        timeTo: target.time?.to || "10:00",
+        timeFrom: target.time?.from || defaultTimeFrom,
+        timeTo: target.time?.to || defaultTimeTo,
         budget: target.budget || 0,
         routeFrom: target.route?.from || "",
         routeTo: target.route?.to || "",
@@ -245,10 +279,32 @@ export const EditScheduleForm = define("edit-schedule-form", { mapping, raw })(
     }
 
     handleSave() {
-      const { name } = this.state;
+      const { name, timeFrom, timeTo } = this.state;
 
       if (!name.trim()) {
         toastStore.add("일정 이름을 입력해 주세요.", "error", 2000);
+        return;
+      }
+
+      if (timeFrom >= timeTo) {
+        toastStore.add("시작 시간은 종료 시간보다 앞서야 합니다.", "error", 2000);
+        return;
+      }
+
+      const currentSchedules = scheduleStore.selectedDayList?.schedule || [];
+      const editingIndex = scheduleStore.editingScheduleIndex;
+
+      const isOverlapping = currentSchedules.some((item, index) => {
+        if (index === editingIndex) return false;
+
+        const itemFrom = item.time.from;
+        const itemTo = item.time.to;
+
+        return timeFrom < itemTo && timeTo > itemFrom;
+      });
+
+      if (isOverlapping) {
+        toastStore.add("다른 일정과 겹치는 시간에는 저장할 수 없습니다.", "error", 2000);
         return;
       }
 

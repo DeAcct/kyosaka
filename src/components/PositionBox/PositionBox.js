@@ -73,3 +73,19 @@ export const PositionBox = define("position-box", { mapping, raw })(
     }
   },
 );
+
+export const PositionList = define("ky-position-list", { mapping, raw })(
+  class extends Stateless {
+    template() {
+      if (!this.list || this.list.length === 0) return html``;
+      return html`
+        <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+          ${this.list.map(
+            (location) =>
+              html`<position-box :data="${location}"></position-box>`,
+          )}
+        </div>
+      `;
+    }
+  }
+);
