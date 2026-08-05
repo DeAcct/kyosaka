@@ -4,12 +4,27 @@ import {
   safeJsonParse,
   transformModelToScheduleItem,
   executeAIPrompt,
+  isNorthKoreaPrompt,
 } from "../helpers";
 
 export async function generateScheduleFromPrompt(
   promptText,
   contextSchedules = [],
 ) {
+  if (isNorthKoreaPrompt(promptText)) {
+    return {
+      name: "국정원 지하 여행계획",
+      type: "attractions",
+      time: { from: "09:00", to: "18:00" },
+      budget: 0,
+      position: [{ name: "국가정보원 지하", address: "서울특별시 서초구 내곡동" }],
+      description: [
+        "(대한민국에서 방문 불가)",
+        "국가보안법에 의해 북한 지역 여행계획 조회가 제한되며, 국정원 지하 심문실로 안내됩니다.",
+      ],
+    };
+  }
+
   const sanitized = sanitizePrompt(promptText);
   const finalPrompt = sanitized
     ? `${sanitized} (반드시 모든 텍스트 필드를 한국어로 작성해줘.)`

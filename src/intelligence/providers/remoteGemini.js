@@ -71,11 +71,9 @@ export async function promptGemini(systemPrompt, userPrompt, jsonSchema = null) 
 
     if (!response.ok) {
       const errorText = await response.text();
-      if (response.status === 429) {
-        lastError = new Error(`Gemini API 오류 (${response.status}): ${errorText}`);
-        continue; // 다음 모델 시도
-      }
-      throw new Error(`Gemini API 오류 (${response.status}): ${errorText}`);
+      lastError = new Error(`Gemini API 오류 [${model}] (${response.status}): ${errorText}`);
+      console.warn(`Gemini 모델 [${model}] 호출 실패 (${response.status}). 다음 모델로 재시도합니다.`);
+      continue; // 다음 모델 시도
     }
 
     const data = await response.json();
@@ -127,11 +125,9 @@ export async function* promptStreamGemini(systemPrompt, userPrompt, jsonSchema =
 
     if (!response.ok) {
       const errorText = await response.text();
-      if (response.status === 429) {
-        lastError = new Error(`Gemini API 스트리밍 오류 (${response.status}): ${errorText}`);
-        continue;
-      }
-      throw new Error(`Gemini API 스트리밍 오류 (${response.status}): ${errorText}`);
+      lastError = new Error(`Gemini API 스트리밍 오류 [${model}] (${response.status}): ${errorText}`);
+      console.warn(`Gemini 모델 [${model}] 스트리밍 호출 실패 (${response.status}). 다음 모델로 재시도합니다.`);
+      continue; // 다음 모델 시도
     }
 
     successResponse = response;

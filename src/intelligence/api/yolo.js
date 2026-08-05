@@ -5,6 +5,7 @@ import {
   transformModelToScheduleItem,
   executeAIStreamPrompt,
   extractPartialSchedule,
+  isNorthKoreaPrompt,
 } from "../helpers";
 
 export async function* generateDayScheduleFromPrompt(promptText, options = {}) {
@@ -14,6 +15,71 @@ export async function* generateDayScheduleFromPrompt(promptText, options = {}) {
     planTitle = "",
     contextSchedules = [],
   } = options;
+
+  if (isNorthKoreaPrompt(promptText, planTitle)) {
+    yield {
+      dayName: "국가정보원 지하 안보 특별 체험",
+      dayDescription:
+        "북한 관련 검색이 감지되어 검은 승합차가 도착했습니다. 안심하세요, 안전한 정밀 안보 점검 코스입니다.",
+      schedules: [
+        {
+          name: "검은 승합차 탑승 및 긴급 이송",
+          type: "transport",
+          time: { from: "09:00", to: "10:00" },
+          budget: 0,
+          description:
+            "선글라스를 쓴 요원들의 안내를 받으며 안대 착용 후 내곡동으로 이동합니다.",
+          route: { from: "현재 위치", to: "국정원 지하 비밀 시설" },
+          position: null,
+        },
+        {
+          name: "절대시계 수령 및 안보 교육",
+          type: "attractions",
+          time: { from: "10:00", to: "12:00" },
+          budget: 0,
+          description:
+            "간첩 신고 포상 안내를 받고 전설의 국정원 절대시계(실물)를 정식 수령합니다.",
+          route: null,
+          position: [
+            {
+              name: "국가정보원 안보전시관",
+              address: "서울특별시 서초구 내곡동",
+              map: "",
+            },
+          ],
+        },
+        {
+          name: "국정원 지하 구내식당 안보 비빔밥",
+          type: "food",
+          time: { from: "12:00", to: "13:00" },
+          budget: 0,
+          description:
+            "요원들과 함께 싹싹 비벼 먹는 영양 만점의 비밀 구내식당 특선 메뉴입니다.",
+          route: null,
+          position: [
+            {
+              name: "내곡동 지하 구내식당",
+              address: "서울특별시 서초구 내곡동",
+              map: "",
+            },
+          ],
+        },
+        {
+          name: "비밀유지 서약서 작성 및 안전 귀가",
+          type: "transport",
+          time: { from: "13:00", to: "14:00" },
+          budget: 0,
+          description:
+            "오늘 일어난 일은 아무에게도 말하지 않겠다는 서약서를 작성한 뒤 안전하게 복귀합니다.",
+          route: { from: "국가정보원", to: "집" },
+          position: null,
+        },
+      ],
+      isDone: true,
+    };
+    return;
+  }
+
   const sanitized = sanitizePrompt(promptText);
 
   const sessionNonce = Math.random().toString(36).substring(7);
