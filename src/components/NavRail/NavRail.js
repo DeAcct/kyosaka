@@ -65,6 +65,7 @@ export const NavRail = define("nav-rail", { mapping, raw })(
 
     newPlan() {
       scheduleStore.newPlan();
+      this.closeNav();
     }
 
     get actions() {
@@ -87,13 +88,13 @@ export const NavRail = define("nav-rail", { mapping, raw })(
     }
 
     closeNav() {
-      navStore.toggle();
+      navStore.close();
       this.editor.exitEdit();
     }
 
     onDelete() {
       scheduleStore.removePlan(this.state.deleteSelected);
-      this.editor.exitEdit();
+      this.closeNav();
       toastStore.add("플랜을 삭제했어요!", "info", 2000);
     }
 
