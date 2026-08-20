@@ -39,15 +39,15 @@ const scheduleItemBlock = (props) => html`
       <span
         class="${props.styles.dragHandle}"
         role="button"
-        aria-label="일정 시간 교환"
-        title="여기를 드래그해 일정 시간을 교환"
+        aria-label="일정 순서 교체"
+        title="여기를 드래그해 일정 전체 순서를 교체"
         draggable="true"
         @pointerdown.stop
         @contextmenu.prevent.stop
         @dragstart="${props.onDragStart}"
         @dragend="${props.onDragEnd}"
       >
-        ⠿
+        <ky-icon name="drag_handle"></ky-icon>
       </span>
       <schedule-icon
         class="${props.styles.icon}"
@@ -217,7 +217,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
         : this.#draggedIndex;
 
       if (draggedIndex >= 0 && draggedIndex !== targetIndex) {
-        scheduleStore.swapScheduleTimes(draggedIndex, targetIndex);
+        scheduleStore.swapScheduleContents(draggedIndex, targetIndex);
         toastStore.add("일정 시간을 서로 바꿨어요!", "info", 1800);
       }
 

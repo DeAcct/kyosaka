@@ -320,7 +320,7 @@ class ScheduleStore extends Store {
     );
   }
 
-  swapScheduleTimes(firstIndex, secondIndex) {
+  swapScheduleContents(firstIndex, secondIndex) {
     const currentPlanId = this.state.selected;
     if (!currentPlanId || firstIndex === secondIndex) return;
 
@@ -346,13 +346,15 @@ class ScheduleStore extends Store {
 
         const firstTime = schedule[firstIndex].time;
         const secondTime = schedule[secondIndex].time;
-        const updatedSchedule = schedule.map((item, index) => {
-          if (index === firstIndex) return { ...item, time: secondTime };
-          if (index === secondIndex) return { ...item, time: firstTime };
-          return item;
-        });
-
-        updatedSchedule.sort((a, b) => a.time.from.localeCompare(b.time.from));
+        const updatedSchedule = [...schedule];
+        updatedSchedule[firstIndex] = {
+          ...schedule[secondIndex],
+          time: firstTime,
+        };
+        updatedSchedule[secondIndex] = {
+          ...schedule[firstIndex],
+          time: secondTime,
+        };
 
         return {
           ...plan,
