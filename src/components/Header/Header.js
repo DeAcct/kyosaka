@@ -1,6 +1,7 @@
 import { Component, define, html } from "@/lib/core";
 
 import "@/components/Icon/Icon";
+import "@/components/ContextMenu/ContextMenu";
 
 import mapping from "./header.module.scss";
 import raw from "./header.module.scss?inline";
@@ -21,22 +22,62 @@ export const Header = define("ky-header", { mapping, raw })(
       return [
         // 🔥 플랜이 정말 존재할 때만 수정 버튼 액션을 배열에 추가합니다.
         ...(hasPlan ? [{ icon: "edit", action: () => this.editTrip() }] : []),
-        { icon: "export", action: () => this.exportJSON() },
+        { icon: "export", action: () => this.openExportMenu() },
       ];
     }
 
-    exportJSON() {
+    getExportFile() {
       const plan = scheduleStore.selectedPlan;
       if (!plan || !plan.id) {
         toastStore.add("내보낼 계획표가 없습니다.", "error", 2000);
-        return;
+        return null;
       }
 
       const filename = `${plan.title || "trip"}.json`;
-      const blob = new Blob([JSON.stringify(plan, null, 2)], {
-        type: "application/json",
+      return {
+        plan,
+        file: new File([JSON.stringify(plan, null, 2)], filename, {
+          type: "application/json",
+        }),
+        filename,
+      };
+    }
+
+    openExportMenu() {
+      this.$refs.contextMenu.open({
+        title: "계획표 내보내기",
+        options: [
+          { text: "공유하기", icon: "share", action: () => this.shareJSON() },
+          { text: "저장하기", icon: "export", action: () => this.saveJSON() },
+        ],
       });
-      const url = URL.createObjectURL(blob);
+    }
+
+    shareJSON() {
+      const exportData = this.getExportFile();
+      if (!exportData) return;
+
+      const { file, plan } = exportData;
+      if (typeof navigator.share !== "function") {
+        toastStore.add("이 브라우저에서는 공유할 수 없어요.", "error", 2000);
+        return;
+      }
+
+      navigator
+        .share({ files: [file], title: `${plan.title || "계획표"} 공유` })
+        .catch((error) => {
+          if (error.name !== "AbortError") {
+            console.error("계획표 공유에 실패했습니다.", error);
+          }
+        });
+    }
+
+    saveJSON() {
+      const exportData = this.getExportFile();
+      if (!exportData) return;
+
+      const { file, filename } = exportData;
+      const url = URL.createObjectURL(file);
       const a = document.createElement("a");
       a.href = url;
       a.download = filename;
@@ -78,8 +119,8 @@ export const Header = define("ky-header", { mapping, raw })(
             `,
           )}
 
-          
         </header>
+        <context-menu $context-menu></context-menu>
       `;
     }
   },
