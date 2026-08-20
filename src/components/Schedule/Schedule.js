@@ -118,6 +118,13 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
     }
 
     handlePointerDown(e, item, index) {
+      // PC 마우스 클릭/드래그는 롱프레스로 처리하지 않고,
+      // 우클릭 context menu와 드래그 핸들만 사용합니다.
+      if (e.pointerType === "mouse") {
+        this.cancelLongPress();
+        return;
+      }
+
       this.#startPos = { x: e.clientX, y: e.clientY };
       if (this.#longPressTimer) clearTimeout(this.#longPressTimer);
 
