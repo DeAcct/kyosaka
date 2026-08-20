@@ -320,6 +320,51 @@ class ScheduleStore extends Store {
     );
   }
 
+  swapScheduleTimes(firstIndex, secondIndex) {
+    const currentPlanId = this.state.selected;
+    if (!currentPlanId || firstIndex === secondIndex) return;
+
+    this.commit("plans", (currentPlans) =>
+      currentPlans.map((plan) => {
+        if (plan.id !== currentPlanId) {
+          return plan;
+        }
+
+        const dayIndex = plan.selected;
+        const targetDay = plan.data[dayIndex];
+        const schedule = targetDay?.schedule || [];
+
+        if (
+          !targetDay ||
+          firstIndex < 0 ||
+          secondIndex < 0 ||
+          firstIndex >= schedule.length ||
+          secondIndex >= schedule.length
+        ) {
+          return plan;
+        }
+
+        const firstTime = schedule[firstIndex].time;
+        const secondTime = schedule[secondIndex].time;
+        const updatedSchedule = schedule.map((item, index) => {
+          if (index === firstIndex) return { ...item, time: secondTime };
+          if (index === secondIndex) return { ...item, time: firstTime };
+          return item;
+        });
+
+        updatedSchedule.sort((a, b) => a.time.from.localeCompare(b.time.from));
+
+        return {
+          ...plan,
+          data: plan.data.map((day, index) =>
+            index === dayIndex ? { ...day, schedule: updatedSchedule } : day,
+          ),
+          edited: Temporal.Now.plainDateTimeISO(),
+        };
+      }),
+    );
+  }
+
   setDaySchedule(scheduleList, dayName, dayDescription) {
     const currentPlanId = this.state.selected;
     if (!currentPlanId) return;

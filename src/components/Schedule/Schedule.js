@@ -27,6 +27,8 @@ const scheduleItemBlock = (props) => html`
     class="${props.styles.schedule}"
     $details
     style="--schedule-rows:${props.totalRows}; --i:${props.index};"
+    @dragover.prevent="${props.onDragOver}"
+    @drop.prevent="${props.onDrop}"
   >
     <summary
       class="${props.styles.shrink}"
@@ -34,6 +36,19 @@ const scheduleItemBlock = (props) => html`
       @contextmenu.prevent="${props.onContextMenu}"
       style="user-select: none; -webkit-user-select: none;"
     >
+      <span
+        class="${props.styles.dragHandle}"
+        role="button"
+        aria-label="일정 시간 교환"
+        title="여기를 드래그해 일정 시간을 교환"
+        draggable="true"
+        @pointerdown.stop
+        @contextmenu.prevent.stop
+        @dragstart="${props.onDragStart}"
+        @dragend="${props.onDragEnd}"
+      >
+        ⠿
+      </span>
       <schedule-icon
         class="${props.styles.icon}"
         name="${props.item.type}"
@@ -72,6 +87,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
   class extends Component {
     #longPressTimer = null;
     #startPos = { x: 0, y: 0 };
+    #draggedIndex = -1;
 
     state = {
       isYoloLoading: false,
@@ -172,6 +188,37 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
           },
         ],
       });
+    }
+
+    handleDragStart(e, index) {
+      this.cancelLongPress();
+      this.#draggedIndex = index;
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", String(index));
+    }
+
+    handleDragOver(e) {
+      if (this.#draggedIndex >= 0) {
+        e.dataTransfer.dropEffect = "move";
+      }
+    }
+
+    handleDrop(e, targetIndex) {
+      const sourceIndex = Number(e.dataTransfer.getData("text/plain"));
+      const draggedIndex = Number.isInteger(sourceIndex)
+        ? sourceIndex
+        : this.#draggedIndex;
+
+      if (draggedIndex >= 0 && draggedIndex !== targetIndex) {
+        scheduleStore.swapScheduleTimes(draggedIndex, targetIndex);
+        toastStore.add("일정 시간을 서로 바꿨어요!", "info", 1800);
+      }
+
+      this.#draggedIndex = -1;
+    }
+
+    handleDragEnd() {
+      this.#draggedIndex = -1;
     }
 
     handleYolo(e) {
@@ -293,6 +340,10 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
               styles: this.styles,
               onPointerDown: (e) => this.handlePointerDown(e, item, index),
               onContextMenu: () => this.handleContextMenu(item, index),
+              onDragStart: (e) => this.handleDragStart(e, index),
+              onDragEnd: () => this.handleDragEnd(),
+              onDragOver: (e) => this.handleDragOver(e),
+              onDrop: (e) => this.handleDrop(e, index),
             }),
           )}
           ${this.state.isYoloLoading
