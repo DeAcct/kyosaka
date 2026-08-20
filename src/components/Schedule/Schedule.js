@@ -1,4 +1,4 @@
-import { Component, define, html, block } from "@/lib/core";
+import { Component, define, html } from "@/lib/core";
 import { switcher } from "@/lib/switcher";
 import { scheduleStore } from "@/store/scheduleStore";
 import { toastStore } from "@/store/toastStore";
@@ -21,10 +21,33 @@ import "@/components/PositionBox/PositionBox";
 import "@/components/Description/Description";
 import "@/components/Icon/Icon";
 
+const findTargetIndex = (currentY, itemEls) => {
+  if (!itemEls || itemEls.length === 0) return -1;
+
+  let closestIndex = -1;
+  let minDistance = Infinity;
+
+  for (let i = 0; i < itemEls.length; i++) {
+    const headerEl = itemEls[i].querySelector("summary") || itemEls[i];
+    const rect = headerEl.getBoundingClientRect();
+    const itemIndex = Number(itemEls[i].dataset.index);
+    const centerY = rect.top + rect.height / 2;
+    const distance = Math.abs(currentY - centerY);
+
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestIndex = itemIndex;
+    }
+  }
+
+  return closestIndex;
+};
+
 const scheduleItemBlock = (props) => html`
   <details
     name="itinerary"
     class="${props.styles.schedule}"
+    data-index="${props.index}"
     $details
     style="--schedule-rows:${props.totalRows}; --i:${props.index};"
     @dragover.prevent="${props.onDragOver}"
@@ -42,8 +65,8 @@ const scheduleItemBlock = (props) => html`
         aria-label="일정 순서 교체"
         title="여기를 드래그해 일정 전체 순서를 교체"
         draggable="true"
-        @pointerdown.stop
         @contextmenu.prevent.stop
+        @pointerdown="${(e) => props.onHandlePointerDown(e)}"
         @dragstart="${props.onDragStart}"
         @dragend="${props.onDragEnd}"
       >
@@ -118,8 +141,6 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
     }
 
     handlePointerDown(e, item, index) {
-      // PC 마우스 클릭/드래그는 롱프레스로 처리하지 않고,
-      // 우클릭 context menu와 드래그 핸들만 사용합니다.
       if (e.pointerType === "mouse") {
         this.cancelLongPress();
         return;
@@ -211,13 +232,16 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
     }
 
     handleDrop(e, targetIndex) {
-      const sourceIndex = Number(e.dataTransfer.getData("text/plain"));
-      const draggedIndex = Number.isInteger(sourceIndex)
-        ? sourceIndex
-        : this.#draggedIndex;
+      e.preventDefault();
+      const rawData = e.dataTransfer.getData("text/plain");
+      const parsedIndex = rawData !== "" ? Number(rawData) : NaN;
+      const sourceIndex =
+        !Number.isNaN(parsedIndex) && parsedIndex >= 0
+          ? parsedIndex
+          : this.#draggedIndex;
 
-      if (draggedIndex >= 0 && draggedIndex !== targetIndex) {
-        scheduleStore.swapScheduleContents(draggedIndex, targetIndex);
+      if (sourceIndex >= 0 && targetIndex >= 0 && sourceIndex !== targetIndex) {
+        scheduleStore.swapScheduleContents(sourceIndex, targetIndex);
         toastStore.add("일정 시간을 서로 바꿨어요!", "info", 1800);
       }
 
@@ -226,6 +250,73 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
 
     handleDragEnd() {
       this.#draggedIndex = -1;
+    }
+
+    handleHandlePointerDown(e, index) {
+      if (e.cancelable) e.preventDefault();
+      e.stopPropagation();
+      this.cancelLongPress();
+
+      const shadow = this.shadowRoot;
+      const itemEls = Array.from(shadow.querySelectorAll("details[data-index]"));
+      const sourceItem = itemEls.find(
+        (el) => Number(el.dataset.index) === index,
+      );
+
+      if (sourceItem) {
+        sourceItem.classList.add(this.styles.touchDragging);
+      }
+
+      let currentTargetIndex = index;
+
+      const onPointerMove = (moveEv) => {
+        if (moveEv.cancelable) moveEv.preventDefault();
+        const currentY = moveEv.clientY;
+
+        if (currentY < 80) {
+          window.scrollBy(0, -8);
+        } else if (currentY > window.innerHeight - 80) {
+          window.scrollBy(0, 8);
+        }
+
+        const newTargetIndex = findTargetIndex(currentY, itemEls);
+
+        if (newTargetIndex >= 0 && newTargetIndex !== currentTargetIndex) {
+          currentTargetIndex = newTargetIndex;
+          itemEls.forEach((el) => {
+            const idx = Number(el.dataset.index);
+            if (idx === newTargetIndex && idx !== index) {
+              el.classList.add(this.styles.touchDragTarget);
+            } else {
+              el.classList.remove(this.styles.touchDragTarget);
+            }
+          });
+        }
+      };
+
+      const onPointerUp = () => {
+        window.removeEventListener("pointermove", onPointerMove);
+        window.removeEventListener("pointerup", onPointerUp);
+        window.removeEventListener("pointercancel", onPointerUp);
+
+        itemEls.forEach((el) => {
+          el.classList.remove(this.styles.touchDragging);
+          el.classList.remove(this.styles.touchDragTarget);
+        });
+
+        if (
+          index >= 0 &&
+          currentTargetIndex >= 0 &&
+          index !== currentTargetIndex
+        ) {
+          scheduleStore.swapScheduleContents(index, currentTargetIndex);
+          toastStore.add("일정 시간을 서로 바꿨어요!", "info", 1800);
+        }
+      };
+
+      window.addEventListener("pointermove", onPointerMove, { passive: false });
+      window.addEventListener("pointerup", onPointerUp, { once: true });
+      window.addEventListener("pointercancel", onPointerUp, { once: true });
     }
 
     handleYolo(e) {
@@ -347,6 +438,7 @@ export const Schedule = define("ky-schedule", { mapping, raw })(
               styles: this.styles,
               onPointerDown: (e) => this.handlePointerDown(e, item, index),
               onContextMenu: () => this.handleContextMenu(item, index),
+              onHandlePointerDown: (e) => this.handleHandlePointerDown(e, index),
               onDragStart: (e) => this.handleDragStart(e, index),
               onDragEnd: () => this.handleDragEnd(),
               onDragOver: (e) => this.handleDragOver(e),

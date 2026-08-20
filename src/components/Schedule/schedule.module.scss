@@ -62,6 +62,26 @@ swipe-wrap {
   background-color: var(--bg-200);
   @include layout.round-list("y");
 
+  &.touchDragging {
+    opacity: 0.6;
+    z-index: 10;
+
+    .shrink {
+      background-color: var(--bg-300);
+      transform: scale(0.98);
+    }
+  }
+
+  &.touchDragTarget {
+    z-index: 5;
+
+    .shrink {
+      outline: 0.2rem dashed var(--brand-500);
+      outline-offset: -0.2rem;
+      background-color: var(--bg-300);
+    }
+  }
+
   // 🎯 [핵심 교정]: 가장 기본적인 열림-닫힘 모션을 믹스인으로 완벽히 전수
   @include accordion.details-sliding-motion(
     $arrow-selector: ".arrow",
@@ -75,10 +95,11 @@ swipe-wrap {
   }
 
   .shrink {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 1.2rem;
-    padding: 1.6rem;
+    padding: 1.6rem 1.6rem 1.6rem 4.8rem;
     transition:
       opacity 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
       scale 150ms var(--ease-in-out-back) calc(30ms * var(--i)),
@@ -90,16 +111,21 @@ swipe-wrap {
     }
 
     .dragHandle {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 4.8rem;
       display: grid;
       place-items: center;
       flex-shrink: 0;
-      width: 1.6rem;
       color: var(--text-500);
       font-size: 2.4rem;
       line-height: 1;
       cursor: grab;
       touch-action: none;
       user-select: none;
+      z-index: 2;
 
       &:active {
         color: var(--brand-500);
